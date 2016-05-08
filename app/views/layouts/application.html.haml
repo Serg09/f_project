@@ -1,10 +1,30 @@
 !!!
-%html
+%html{:lang => "en"}
   %head
-    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title Fulfillment
-    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true
-    = javascript_include_tag 'application', 'data-turbolinks-track' => true
-    = csrf_meta_tags
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
+    / The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
+    %title Crowdscribed Fulfillment
+    =stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true
+    =javascript_include_tag 'application', 'data-turbolinks-track' => true
+    =csrf_meta_tags
   %body
-    = yield
+    =render 'shared/nav_bar'
+    -if content_for? :jumbotron
+      .jumbotron
+        .container
+          =yield :jumbotron
+    .container
+      =yield
+
+      %footer
+        %p © 2015 Company, Inc.
+
+    -#/ Placed at the end of the document so the pages load faster
+    -#%script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
+    -#:javascript
+    -#  window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+    -#%script{:src => "../../dist/js/bootstrap.min.js"}
+    -#/ IE10 viewport hack for Surface/desktop Windows 8 bug
+    -#%script{:src => "../../assets/js/ie10-viewport-bug-workaround.js"}
