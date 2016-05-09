@@ -28,6 +28,7 @@ gem 'twitter-bootstrap-rails'
 gem 'devise'
 gem 'pg'
 gem 'simple-navigation'
+gem 'puma'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
