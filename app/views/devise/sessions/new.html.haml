@@ -1,4 +1,6 @@
-%h2 Log in
+=content_for :page_title do
+  Sign in
+
 .row
   .col-md-6
     = form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
@@ -14,6 +16,6 @@
             = f.check_box :remember_me
             Remember me
       .actions
-        = f.submit "Log in", class: 'btn btn-primary', title: 'Click here to sign in.'
+        = f.submit "Sign in", class: 'btn btn-primary', title: 'Click here to sign in.'
   .col-md-6
     = render "devise/shared/links"

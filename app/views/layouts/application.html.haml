@@ -15,8 +15,12 @@
       -if content_for? :jumbotron
         .jumbotron
           =yield :jumbotron
+      -if content_for? :page_title
+        %h1#page-title
+          =yield :page_title
       =render 'shared/flash' if flash.any?
-      =yield
+      #main-content
+        =yield
 
       %footer
         %p © 2016 Crowdscribed, LLC
