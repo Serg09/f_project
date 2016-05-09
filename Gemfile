@@ -53,6 +53,8 @@ end
 
 group :test do
   gem 'sqlite3'
+  gem 'cucumber-rails', require: false
+  gem 'database_cleaner'
 end
 
 group :production do
