@@ -1,4 +1,3 @@
-@wip
 Feature: Sign in
   As a user,
   In order to access the site, 
