@@ -15,6 +15,7 @@
       -if content_for? :jumbotron
         .jumbotron
           =yield :jumbotron
+      =render 'shared/flash' if flash.any?
       =yield
 
       %footer

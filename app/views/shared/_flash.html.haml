@@ -1,0 +1,6 @@
+#notifications
+  -flash.each do |k, message|
+    .alert.alert-dismissible{ :class => flash_key_to_alert_class(k), :role => 'alert' }
+      %button.close{ :type => 'button', 'data-dismiss' => 'alert', 'aria-label' => 'Close' }
+        %span{ 'aria-hidden' => true } &times;
+      =message
