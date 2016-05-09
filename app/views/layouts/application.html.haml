@@ -11,11 +11,10 @@
     =csrf_meta_tags
   %body
     =render 'shared/nav_bar'
-    -if content_for? :jumbotron
-      .jumbotron
-        .container
+    .container.container-default
+      -if content_for? :jumbotron
+        .jumbotron
           =yield :jumbotron
-    .container
       =yield
 
       %footer
