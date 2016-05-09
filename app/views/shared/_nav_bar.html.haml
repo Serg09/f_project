@@ -8,6 +8,7 @@
         %span.icon-bar
       %a.navbar-brand{:href => "/"} Crowdscribed Fulfillment
     #navbar.navbar-collapse.collapse
+      =render_navigation renderer: :bootstrap_navigation_renderer, expand_all: true
       %form.navbar-form.navbar-right
         .form-group
           %input.form-control{:placeholder => "Email", :type => "text"}/
