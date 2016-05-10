@@ -127,4 +127,16 @@ RSpec.describe OrderItem, type: :model do
       expect(item).to have_at_least(1).error_on :tax
     end
   end
+
+  describe '#total' do
+    let(:item) do
+      FactoryGirl.create(:order_item, price: 20,
+                                      quantity: 2,
+                                      freight_charge: 2.50,
+                                      tax: 1.60)
+    end
+    it 'is the sum of #price * quantity, #freight_charge, and #tax' do
+      expect(item.total).to eq 44.10
+    end
+  end
 end

@@ -37,7 +37,23 @@ class OrderItem < ActiveRecord::Base
                              :freight_charge,
                              :tax], greater_than_or_equal_to: 0
 
+  before_validation :set_defaults
+
+  def total
+    return 0 unless quantity.present? && quantity > 0
+
+    ((price || 0) * quantity) +
+      (freight_charge || 0) +
+      (tax || 0)
+  end
+
   private
+
+  def set_defaults
+    self.discount_percentage = 0 unless discount_percentage
+    self.freight_charge = 0 unless freight_charge
+    self.tax = 0 unless tax
+  end
 
   def set_line_item_number
     self.line_item_no = order.items.count + 1

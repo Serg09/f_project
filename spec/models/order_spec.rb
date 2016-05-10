@@ -149,10 +149,46 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#order_date' do
+    it 'is required' do
+      order = Order.new attributes.except(:order_date)
+      expect(order).to have_at_least(1).error_on :order_date
+    end
+  end
+
   describe '#items' do
     it 'is a list of items in the order' do
       order = Order.new attributes
       expect(order).to have(0).items
+    end
+  end
+
+  describe '#total' do
+    let (:order) { FactoryGirl.create(:order) }
+    let!(:i1) do FactoryGirl.create(:order_item, order: order,
+                                                 quantity: 1,
+                                                 price: 20,
+                                                 freight_charge: 3,
+                                                 tax: 1.5)
+    end
+    let!(:i2) do FactoryGirl.create(:order_item, order: order,
+                                                 quantity: 1,
+                                                 price: 30,
+                                                 freight_charge: nil,
+                                                 tax: nil)
+    end
+
+    it 'is the sum of the line item totals' do
+      expect(order.total).to eq 54.50
+    end
+  end
+
+  describe '::by_order_date' do
+    let!(:o1) { FactoryGirl.create(:order, order_date: '2016-01-01') }
+    let!(:o2) { FactoryGirl.create(:order, order_date: '2016-02-01') }
+
+    it 'returns the order by order date descending' do
+      expect(Order.by_order_date.map(&:id)).to eq [o2.id, o1.id]
     end
   end
 end
