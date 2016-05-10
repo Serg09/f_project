@@ -1,0 +1,13 @@
+=content_for :page_title do
+  Orders
+
+%table#order-table.table.table-striped.table-hover
+  %tr
+    %th Order date
+    %th Customer name
+    %th Total
+  -@orders.each do |order|
+    %tr
+      %td not implemented
+      %td= order.customer_name
+      %td not implemented

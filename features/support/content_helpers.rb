@@ -5,7 +5,7 @@ module ContentHelpers
 
   def parse_table(html_table)
     rows = html_table.all('tr')
-    rows.map{|row| row.all('td|th').map{|c| c.text.strip}}
+    rows.map{|row| row.all('td,th').map{|c| c.text.strip}}
   end
 end
 World(ContentHelpers)
