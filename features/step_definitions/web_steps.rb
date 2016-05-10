@@ -19,3 +19,10 @@ end
 When /^I click "([^"]+)"$/ do |locator|
   click_on locator
 end
+
+Then /^I should see the following (.*) table$/ do |description, expected_table|
+  id = "##{description_to_id(description)}-table"
+  html_table = find(id)
+  actual_table = parse_table(html_table)
+  expected_table.diff! actual_table
+end

@@ -8,6 +8,7 @@ module NavigationHelpers
 
   def locator_for(location_description)
     case location_description
+    when "menu" then "#menu"
     when "navigation" then "#menu"
     when "notification area" then "#notifications"
     when "page title" then "#page-title"
