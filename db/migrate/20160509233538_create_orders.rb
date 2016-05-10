@@ -6,9 +6,9 @@ class CreateOrders < ActiveRecord::Migration
       t.string :address_2, limit: 50
       t.string :city, limit: 50
       t.string :state, limit: 2
-      t.string :postal_code, limit: 9
+      t.string :postal_code, limit: 10
       t.string :country_code, limit: 3
-      t.string :telephone, limit: 15
+      t.string :telephone, limit: 20
 
       t.timestamps null: false
     end
