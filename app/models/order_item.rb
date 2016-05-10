@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: order_items
+#
+#  id                  :integer          not null, primary key
+#  order_id            :integer          not null
+#  line_item_no        :integer          not null
+#  sku                 :string(30)       not null
+#  description         :string(50)
+#  quantity            :integer          not null
+#  price               :decimal(, )
+#  discount_percentage :decimal(, )
+#  freight_charge      :decimal(, )
+#  tax                 :decimal(, )
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#
+
 class OrderItem < ActiveRecord::Base
   belongs_to :order
 

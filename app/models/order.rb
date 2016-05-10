@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: orders
+#
+#  id            :integer          not null, primary key
+#  customer_name :string(50)       not null
+#  address_1     :string(50)       not null
+#  address_2     :string(50)
+#  city          :string(50)
+#  state         :string(2)
+#  postal_code   :string(10)
+#  country_code  :string(3)
+#  telephone     :string(25)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+
 class Order < ActiveRecord::Base
   has_many :items, class_name: 'OrderItem'
 
