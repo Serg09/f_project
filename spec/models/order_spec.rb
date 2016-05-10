@@ -138,13 +138,13 @@ RSpec.describe Order, type: :model do
       expect(order).to have_at_least(1).error_on :telephone
     end
 
-    it 'can be 20 characters' do
-      order = Order.new attributes.merge(telephone: 'x' * 20)
+    it 'can be 25 characters' do
+      order = Order.new attributes.merge(telephone: 'x' * 25)
       expect(order).to be_valid
     end
 
-    it 'cannot be more than 15characters' do
-      order = Order.new attributes.merge(telephone: 'x' * 21)
+    it 'cannot be more than 25 characters' do
+      order = Order.new attributes.merge(telephone: 'x' * 26)
       expect(order).to have_at_least(1).error_on :telephone
     end
   end

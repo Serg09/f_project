@@ -14,5 +14,5 @@ class Order < ActiveRecord::Base
   validates_length_of :state, is: 2
   validates_length_of :postal_code, maximum: 10
   validates_length_of :country_code, minimum: 2, maximum: 3
-  validates_length_of :telephone, maximum: 20
+  validates_length_of :telephone, maximum: 25
 end
