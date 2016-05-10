@@ -1,0 +1,37 @@
+# == Schema Information
+#
+# Table name: orders
+#
+#  id            :integer          not null, primary key
+#  customer_name :string(50)       not null
+#  address_1     :string(50)       not null
+#  address_2     :string(50)
+#  city          :string(50)
+#  state         :string(2)
+#  postal_code   :string(10)
+#  country_code  :string(3)
+#  telephone     :string(25)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+
+class Order < ActiveRecord::Base
+  has_many :items, class_name: 'OrderItem'
+
+  validates_presence_of :customer_name,
+                        :address_1,
+                        :city,
+                        :state,
+                        :postal_code,
+                        :country_code,
+                        :telephone
+  validates_length_of [:customer_name,
+                       :address_1,
+                       :address_2,
+                       :city],
+                       maximum: 50
+  validates_length_of :state, is: 2
+  validates_length_of :postal_code, maximum: 10
+  validates_length_of :country_code, minimum: 2, maximum: 3
+  validates_length_of :telephone, maximum: 25
+end
