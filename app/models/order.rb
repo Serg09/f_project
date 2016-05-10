@@ -1,4 +1,6 @@
 class Order < ActiveRecord::Base
+  has_many :items, class_name: 'OrderItem'
+
   validates_presence_of :customer_name,
                         :address_1,
                         :city,

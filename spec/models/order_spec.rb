@@ -148,4 +148,11 @@ RSpec.describe Order, type: :model do
       expect(order).to have_at_least(1).error_on :telephone
     end
   end
+
+  describe '#items' do
+    it 'is a list of items in the order' do
+      order = Order.new attributes
+      expect(order).to have(0).items
+    end
+  end
 end
