@@ -13,6 +13,7 @@
 #  telephone     :string(25)
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
+#  order_date    :date             not null
 #
 
 class Order < ActiveRecord::Base
