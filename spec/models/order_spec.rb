@@ -183,12 +183,33 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#batch' do
+    let (:batch) { FactoryGirl.create(:batch) }
+    let (:order) { FactoryGirl.create(:order, batch: batch) }
+
+    it 'is a reference to the batch to which the order belongs' do
+      expect(order.batch).to eq batch
+    end
+  end
+
   describe '::by_order_date' do
     let!(:o1) { FactoryGirl.create(:order, order_date: '2016-01-01') }
     let!(:o2) { FactoryGirl.create(:order, order_date: '2016-02-01') }
 
     it 'returns the order by order date descending' do
       expect(Order.by_order_date.map(&:id)).to eq [o2.id, o1.id]
+    end
+  end
+
+  describe '::unbatched' do
+    let (:batch) { FactoryGirl.create(:batch) }
+    let!(:o1) { FactoryGirl.create(:order, batch: batch) }
+    let!(:o2) { FactoryGirl.create(:order) }
+    let!(:o3) { FactoryGirl.create(:order, batch: batch) }
+    let!(:o4) { FactoryGirl.create(:order) }
+
+    it 'returns a list of orders that have not been assigned to a batch' do
+      expect(Order.unbatched.map(&:id)).to contain_exactly o2.id, o4.id
     end
   end
 end
