@@ -19,6 +19,7 @@ class Order < ActiveRecord::Base
   has_many :items, class_name: 'OrderItem'
 
   validates_presence_of :customer_name,
+                        :order_date,
                         :address_1,
                         :city,
                         :state,
@@ -34,4 +35,10 @@ class Order < ActiveRecord::Base
   validates_length_of :postal_code, maximum: 10
   validates_length_of :country_code, minimum: 2, maximum: 3
   validates_length_of :telephone, maximum: 25
+
+  scope :by_order_date, ->{order('order_date desc')}
+
+  def total
+    items.reduce(0){|sum, i| sum + i.total}
+  end
 end

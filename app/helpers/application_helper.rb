@@ -8,6 +8,10 @@ module ApplicationHelper
     "alert-#{FLASH_MAP[flash_key] || flash_key}"
   end
 
+  def format_date(value)
+    value.strftime '%-m/%-d/%Y'
+  end
+
   def show_nav_bar_sign_in_form?
     !(user_signed_in? || request_uri.path == new_user_session_path)
   end

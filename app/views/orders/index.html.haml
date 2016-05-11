@@ -1,0 +1,14 @@
+=content_for :page_title do
+  Orders
+
+%table#order-table.table.table-striped.table-hover
+  %tr
+    %th Order date
+    %th Customer name
+    %th Total
+  -@orders.each do |order|
+    %tr
+      %td= format_date(order.order_date)
+      %td= order.customer_name
+      %td= number_to_currency(order.total)
+=will_paginate @orders, renderer: BootstrapPagination::Rails
