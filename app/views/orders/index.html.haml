@@ -11,3 +11,4 @@
       %td= format_date(order.order_date)
       %td= order.customer_name
       %td= number_to_currency(order.total)
+=will_paginate @orders, renderer: BootstrapPagination::Rails
