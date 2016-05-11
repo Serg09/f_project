@@ -8,6 +8,6 @@
     %th Total
   -@orders.each do |order|
     %tr
-      %td not implemented
+      %td= format_date(order.order_date)
       %td= order.customer_name
-      %td not implemented
+      %td= number_to_currency(order.total)
