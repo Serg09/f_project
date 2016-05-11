@@ -28,10 +28,10 @@ describe LsiBatchWriter do
   let (:expected_output_path) do
     path = Rails.root.join('spec', 'fixtures', 'files', 'lsi_batch_writer_expected_output.txt')
   end
+  let (:writer) { LsiBatchWriter.new(batch) }
 
   describe '#write' do
     it 'writes the batch content to the specified IO object' do
-      writer = LsiBatchWriter.new(batch)
       io = StringIO.new
       writer.write io
 
@@ -41,6 +41,36 @@ describe LsiBatchWriter do
           expect(io.readline).to eq l
         end
       end
+    end
+  end
+
+  describe '#alpha_of_length' do
+    it 'right-pads the value with blank spaces if it is shorter than the specified length' do
+      expect(writer.alpha_of_length("test", 6)).to eq "test  "
+    end
+
+    it 'truncates the value if it is longer than the specified length' do
+      expect(writer.alpha_of_length("thisistoolong", 4)).to eq "this"
+    end
+
+    it 'returns the value as-if if it is extactly the specified length' do
+      expect(writer.alpha_of_length("justright", 9)).to eq "justright"
+    end
+  end
+
+  describe '#number_of_length' do
+    it 'returns a string' do
+      expect(writer.number_of_length(10, 2)).to be_a String
+    end
+
+    it 'left-pads the value with zeros if it is shorter than the specified length' do
+      expect(writer.number_of_length(1, 5)).to eq "00001"
+    end
+
+    it 'raises and exception if the value is longer than the specified length' do
+      expect do
+        writer.number_of_length(100, 2)
+      end.to raise_error ArgumentError, "The value 100 is longer than the specified length 2"
     end
   end
 end
