@@ -61,6 +61,7 @@ group :test do
   gem 'sqlite3'
   gem 'cucumber-rails', require: false
   gem 'database_cleaner'
+  gem 'timecop'
 end
 
 group :production do
