@@ -1,5 +1,8 @@
 FactoryGirl.define do
   factory :order do
+    transient do
+      item_count 0
+    end
     order_date { Faker::Date.backward(5) }
     customer_name { Faker::Name.name }
     address_1 { Faker::Address.street_address }
@@ -9,5 +12,11 @@ FactoryGirl.define do
     postal_code { Faker::Address.postcode }
     country_code { Faker::Address.country_code }
     telephone { Faker::PhoneNumber.phone_number }
+
+    after(:create) do |order, evaluator|
+      (0..(evaluator.item_count)).each do |i|
+        order.items << FactoryGirl.create(:order_item, order: order)
+      end
+    end
   end
 end
