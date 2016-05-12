@@ -1,4 +1,8 @@
 class LsiBatchWriter
+  class << self
+    attr_accessor :client_id
+  end
+
   def initialize(batch)
     @batch = batch
   end
@@ -14,11 +18,6 @@ class LsiBatchWriter
     else
       value.slice(0, length)
     end
-  end
-
-  def client_id
-    # TODO Read from some configuration
-    3
   end
 
   # Left-pads the value up to the specified
@@ -37,6 +36,36 @@ class LsiBatchWriter
   def write(io)
     raise 'Batch has no orders' unless @batch.orders.any?
 
-    io.puts "$$HDR#{@lient_id}"
+    write_batch_header(io)
+    @batch.orders.each{|o| write_order(io, o)}
+  end
+
+  private
+
+  def write_batch_header(io)
+    io.print "$$HDR"
+    io.print number_of_length(LsiBatchWriter.client_id, 6)
+    io.print number_of_length(@batch.id, 10)
+    io.print @batch.created_at.strftime('%Y%m%d')
+    io.print @batch.created_at.strftime('%H%M%S')
+    io.puts ""
+  end
+
+  def write_order(io, order)
+    write_order_header(io, order)
+    write_order_address(io, order)
+    order.items.each{|i| write_order_item(io, i)}
+  end
+
+  def write_order_header(io, order)
+    io.print 'H1'
+    io.print number_of_length(order.id, 15)
+    io.print order.order_date.strftime('%Y%m%d')
+  end
+
+  def write_order_address(io, order)
+  end
+
+  def write_order_item(io, item)
   end
 end

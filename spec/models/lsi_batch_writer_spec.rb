@@ -3,17 +3,18 @@ require 'rails_helper'
 describe LsiBatchWriter do
   let (:batch) { FactoryGirl.create(:batch) }
   let (:order) do
-    FactoryGirl.create(:order, order_date: '2016-03-02',
-                               customer_name: 'John Doe',
-                               address_1: '1234 Main St',
-                               address_2: 'Apt 227',
-                               city: 'Dallas',
-                               state: 'TX',
-                               postal_code: '75200',
-                               country_code: 'USA',
-                               telephone: '214-555-1212',
-                               batch: batch,
-                               created_at: '2016-03-02 12:30:42 CST')
+    Timecop.freeze(DateTime.parse('2016-03-02 06:30:42 CST')) do
+      FactoryGirl.create(:order, order_date: '2016-02-27',
+                                 customer_name: 'John Doe',
+                                 address_1: '1234 Main St',
+                                 address_2: 'Apt 227',
+                                 city: 'Dallas',
+                                 state: 'TX',
+                                 postal_code: '75200',
+                                 country_code: 'USA',
+                                 telephone: '214-555-1212',
+                                 batch: batch)
+    end
   end
   let!(:item) do
     FactoryGirl.create(:order_item, order: order,

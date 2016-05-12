@@ -1,5 +1,5 @@
 $$HDR654321000000000120160302123042
-H1UNIQUEPONUMBER120011126                              C ORDNUMBER0000000000000000          USPS1P    Net 60 Days                   000000000000000000000000000000000000000000000000000000000                                    B Y 20160302USDRON
-H2UNIQUEPONUMBER1ST                         CUSTOMER NAME                                     1234 MAIN ST                                      APT 227                                           LINE 3                                                                                              DALLAS                        TX75200    USA2145551234          
-H3UNIQUEPONUMBER1Other items are being shipped separately.                             PKG
-D1UNIQUEPONUMBER1                         1               0123456789                                                                              1                            1999      2000        500       200       199      
+H100000000000000120160227                              C ORDNUMBER0000000000000000          USPS1P    Net 60 Days                   000000000000000000000000000000000000000000000000000000000                                    B Y 20160302USDRON
+H2000000000000001ST                         CUSTOMER NAME                                     1234 MAIN ST                                      APT 227                                           LINE 3                                                                                              DALLAS                        TX75200    USA2145551234          
+H3000000000000001Other items are being shipped separately.                             PKG
+D1000000000000001                         1               0123456789                                                                              1                            1999      2000        500       200       199      
