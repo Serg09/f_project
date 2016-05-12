@@ -1,7 +1,4 @@
 class LsiBatchWriter
-  class << self
-    attr_accessor :client_id
-  end
   SHIP_METHODS = {
     US:
     {
@@ -86,7 +83,7 @@ class LsiBatchWriter
 
   def write_batch_header(io)
     io.print "$$HDR"
-    io.print number_of_length(LsiBatchWriter.client_id, 6)
+    io.print number_of_length(LSI_CLIENT_ID, 6)
     io.print number_of_length(@batch.id, 10)
     io.print @batch.created_at.strftime('%Y%m%d')
     io.print @batch.created_at.strftime('%H%M%S')

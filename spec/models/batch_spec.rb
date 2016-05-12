@@ -38,40 +38,57 @@ RSpec.describe Batch, type: :model do
   end
 
   describe '::batch_orders' do
-    let (:existing_batch) { FactoryGirl.create(:batch) }
-    let!(:batched_order) { FactoryGirl.create(:order, batch: existing_batch) }
+    context 'when unbatched orders are present' do
+      let (:existing_batch) { FactoryGirl.create(:batch) }
+      let!(:batched_order) { FactoryGirl.create(:order, batch: existing_batch) }
 
-    let!(:o1) { FactoryGirl.create(:order, item_count: 1) }
+      let!(:o1) { FactoryGirl.create(:order, item_count: 1) }
 
-    it 'creates a new batch' do
-      expect do
-        Batch.batch_orders
-      end.to change(Batch, :count).by(1)
+      it 'creates a new batch' do
+        expect do
+          Batch.batch_orders
+        end.to change(Batch, :count).by(1)
+      end
+
+      it 'returns the new batch' do
+        batch = Batch.batch_orders
+        expect(batch).not_to be_nil
+        expect(batch).to be_a Batch
+      end
+
+      it 'adds unbatched orders to the batch' do
+        batch = Batch.batch_orders
+        expect(batch.orders.map(&:id)).to contain_exactly o1.id
+      end
+
+      it 'updates the batched orders' do
+        expect do
+          Batch.batch_orders
+          o1.reload
+        end.to change(o1, :batch_id).from(nil).to(Fixnum)
+      end
+
+      it 'does not change orders already batched' do
+        expect do
+          Batch.batch_orders
+          batched_order.reload
+        end.not_to change(batched_order, :batch_id)
+      end
     end
 
-    it 'returns the new batch' do
-      batch = Batch.batch_orders
-      expect(batch).not_to be_nil
-      expect(batch).to be_a Batch
-    end
+    context 'when no unbatched orders are present' do
+      let (:batch) { FactoryGirl.create(:batch) }
+      let!(:order) { FactoryGirl.create(:order, batch: batch) }
 
-    it 'adds unbatched orders to the batch' do
-      batch = Batch.batch_orders
-      expect(batch.orders.map(&:id)).to contain_exactly o1.id
-    end
+      it 'returns nil' do
+        expect(Batch.batch_orders).to be_nil
+      end
 
-    it 'updates the batched orders' do
-      expect do
-        Batch.batch_orders
-        o1.reload
-      end.to change(o1, :batch_id).from(nil).to(Fixnum)
-    end
-
-    it 'does not change orders already batched' do
-      expect do
-        Batch.batch_orders
-        batched_order.reload
-      end.not_to change(batched_order, :batch_id)
+      it 'does not create a batch record' do
+        expect do
+          Batch.batch_orders
+        end.not_to change(Batch, :count)
+      end
     end
   end
 end

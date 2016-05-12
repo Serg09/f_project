@@ -40,5 +40,7 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 end
-
-LsiBatchWriter.client_id = 654321
+LSI_CLIENT_ID = 654321
+LSI_FTP_URL = 'ftp://localhost/'
+LSI_USERNAME = 'jdoe'
+LSI_PASSWORD = 'please'
