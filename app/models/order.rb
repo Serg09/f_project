@@ -17,6 +17,7 @@
 
 class Order < ActiveRecord::Base
   has_many :items, class_name: 'OrderItem'
+  belongs_to :batch
 
   validates_presence_of :customer_name,
                         :order_date,
@@ -37,6 +38,7 @@ class Order < ActiveRecord::Base
   validates_length_of :telephone, maximum: 25
 
   scope :by_order_date, ->{order('order_date desc')}
+  scope :unbatched, ->{where(batch_id: nil)}
 
   def total
     items.reduce(0){|sum, i| sum + i.total}
