@@ -36,4 +36,42 @@ RSpec.describe Batch, type: :model do
       expect(batch).to have(0).orders
     end
   end
+
+  describe '::batch_orders' do
+    let (:existing_batch) { FactoryGirl.create(:batch) }
+    let!(:batched_order) { FactoryGirl.create(:order, batch: existing_batch) }
+
+    let!(:o1) { FactoryGirl.create(:order, item_count: 1) }
+
+    it 'creates a new batch' do
+      expect do
+        Batch.batch_orders
+      end.to change(Batch, :count).by(1)
+    end
+
+    it 'returns the new batch' do
+      batch = Batch.batch_orders
+      expect(batch).not_to be_nil
+      expect(batch).to be_a Batch
+    end
+
+    it 'adds unbatched orders to the batch' do
+      batch = Batch.batch_orders
+      expect(batch.orders.map(&:id)).to contain_exactly o1.id
+    end
+
+    it 'updates the batched orders' do
+      expect do
+        Batch.batch_orders
+        o1.reload
+      end.to change(o1, :batch_id).from(nil).to(Fixnum)
+    end
+
+    it 'does not change orders already batched' do
+      expect do
+        Batch.batch_orders
+        batched_order.reload
+      end.not_to change(batched_order, :batch_id)
+    end
+  end
 end

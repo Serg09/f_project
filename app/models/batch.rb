@@ -12,4 +12,10 @@ class Batch < ActiveRecord::Base
   has_many :orders
 
   validates_inclusion_of :status, in: STATUSES
+
+  def self.batch_orders
+    batch = Batch.create!
+    Order.unbatched.each{|o| batch.orders << o}
+    batch
+  end
 end
