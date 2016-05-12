@@ -14,7 +14,7 @@ FactoryGirl.define do
     telephone { Faker::PhoneNumber.phone_number }
 
     after(:create) do |order, evaluator|
-      (0..(evaluator.item_count)).each do |i|
+      (1..(evaluator.item_count)).each do |i|
         order.items << FactoryGirl.create(:order_item, order: order)
       end
     end
