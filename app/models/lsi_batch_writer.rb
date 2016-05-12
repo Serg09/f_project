@@ -96,6 +96,7 @@ class LsiBatchWriter
   def write_order(io, order)
     write_order_header(io, order)
     write_order_address(io, order)
+    write_order_comments(io, order)
     order.items.each{|i| write_order_item(io, i)}
   end
 
@@ -125,7 +126,7 @@ class LsiBatchWriter
   end
 
   def write_order_address(io, order)
-    io.print 'H2'
+    io.print 'H2'     # record type
     io.print purchase_order_number(order) # Purchase order number
     io.print 'ST'     # Address type, ST = Ship to, RT = Return to, CS = Consolidator
     io.print ' ' * 25 # Internal use only
@@ -146,6 +147,54 @@ class LsiBatchWriter
     io.puts ''
   end
 
+  def write_order_comments(io, order)
+    # may implement this later if needed
+  end
+
   def write_order_item(io, item)
+    io.print 'D1'     # record type
+    io.print purchase_order_number(item.order)       # purchase order number
+    io.print ' ' * 25 # Customer PO number
+    io.print number_of_length(item.line_item_no, 5)  # line item number
+    io.print ' ' * 3  # Internal use only
+    io.print ' ' * 8  # Internal use only
+
+    isbn = item.sku.gsub(/[^0-9a-z]/i, '').upcase
+    if isbn.length <= 10                             # Title (ISBN) 10-digit
+      io.print alpha_of_length(isbn, 10) 
+    else
+      io.print ' ' * 10
+    end
+
+    io.print ' ' * 78 # Internal use only
+    io.print number_of_length(item.quantity, 7)      # quantity
+    io.print ' ' * 21 # Internal use only
+    io.print ' '      # Internal use only
+    io.print ' ' * 9  # price
+    io.print ' '      # Internal use only
+    io.print ' ' * 5  # Discount percentage
+    io.print ' ' * 7  # Internal use only
+    io.print number_of_length((item.freight_charge * 100).to_i, 9)  # freight amount
+    io.print ' '      # Internal use only
+    io.print number_of_length((item.tax * 100).to_i, 9)             # tax amount
+    io.print ' '      # Internal use only
+    io.print ' ' * 9  # Handling amount
+
+    if isbn.length == 13  # Title ISBN 13-digit
+      io.print isbn
+    else
+      io.print ' ' * 13
+    end
+
+    io.print ' ' * 7  # Internal use only
+
+    if isbn.length == 14  # Title prefixed ISGN 13 / VTIN
+      io.print isbn
+    else
+      io.print ' ' * 14
+    end
+
+    io.print ' ' * 6  # Internal use only
+    io.puts ''
   end
 end

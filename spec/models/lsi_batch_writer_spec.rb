@@ -19,7 +19,7 @@ describe LsiBatchWriter do
   let!(:item) do
     FactoryGirl.create(:order_item, order: order,
                                     line_item_no: 1,
-                                    sku: 'ABC123',
+                                    sku: '325253259-X',
                                     quantity: 1,
                                     price: 19.99,
                                     discount_percentage: 0.10,
