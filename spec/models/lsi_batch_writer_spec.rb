@@ -46,16 +46,16 @@ describe LsiBatchWriter do
   end
 
   describe '#alpha_of_length' do
-    it 'right-pads the value with blank spaces if it is shorter than the specified length' do
-      expect(writer.alpha_of_length("test", 6)).to eq "test  "
+    it 'up-cases and right-pads the value with blank spaces if it is shorter than the specified length' do
+      expect(writer.alpha_of_length("test", 6)).to eq "TEST  "
     end
 
     it 'truncates the value if it is longer than the specified length' do
-      expect(writer.alpha_of_length("thisistoolong", 4)).to eq "this"
+      expect(writer.alpha_of_length("thisistoolong", 4)).to eq "THIS"
     end
 
     it 'returns the value as-if if it is extactly the specified length' do
-      expect(writer.alpha_of_length("justright", 9)).to eq "justright"
+      expect(writer.alpha_of_length("justright", 9)).to eq "JUSTRIGHT"
     end
   end
 

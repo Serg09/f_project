@@ -49,11 +49,12 @@ class LsiBatchWriter
   # values to the specified length if the
   # values is longer
   def alpha_of_length(value, length)
-    return value if value.length == length
-    if value.length < length
-      "#{value}#{" " * (length - value.length)}"
+    result = value.upcase
+    return result if result.length == length
+    if result.length < length
+      "#{result}#{" " * (length - result.length)}"
     else
-      value.slice(0, length)
+      result.slice(0, length)
     end
   end
 
@@ -79,6 +80,10 @@ class LsiBatchWriter
 
   private
 
+  def purchase_order_number(order)
+    alpha_of_length('%09d' % order.id, 15)
+  end
+
   def write_batch_header(io)
     io.print "$$HDR"
     io.print number_of_length(LsiBatchWriter.client_id, 6)
@@ -96,7 +101,7 @@ class LsiBatchWriter
 
   def write_order_header(io, order)
     io.print 'H1'     # record type
-    io.print alpha_of_length('%09d' % order.id, 15) # Purchase order number
+    io.print purchase_order_number(order) # Purchase order number
     io.print order.order_date.strftime('%Y%m%d')    # Order date
     io.print ' ' * 30 # Ref # TODO find out what this is
     io.print 'C'      # Order type
@@ -120,6 +125,25 @@ class LsiBatchWriter
   end
 
   def write_order_address(io, order)
+    io.print 'H2'
+    io.print purchase_order_number(order) # Purchase order number
+    io.print 'ST'     # Address type, ST = Ship to, RT = Return to, CS = Consolidator
+    io.print ' ' * 25 # Internal use only
+    io.print alpha_of_length(order.customer_name, 35)
+    io.print ' ' * 15 # Internal use only
+    io.print alpha_of_length(order.address_1, 35) # address line 1
+    io.print ' ' * 15 # Internal use only
+    io.print alpha_of_length(order.address_2, 35) # address line 2
+    io.print ' ' * 15 # Internal use only
+    io.print ' ' * 35 # address line 3
+    io.print ' ' * 65 # Internal use only
+    io.print alpha_of_length(order.city, 30)        # city
+    io.print alpha_of_length(order.state, 2)        # state
+    io.print alpha_of_length(order.postal_code, 9)  # postal code
+    io.print alpha_of_length(order.country_code, 3) # country code
+    io.print alpha_of_length(order.telephone.gsub(/\D/, ''), 15)   # phone number
+    io.print ' ' * 5  # Internal use only
+    io.puts ''
   end
 
   def write_order_item(io, item)
