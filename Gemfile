@@ -28,6 +28,8 @@ gem 'pg'
 gem 'simple-navigation'
 gem 'puma'
 gem 'will_paginate-bootstrap'
+gem 'resque'
+gem 'resque-scheduler'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -45,6 +47,7 @@ group :development, :test do
   gem 'rspec-collection_matchers'
   gem 'factory_girl_rails'
   gem 'faker'
+  gem 'foreman'
 end
 
 group :development do
