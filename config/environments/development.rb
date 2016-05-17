@@ -40,3 +40,6 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 end
+
+REMOTE_FILE_PROVIDER = RemoteFileProvider::Nil.new
+LSI_CLIENT_ID = 654321

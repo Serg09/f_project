@@ -1,5 +1,3 @@
-require 'net/ftp'
-
 class ExportProcessor
   @queue = :normal
 
@@ -33,9 +31,6 @@ class ExportProcessor
   end
 
   def self.send_file(file)
-    Net::FTP.open(LSI_FTP_URL, LSI_USERNAME, LSI_PASSWORD) do |ftp|
-      ftp.chdir('incoming')
-      ftp.puttextfile(file, remote_file_name)
-    end
+    REMOTE_FILE_PROVIDER.send_file(file, remote_file_name, 'incoming')
   end
 end
