@@ -41,4 +41,5 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 end
 
-LsiBatchWriter.client_id = 654321
+REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('ftp://localhost/', 'jdoe', 'please01')
+LSI_CLIENT_ID = 654321

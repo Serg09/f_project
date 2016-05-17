@@ -1,0 +1,3 @@
+ExportProcessor:
+  cron: "0 * * * *"
+  queue: normal
