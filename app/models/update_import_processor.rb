@@ -17,7 +17,11 @@ class UpdateImportProcessor
 
   def self.process_record(record)
     order = Order.find(record[:order_id])
-    order.acknowledge
+    if record[:errors].present?
+      order.reject
+    else
+      order.acknowledge
+    end
   rescue => e
     Rails.logger.error "Unable to process POA record #{record.inspect} #{e.class.name} - #{e.message}\n  #{e.backtrace.join("\n  ")}"
   end

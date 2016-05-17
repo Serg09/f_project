@@ -20,6 +20,7 @@ FactoryGirl.define do
     end
 
     factory :exported_order do
+      status 'exported'
     end
   end
 end

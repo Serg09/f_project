@@ -20,6 +20,7 @@ describe UpdateImportProcessor do
       it 'updates the status of the order to "processing"' do
         expect do
           UpdateImportProcessor.perform
+          order1.reload
         end.to change(order1, :status).from('exported').to('processing')
       end
     end
@@ -28,7 +29,8 @@ describe UpdateImportProcessor do
       it 'updates the status of the order to "error"' do
         expect do
           UpdateImportProcessor.perform
-        end.to change(order2, :status).from('exported').to('error')
+          order2.reload
+        end.to change(order2, :status).from('exported').to('rejected')
       end
     end
 

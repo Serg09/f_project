@@ -41,6 +41,15 @@ class Order < ActiveRecord::Base
   scope :by_order_date, ->{order('order_date desc')}
   scope :unbatched, ->{where(batch_id: nil)}
 
+  state_machine :status, initial: :new do
+    event :acknowledge do
+      transition exported: :processing
+    end
+    event :reject do
+      transition exported: :rejected
+    end
+  end
+
   def total
     items.reduce(0){|sum, i| sum + i.total}
   end
