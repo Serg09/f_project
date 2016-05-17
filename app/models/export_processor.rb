@@ -19,7 +19,7 @@ class ExportProcessor
   private
 
   def self.create_batch_file(batch)
-    writer = LsiBatchWriter.new(batch)
+    writer = Lsi::BatchWriter.new(batch)
     file = StringIO.new
     writer.write file
     file.rewind

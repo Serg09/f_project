@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe LsiBatchWriter do
+describe Lsi::BatchWriter do
   let (:batch) do
     Timecop.freeze(DateTime.parse('2016-03-02 06:30:42 CST')) do
       FactoryGirl.create(:batch, orders: [order])
@@ -30,7 +30,7 @@ describe LsiBatchWriter do
   let (:expected_output_path) do
     path = Rails.root.join('spec', 'fixtures', 'files', 'lsi_batch_writer_expected_output.txt')
   end
-  let (:writer) { LsiBatchWriter.new(batch) }
+  let (:writer) { Lsi::BatchWriter.new(batch) }
 
   describe '#write' do
     it 'writes the batch content to the specified IO object' do
