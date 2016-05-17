@@ -18,5 +18,8 @@ FactoryGirl.define do
         order.items << FactoryGirl.create(:order_item, order: order)
       end
     end
+
+    factory :exported_order do
+    end
   end
 end
