@@ -43,7 +43,11 @@ describe UpdateImportProcessor do
     end
 
     #TODO Decide if we need to do this
-    it 'saves the file content to the database'
+    it 'saves the file content to the database' do
+      expect do
+        UpdateImportProcessor.perform
+      end.to change(Document, :count).by(1)
+    end
 
     it 'deletes the remote file' do
       expect(ftp).to receive(:delete).with(remote_filename)

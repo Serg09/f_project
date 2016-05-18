@@ -22,7 +22,7 @@ module RemoteFileProvider
       Net::FTP.open(@url, @username, @password) do |ftp|
         ftp.chdir(directory) if directory
         ftp.list.each do |filename|
-          if yield ftp.gettextfile(filename)
+          if yield ftp.gettextfile(filename), filename
             ftp.delete filename
           end
         end
