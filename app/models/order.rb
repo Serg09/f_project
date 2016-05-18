@@ -17,6 +17,8 @@
 #
 
 class Order < ActiveRecord::Base
+  include AASM
+
   has_many :items, class_name: 'OrderItem'
   belongs_to :batch
 
@@ -41,17 +43,18 @@ class Order < ActiveRecord::Base
   scope :by_order_date, ->{order('order_date desc')}
   scope :unbatched, ->{where(batch_id: nil)}
 
-  state_machine :status, initial: :new do
+  aasm(:status, whiny_transitions: false) do
+    state :new, initial: true
+    state :exported, :processing, :shipped, :rejected
     event :export do
-      transition new: :exported
+      transitions from: :new, to: :exported
     end
     event :acknowledge do
-      transition exported: :processing
+      transitions from: :exported, to: :processing
     end
     event :reject do
-      transition exported: :rejected
+      transitions from: :exported, to: :rejected
     end
-    state :new, :exported, :processing, :rejected, :shipped
   end
 
   def total
