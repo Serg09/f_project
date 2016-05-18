@@ -42,12 +42,16 @@ class Order < ActiveRecord::Base
   scope :unbatched, ->{where(batch_id: nil)}
 
   state_machine :status, initial: :new do
+    event :export do
+      transition new: :exported
+    end
     event :acknowledge do
       transition exported: :processing
     end
     event :reject do
       transition exported: :rejected
     end
+    state :new, :exported, :processing, :rejected, :shipped
   end
 
   def total

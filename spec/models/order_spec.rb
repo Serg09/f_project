@@ -192,6 +192,24 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#export' do
+    let (:order) { FactoryGirl.create(:order) }
+    it 'changes the status to "exported"' do
+      expect do
+        order.export
+      end.to change(order, :status).from('new').to('exported')
+    end
+  end
+
+  describe '#acknowledge' do
+    let (:order) { FactoryGirl.create(:exported_order) }
+    it 'changes the status to "processing"' do
+      expect do
+        order.acknowledge
+      end.to change(order, :status).from('exported').to('processing')
+    end
+  end
+
   describe '::by_order_date' do
     let!(:o1) { FactoryGirl.create(:order, order_date: '2016-01-01') }
     let!(:o2) { FactoryGirl.create(:order, order_date: '2016-02-01') }
