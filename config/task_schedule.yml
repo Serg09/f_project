@@ -1,3 +1,7 @@
 ExportProcessor:
   cron: "0 * * * *"
   queue: normal
+
+UpdateImportProcessor:
+  cron: "30 * * * *"
+  queue: normal

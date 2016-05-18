@@ -30,6 +30,7 @@ gem 'puma'
 gem 'will_paginate-bootstrap'
 gem 'resque'
 gem 'resque-scheduler'
+gem 'aasm'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

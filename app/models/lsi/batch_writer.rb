@@ -1,4 +1,4 @@
-class LsiBatchWriter
+class Lsi::BatchWriter
   SHIP_METHODS = {
     US:
     {

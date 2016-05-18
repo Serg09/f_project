@@ -14,9 +14,14 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  order_date    :date             not null
+#  batch_id      :integer
+#  status        :string(30)       default("new"), not null
+#  error         :text
 #
 
 class Order < ActiveRecord::Base
+  include AASM
+
   has_many :items, class_name: 'OrderItem'
   belongs_to :batch
 
@@ -40,6 +45,20 @@ class Order < ActiveRecord::Base
 
   scope :by_order_date, ->{order('order_date desc')}
   scope :unbatched, ->{where(batch_id: nil)}
+
+  aasm(:status, whiny_transitions: false) do
+    state :new, initial: true
+    state :exported, :processing, :shipped, :rejected
+    event :export do
+      transitions from: :new, to: :exported
+    end
+    event :acknowledge do
+      transitions from: :exported, to: :processing
+    end
+    event :reject do
+      transitions from: :exported, to: :rejected
+    end
+  end
 
   def total
     items.reduce(0){|sum, i| sum + i.total}
