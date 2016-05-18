@@ -44,6 +44,7 @@ class Order < ActiveRecord::Base
   validates_length_of :telephone, maximum: 25
 
   scope :by_order_date, ->{order('order_date desc')}
+  scope :by_status, ->(status){where(status: status)}
   scope :unbatched, ->{where(batch_id: nil)}
 
   aasm(:status, whiny_transitions: false) do
