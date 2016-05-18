@@ -2,10 +2,15 @@ class UpdateImportProcessor
   @queue = :normal
 
   def self.perform
+    Rails.logger.debug "start UpdateImportProcessor::perform"
+
     REMOTE_FILE_PROVIDER.get_and_delete_files('outgoing') do |file, filename|
+      Rails.logger.info "importing file #{filename}"
       Document.create source: 'lsi', filename: filename, content: file
       process_file file
     end
+
+    Rails.logger.debug "end UpdateImportProcessor::perform"
   end
 
   private
@@ -19,6 +24,9 @@ class UpdateImportProcessor
   end
 
   def self.process_record(record)
+
+    Rails.logger.info "processing order #{record[:order_id]}"
+
     order = Order.find(record[:order_id])
     if record[:errors].present?
       order.error = record[:errors].join("\n")

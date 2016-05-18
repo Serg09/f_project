@@ -1,19 +1,28 @@
 class ExportProcessor
   @queue = :normal
 
-  def self.perform
-    Rails.logger.info "start ExportProcessor::perform"
+  def self.perform(options = {})
+    Rails.logger.debug "start ExportProcessor::perform"
 
-    batch = Batch.batch_orders
-    if batch
-      file = create_batch_file(batch)
-      send_file(file)
-      batch.update_attribute :status, Batch.DELIVERED
+    batches = if options['retry']
+                Batch.by_status('new')
+              else
+                [Batch.batch_orders].compact
+              end
+    if batches.any?
+      batches.each do |batch|
+        file = create_batch_file(batch)
+        send_file(file)
+        batch.update_attribute :status, Batch.DELIVERED
+        batch.orders.each{|o| o.export!}
+      end
     else
-      Rails.logger.info "end ExportProcessor::perfom - no orders to export"
+      Rails.logger.info "No orders to export"
     end
+
+    Rails.logger.debug "end ExportProcessor::perform"
   rescue => e
-    Rails.logger.error "Unable to complete the export. batch=#{batch.try(:inspect)} error: #{e.class.name} : #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    Rails.logger.error "Unable to complete the export. batches=#{batches.inspect} error: #{e.class.name} : #{e.message}\n  #{e.backtrace.join("\n  ")}"
   end
 
   private

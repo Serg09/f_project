@@ -9,7 +9,7 @@
 #
 
 class Batch < ActiveRecord::Base
-  STATUSES = %w(new delivered acknowledged)
+  STATUSES = %w(new delivered)
 
   class << self
     STATUSES.each do |status|
@@ -22,6 +22,8 @@ class Batch < ActiveRecord::Base
   has_many :orders
 
   validates_inclusion_of :status, in: STATUSES
+
+  scope :by_status, ->(status){where(status: status)}
 
   def self.batch_orders
     return nil unless Order.unbatched.any?

@@ -91,4 +91,13 @@ RSpec.describe Batch, type: :model do
       end
     end
   end
+
+  describe '::by_status' do
+    let!(:new_batch) { FactoryGirl.create(:new_batch) }
+    let!(:delivered_batch) { FactoryGirl.create(:delivered_batch) }
+
+    it 'returns the batches having the specified status' do
+      expect(Batch.by_status('new').map(&:id)).to eq [new_batch.id]
+    end
+  end
 end
