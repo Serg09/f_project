@@ -34,6 +34,12 @@ describe UpdateImportProcessor do
           order2.reload
         end.to change(order2, :status).from('exported').to('rejected')
       end
+
+      it 'updates the errors attribute of the order' do
+        UpdateImportProcessor.perform
+        order2.reload
+        expect(order2.error).to eq 'Unrecognized ISBN'
+      end
     end
 
     #TODO Decide if we need to do this

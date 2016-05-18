@@ -18,6 +18,7 @@ class UpdateImportProcessor
   def self.process_record(record)
     order = Order.find(record[:order_id])
     if record[:errors].present?
+      order.error = record[:errors].join("\n")
       order.reject!
     else
       order.acknowledge!
