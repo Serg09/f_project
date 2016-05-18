@@ -9,7 +9,7 @@
       %a.navbar-brand{:href => "/"} Crowdscribed Fulfillment
     #navbar.navbar-collapse.collapse
       #menu
-        =render_navigation renderer: :bootstrap_navigation_renderer, expand_all: true
+        =render_navigation level: 1
       -if show_nav_bar_sign_in_form?
         %form.navbar-form.navbar-right
           .form-group
