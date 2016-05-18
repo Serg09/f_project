@@ -1,4 +1,6 @@
 class UpdateImportProcessor
+  @queue = :normal
+
   def self.perform
     REMOTE_FILE_PROVIDER.get_and_delete_files('outgoing') do |file, filename|
       Document.create source: 'lsi', filename: filename, content: file
