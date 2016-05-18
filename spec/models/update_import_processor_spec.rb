@@ -3,10 +3,12 @@ require 'rails_helper'
 describe UpdateImportProcessor do
   let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'lsi_purchase_order_acknowledgment.txt')) }
   let (:remote_filename) { 'M030112304.PPR' }
-  let (:ftp) { double('ftp') }
+
   let (:order1) { FactoryGirl.create(:exported_order) }
   let (:order2) { FactoryGirl.create(:exported_order) }
   let!(:batch) { FactoryGirl.create(:batch, orders: [order1, order2]) }
+
+  let (:ftp) { double('ftp') }
   before(:each) do
     expect(Net::FTP).to receive(:open).and_yield ftp
     expect(ftp).to receive(:chdir).with('outgoing')
