@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: batches
+#
+#  id         :integer          not null, primary key
+#  status     :string           default("new"), not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class Batch < ActiveRecord::Base
   STATUSES = %w(new delivered acknowledged)
 

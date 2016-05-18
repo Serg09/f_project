@@ -14,6 +14,9 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  order_date    :date             not null
+#  batch_id      :integer
+#  status        :string(30)       default("new"), not null
+#  error         :text
 #
 
 class Order < ActiveRecord::Base
