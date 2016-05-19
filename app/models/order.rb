@@ -64,4 +64,10 @@ class Order < ActiveRecord::Base
   def total
     items.reduce(0){|sum, i| sum + i.total}
   end
+
+  def <<(sku)
+    item = items.create!(sku: sku,
+                         quantity: 1,
+                         price: 0)
+  end
 end

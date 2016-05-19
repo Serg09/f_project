@@ -210,6 +210,24 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#<<' do
+    let (:order) { FactoryGirl.create(:new_order) }
+    let (:sku) { '1234567890123' }
+
+    it 'adds a item to the order' do
+      expect do
+        order << sku
+      end.to change(order.items, :count).by(1)
+    end
+
+    it 'returns the new item' do
+      item = order << sku
+      expect(item).to be_a OrderItem
+      expect(item.sku).to eq sku
+      expect(item.quantity).to eq 1
+    end
+  end
+
   describe '::by_order_date' do
     let!(:o1) { FactoryGirl.create(:order, order_date: '2016-01-01') }
     let!(:o2) { FactoryGirl.create(:order, order_date: '2016-02-01') }
