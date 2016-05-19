@@ -52,4 +52,13 @@ class Lsi::PoaReader < Lsi::FixedWidthReader
   add_line_def('D1', ITEM_RECORD)
   add_line_def('D2', ITEM_ERROR)
   add_line_def('$$EOF', BATCH_FOOTER)
+
+  protected
+
+  def process_data(data)
+    actual_line_count = line_count - 1 # exclude the header
+    if data[:header] == '$$EOF' && actual_line_count != data[:record_count]
+      Rails.logger.warn "The actual record count (#{actual_line_count}) does not match the reported record count (#{data[:record_count]})"
+    end
+  end
 end

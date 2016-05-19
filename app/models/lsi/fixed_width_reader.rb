@@ -49,24 +49,35 @@ class Lsi::FixedWidthReader
     }
   end
 
+  attr_accessor :line_count
+
   def initialize(content)
     @content = content
   end
 
   def read
+    self.line_count = 0
     result = []
     @content.each_line do |line|
       column_defs = get_column_defs(line)
       if column_defs
-        hash = parse_line(line, column_defs)
-        yield hash if block_given?
-        result << hash
+        data = parse_line(line, column_defs)
+        process_data(data)
+        yield data if block_given?
+        result << data
+      else
+        Rails.logger.warn "Unable to parse line #{line_count + 1}: #{line}"
       end
+      self.line_count += 1
     end
     result
   end
 
   protected
+
+  def process_data(data)
+    # This can be overridden to pre-process or report on the results
+  end
 
   def get_column_defs(line)
     line_def = @@line_defs.lazy.select do |line_def|
