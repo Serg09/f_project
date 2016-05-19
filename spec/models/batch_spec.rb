@@ -18,12 +18,6 @@ RSpec.describe Batch, type: :model do
       expect(batch).to be_valid
     end
 
-    it 'can be changed to "acknowledged"' do
-      batch = Batch.create!
-      batch.status = Batch.ACKNOWLEDGED
-      expect(batch).to be_valid
-    end
-
     it 'cannot be anything other than "delivered", "acknowledged", or "new"' do
       batch = Batch.new status: 'somethingelse'
       expect(batch).to have_at_least(1).error_on :status
