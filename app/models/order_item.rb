@@ -17,6 +17,8 @@
 #
 
 class OrderItem < ActiveRecord::Base
+  include AASM
+
   belongs_to :order
 
   before_create :set_line_item_number
@@ -38,6 +40,37 @@ class OrderItem < ActiveRecord::Base
                              :tax], greater_than_or_equal_to: 0
 
   before_validation :set_defaults
+
+  aasm(:status, whiny_transitions: false) do
+    state :new, initial: true
+    state :processing, :partially_shipped, :shipped, :rejected, :back_ordered, :cancelled
+
+    event :acknowledge do
+      transitions from: :new, to: :processing
+    end
+
+    event :ship_part do
+      transitions from: :processing, to: :partially_shipped
+    end
+
+    event :ship do
+      transitions from: [:processing, :partially_shipped], to: :shipped
+    end
+
+    event :reject do
+      before{ self.accepted_quantity = 0 }
+      transitions from: :new, to: :rejected
+    end
+
+    event :cancel do
+      before{ self.accepted_quantity = 0 }
+      transitions from: :new, to: :cancelled
+    end
+
+    event :back_order do
+      transitions from: :new, to: :back_ordered
+    end
+  end
 
   def total
     return 0 unless quantity.present? && quantity > 0

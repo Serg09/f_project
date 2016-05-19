@@ -66,8 +66,8 @@ class Order < ActiveRecord::Base
   end
 
   def <<(sku)
-    item = items.create!(sku: sku,
-                         quantity: 1,
-                         price: 0)
+    items.create!(sku: sku,
+                  quantity: 1,
+                  price: 0)
   end
 end

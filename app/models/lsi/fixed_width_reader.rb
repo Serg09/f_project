@@ -91,9 +91,11 @@ class Lsi::FixedWidthReader
     result = {}
     start = 0
     column_defs.each do |column_def|
-      raw_value = line.slice(start, column_def.length).strip
-      transformed_value = column_def.transform.call(raw_value)
-      result[column_def.name] = transformed_value
+      raw_value = line.slice(start, column_def.length)
+      if raw_value.present?
+        transformed_value = column_def.transform.call(raw_value.strip)
+        result[column_def.name] = transformed_value
+      end
       start += column_def.length
     end
     result
