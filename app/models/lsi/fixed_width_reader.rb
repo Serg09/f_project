@@ -1,10 +1,42 @@
 class Lsi::FixedWidthReader
   class ColumnDef
+    TRANSFORMERS = {
+      integer:   ->(v){v.to_i},
+      date:      ->(v){parse_date(v)},
+      date_time: ->(v){parse_date_time(v)}
+    }
+
     attr_accessor :name, :length, :transform
+
     def initialize(name, length, transform = nil)
       self.name = name
       self.length = length
-      self.transform = transform || ->(v){v}
+      if transform.is_a? Symbol
+        self.transform = TRANSFORMERS[transform]
+      else
+        self.transform = transform || ->(v){v}
+      end
+    end
+
+    private
+
+    def self.parse_date(string_date)
+      Date.new(
+        string_date[0..3].to_i,
+        string_date[4..5].to_i,
+        string_date[6..7].to_i
+      )
+    end
+
+    def self.parse_date_time(string_date_time)
+      DateTime.new(
+        string_date_time[0..3].to_i,
+        string_date_time[4..5].to_i,
+        string_date_time[6..7].to_i,
+        string_date_time[8..9].to_i,
+        string_date_time[10..11].to_i,
+        string_date_time[12..13].to_i
+      )
     end
   end
 
@@ -22,25 +54,14 @@ class Lsi::FixedWidthReader
   end
 
   def read
-    current_record = {}
     result = []
     @content.each_line do |line|
-      column_defs, new_record = get_column_defs(line)
+      column_defs = get_column_defs(line)
       if column_defs
         hash = parse_line(line, column_defs)
-        if new_record
-          unless current_record.empty?
-            result << current_record
-            yield current_record if block_given?
-            current_record = {}
-          end
-        end
-        process_line(current_record, hash)
+        yield hash if block_given?
+        result << hash
       end
-    end
-    unless current_record.empty?
-      result << current_record
-      yield current_record if block_given?
     end
     result
   end
@@ -51,19 +72,7 @@ class Lsi::FixedWidthReader
     line_def = @@line_defs.lazy.select do |line_def|
       line.starts_with?(line_def[:start])
     end.first
-    line_def ? [line_def[:column_defs], line_def[:new_record_marker]] : nil
-  end
-
-  def process_line(current_record, data)
-    raise 'must implemented process_line(current_record, data)'
-  end
-
-  def self.parse_date(string_date)
-    Date.new(
-      string_date[0..3].to_i,
-      string_date[4..5].to_i,
-      string_date[6..7].to_i
-    )
+    line_def ? line_def[:column_defs] : nil
   end
 
   # Reads a line containing fixed-width columns of data
