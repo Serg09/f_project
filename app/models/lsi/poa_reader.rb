@@ -1,16 +1,16 @@
 # Reads purchase order acknowledgment files from LSI
 class Lsi::PoaReader < Lsi::FixedWidthReader
   ORDER_RECORD = [
-    ColumnDef.new(:header,    2, ->(v){v}),
-    ColumnDef.new(:batch_id, 10, ->(v){v.to_i}),
-    ColumnDef.new(:order_id, 15, ->(v){v.to_i}),
+    ColumnDef.new(:header,     2),
+    ColumnDef.new(:batch_id,  10, ->(v){v.to_i}),
+    ColumnDef.new(:order_id,  15, ->(v){v.to_i}),
     ColumnDef.new(:order_date, 8, ->(v){parse_date(v)})
   ]
   ERROR_RECORD = [
-    ColumnDef.new(:header,    2, ->(v){v}),
+    ColumnDef.new(:header,    2),
     ColumnDef.new(:batch_id, 10, ->(v){v.to_i}),
     ColumnDef.new(:order_id, 15, ->(v){v.to_i}),
-    ColumnDef.new(:error,    40, ->(v){v})
+    ColumnDef.new(:error,    40)
   ]
 
   add_line_def('H1', ORDER_RECORD, true)

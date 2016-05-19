@@ -1,5 +1,12 @@
 class Lsi::FixedWidthReader
-  ColumnDef = Struct.new(:name, :length, :transform)
+  class ColumnDef
+    attr_accessor :name, :length, :transform
+    def initialize(name, length, transform = nil)
+      self.name = name
+      self.length = length
+      self.transform = transform || ->(v){v}
+    end
+  end
 
   @@line_defs = []
   def self.add_line_def(start, column_defs, new_record_marker = false)
