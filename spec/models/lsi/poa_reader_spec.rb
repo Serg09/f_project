@@ -8,4 +8,8 @@ describe Lsi::PoaReader do
     reader = Lsi::PoaReader.new(content)
     expect(reader.read).to have(7).items
   end
+
+  it 'warns if the number of recrds read does not match the batch footer'
+  it 'updates referenced orders'
+  it 'updates referenced line items'
 end
