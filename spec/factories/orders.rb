@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :order do
+  factory :order, aliases: [:new_order] do
     transient do
       item_count 0
     end

@@ -1,11 +1,14 @@
 require 'rails_helper'
 
 describe UpdateImportProcessor do
-  let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'lsi_purchase_order_acknowledgment.txt')) }
+  let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'lsi_purchase_order_acknowledgment_sample.txt')) }
   let (:remote_filename) { 'M030112304.PPR' }
 
   let (:order1) { FactoryGirl.create(:exported_order) }
+  let!(:item1_1) { order1 << '1234567890' }
   let (:order2) { FactoryGirl.create(:exported_order) }
+  let!(:item2_1) { order2 << '1234567890' }
+  let!(:item2_2) { order2 << '123456987X' }
   let!(:batch) { FactoryGirl.create(:batch, orders: [order1, order2]) }
 
   let (:ftp) { double('ftp') }
@@ -25,10 +28,17 @@ describe UpdateImportProcessor do
           order1.reload
         end.to change(order1, :status).from('exported').to('processing')
       end
+
+      it 'updates the status of the line items to "processing"' do
+        expect do
+          UpdateImportProcessor.perform
+          item1_1.reload
+        end.to change(item1_1, :status).from('new').to('processing')
+      end
     end
 
-    context 'for records with errors' do
-      it 'updates the status of the order to "error"' do
+    context 'for order error records' do
+      it 'updates the status of the order to "rejected"' do
         expect do
           UpdateImportProcessor.perform
           order2.reload
@@ -39,6 +49,15 @@ describe UpdateImportProcessor do
         UpdateImportProcessor.perform
         order2.reload
         expect(order2.error).to eq 'Unrecognized ISBN'
+      end
+    end
+
+    context 'for item error records' do
+      it 'updates the status of the item to "rejected"' do
+        expect do
+          UpdateImportProcessor.perform
+          item2_2.reload
+        end.to change(item2_2, :status).from('new').to('rejected')
       end
     end
 

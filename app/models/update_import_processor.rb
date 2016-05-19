@@ -24,17 +24,30 @@ class UpdateImportProcessor
   end
 
   def self.process_record(record)
-
-    Rails.logger.info "processing order #{record[:order_id]}"
-
-    order = Order.find(record[:order_id])
-    if record[:errors].present?
-      order.error = record[:errors].join("\n")
-      order.reject!
-    else
-      order.acknowledge!
+    order = Order.find(record[:order_id]) if record[:order_id]
+    case record[:header]
+    when '$$HDR'
+      Rails.logger.info "Processing order acknowledgment batch #{record[:batch_id]}"
+    when 'H1'
+      process_order(record, order)
+    when 'H2'
+      process_order_error(record, order)
     end
   rescue => e
     Rails.logger.error "Unable to process POA record #{record.inspect} #{e.class.name} - #{e.message}\n  #{e.backtrace.join("\n  ")}"
+  end
+
+  def self.process_order(record, order)
+    order.acknowledge!
+  end
+
+  def self.process_order_error(record, order)
+    order = Order.find(record[:order_id])
+    if order.error
+      order.error = record[:error]
+    else
+      order.error << "\n#{record[:error]}"
+    end
+    order.reject!
   end
 end
