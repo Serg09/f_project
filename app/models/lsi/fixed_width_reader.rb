@@ -1,52 +1,9 @@
 class Lsi::FixedWidthReader
-  class ColumnDef
-    TRANSFORMERS = {
-      integer:   ->(v){v.to_i},
-      date:      ->(v){parse_date(v)},
-      date_time: ->(v){parse_date_time(v)}
-    }
-
-    attr_accessor :name, :length, :transform
-
-    def initialize(name, length, transform = nil)
-      self.name = name
-      self.length = length
-      if transform.is_a? Symbol
-        self.transform = TRANSFORMERS[transform]
-      else
-        self.transform = transform || ->(v){v}
-      end
-    end
-
-    private
-
-    def self.parse_date(string_date)
-      Date.new(
-        string_date[0..3].to_i,
-        string_date[4..5].to_i,
-        string_date[6..7].to_i
-      )
-    end
-
-    def self.parse_date_time(string_date_time)
-      DateTime.new(
-        string_date_time[0..3].to_i,
-        string_date_time[4..5].to_i,
-        string_date_time[6..7].to_i,
-        string_date_time[8..9].to_i,
-        string_date_time[10..11].to_i,
-        string_date_time[12..13].to_i
-      )
-    end
-  end
-
   @@line_defs = []
-  def self.add_line_def(start, column_defs, new_record_marker = false)
-    @@line_defs << {
-      start: start,
-      column_defs: column_defs,
-      new_record_marker: new_record_marker
-    }
+  def self.add_line_def(start)
+    line = Lsi::LineDefinition.new(start)
+    yield line if block_given?
+    @@line_defs << line
   end
 
   attr_accessor :line_count
@@ -81,9 +38,9 @@ class Lsi::FixedWidthReader
 
   def get_column_defs(line)
     line_def = @@line_defs.lazy.select do |line_def|
-      line.starts_with?(line_def[:start])
+      line.starts_with?(line_def.start)
     end.first
-    line_def ? line_def[:column_defs] : nil
+    line_def ? line_def.columns : nil
   end
 
   # Reads a line containing fixed-width columns of data
