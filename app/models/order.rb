@@ -57,7 +57,7 @@ class Order < ActiveRecord::Base
       transitions from: :exported, to: :processing
     end
     event :reject do
-      transitions from: :exported, to: :rejected
+      transitions from: [:processing, :exported], to: :rejected
     end
   end
 

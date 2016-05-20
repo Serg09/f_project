@@ -47,11 +47,10 @@ class UpdateImportProcessor
   end
 
   def self.process_order_error(record, order)
-    order = Order.find(record[:order_id])
-    if order.error
-      order.error = record[:error]
-    else
+    if order.error.present?
       order.error << "\n#{record[:error]}"
+    else
+      order.error = record[:error]
     end
     order.reject!
   end

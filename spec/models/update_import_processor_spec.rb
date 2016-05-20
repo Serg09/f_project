@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 describe UpdateImportProcessor do
-  let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'lsi_purchase_order_acknowledgment_sample.txt')) }
+  let (:filename) { 'lsi_purchase_order_acknowledgment_sample.txt' }
+  let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', filename)) }
   let (:remote_filename) { 'M030112304.PPR' }
 
   let (:order1) { FactoryGirl.create(:exported_order) }
@@ -45,18 +46,19 @@ describe UpdateImportProcessor do
     end
 
     context 'for order error records' do
-      it 'updates the status of the order to "rejected"' #do
-      #  expect do
-      #    UpdateImportProcessor.perform
-      #    order2.reload
-      #  end.to change(order2, :status).from('exported').to('rejected')
-      #end
+      let (:filename) { 'lsi_purchase_order_acknowledgment.txt' }
+      it 'updates the status of the order to "rejected"' do
+        expect do
+          UpdateImportProcessor.perform
+          order2.reload
+        end.to change(order2, :status).from('exported').to('rejected')
+      end
 
-      it 'updates the errors attribute of the order' #do
-      #  UpdateImportProcessor.perform
-      #  order2.reload
-      #  expect(order2.error).to eq 'Unrecognized ISBN'
-      #end
+      it 'updates the errors attribute of the order' do
+        UpdateImportProcessor.perform
+        order2.reload
+        expect(order2.error).to eq 'Unrecognized ISBN'
+      end
     end
 
     context 'for item error records' do
@@ -68,7 +70,6 @@ describe UpdateImportProcessor do
       end
     end
 
-    #TODO Decide if we need to do this
     it 'saves the file content to the database' do
       expect do
         UpdateImportProcessor.perform
