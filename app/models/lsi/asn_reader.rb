@@ -29,8 +29,8 @@ class Lsi::AsnReader < Lsi::FixedWidthReader
   add_line_def('I') do |l|
     l.column(:header, 1)
     l.column(:order_id, 15, :integer)
-    l.column(:item_line_no, 5, :integer)
-    l.column(:lsi_item_line_no, 5, :integer)
+    l.column(:line_item_no, 5, :integer)
+    l.column(:lsi_line_item_no, 5, :integer)
     l.column(:sku_10, 10)
     l.column(:price, 9, :decimal)
     l.column(:shipped_quantity, 9, :integer)

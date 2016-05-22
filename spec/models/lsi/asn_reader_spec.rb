@@ -75,5 +75,118 @@ describe Lsi::AsnReader do
         }
       ]
     end
+
+    it 'returns item-level records' do
+      expect(reader.read.select{|r| r[:header] == 'I'}).to eq [
+        {
+          header: 'I',
+          order_id: 1,
+          line_item_no: 1,
+          lsi_line_item_no: 1,
+          sku_10: '0759635943',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 50
+        },
+        {
+          header: 'I',
+          order_id: 2,
+          line_item_no: 1,
+          lsi_line_item_no: 1,
+          sku_10: '1588207781',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 10
+        },
+        {
+          header: 'I',
+          order_id: 3,
+          line_item_no: 1,
+          lsi_line_item_no: 1,
+          sku_10: '0759643105',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 10
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 1,
+          lsi_line_item_no: 1,
+          sku_10: '0759643059',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 2,
+          lsi_line_item_no: 2,
+          sku_10: '1585001732',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 3,
+          lsi_line_item_no: 3,
+          sku_10: '1588204758',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 4,
+          lsi_line_item_no: 4,
+          sku_10: '1585005398',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 5,
+          lsi_line_item_no: 5,
+          sku_10: '1588208974',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 6,
+          lsi_line_item_no: 6,
+          sku_10: '1587210045',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 7,
+          lsi_line_item_no: 7,
+          sku_10: '1585004634',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 8,
+          lsi_line_item_no: 8,
+          sku_10: '0759639507',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        },
+        {
+          header: 'I',
+          order_id: 5,
+          line_item_no: 9,
+          lsi_line_item_no: 9,
+          sku_10: '1585005215',
+          price: BigDecimal.new(0, 9),
+          shipped_quantity: 1
+        }
+      ]
+    end
   end
 end
