@@ -188,5 +188,94 @@ describe Lsi::AsnReader do
         }
       ]
     end
+
+    it 'returns the carton-level records' do
+      expect(reader.read.select{|l| l[:header] == 'P'}).to eq [
+        {
+          header: 'P',
+          order_id: 1,
+          line_item_no: 1,
+          carton_id: '00000388080010609160 1ZW3',
+          tracking_number: '985X0320377777'
+        },
+        {
+          header: 'P',
+          order_id: 2,
+          line_item_no: 1,
+          carton_id: '00000388080010609573 8985',
+          tracking_number: '173761'
+        },
+        {
+          header: 'P',
+          order_id: 3,
+          line_item_no: 1,
+          carton_id: '00000388080010609580 1ZW3',
+          tracking_number: '985X0320375555'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 1,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 2,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 3,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 4,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 5,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 6,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 7,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 8,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        },
+        {
+          header: 'P',
+          order_id: 5,
+          line_item_no: 9,
+          carton_id: '00000388080010608699 1ZW3',
+          tracking_number: '985X0320374414'
+        }
+      ]
+    end
   end
 end
