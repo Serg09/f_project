@@ -2,7 +2,7 @@ class Lsi::LineDefinition
   TRANSFORMERS = {
     integer:   ->(v){v.to_i},
     date:      ->(v){parse_date(v)},
-    decimal:   ->(v){BigDecimal.new(v) / 100},
+    decimal:   ->(v){BigDecimal.new(v, 9) / 100},
     date_time: ->(v){parse_date_time(v)}
   }
 
