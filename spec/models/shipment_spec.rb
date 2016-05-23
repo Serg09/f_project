@@ -50,4 +50,11 @@ RSpec.describe Shipment, type: :model do
       expect(shipment).to have_at_least(1).error_on :quantity
     end
   end
+
+  describe '#items' do
+    it 'is a list of items in the shipment' do
+      shipment = Shipment.new attributes
+      expect(shipment).to have(0).items
+    end
+  end
 end
