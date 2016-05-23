@@ -24,7 +24,10 @@ RSpec.describe Shipment, type: :model do
   end
 
   describe '#order' do
-    it 'is a reference to the order'
+    it 'is a reference to the order' do
+      shipment = Shipment.new attributes
+      expect(shipment.order).to eq order
+    end
   end
 
   describe '#external_id' do
@@ -35,10 +38,16 @@ RSpec.describe Shipment, type: :model do
   end
 
   describe '#ship_date' do
-    it 'is required'
+    it 'is required' do
+      shipment = Shipment.new attributes.except(:ship_date)
+      expect(shipment).to have_at_least(1).error_on :ship_date
+    end
   end
 
   describe '#quantity' do
-    it 'is required'
+    it 'is required' do
+      shipment = Shipment.new attributes.except(:quantity)
+      expect(shipment).to have_at_least(1).error_on :quantity
+    end
   end
 end
