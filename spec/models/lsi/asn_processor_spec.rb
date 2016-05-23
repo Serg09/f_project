@@ -20,7 +20,12 @@ describe Lsi::AsnProcessor do
       end
     end
     context 'with an item-level record' do
-      it 'creates a shipment item record'
+      it 'creates a shipment item record' do
+        expect do
+          processor.process
+        end.to change(ShipmentItem, :count).by(12)
+      end
+
       it 'links the new shipment item record to the corresponding order item record'
       context 'that completely fulfills the line item' do
         it 'updates the status of the corresponding order item to "shipped"'
