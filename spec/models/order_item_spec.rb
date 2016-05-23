@@ -139,4 +139,93 @@ RSpec.describe OrderItem, type: :model do
       expect(item.total).to eq 44.10
     end
   end
+
+  describe '#shipment_items' do
+    it 'is a list of shipment items associated with the order item' do
+      item = OrderItem.new attributes
+      expect(item).to have(0).shipment_items
+    end
+  end
+
+  shared_context :processing do
+    let (:order_item) { FactoryGirl.create(:order_item, order: order, quantity: 3) }
+  end
+
+  shared_context :partial_shipment do
+    include_context :processing
+
+    let!(:shipment) { FactoryGirl.create(:shipment, order: order) }
+    let!(:shipment_item_1) do
+      FactoryGirl.create(:shipment_item, shipment: shipment,
+                                         order_item: order_item,
+                                         shipped_quantity: 1)
+    end
+    let!(:shipment_item_2) do
+      FactoryGirl.create(:shipment_item, shipment: shipment,
+                                         order_item: order_item,
+                                         shipped_quantity: 1)
+    end
+  end
+
+  shared_context :full_shipment do
+    include_context :partial_shipment
+    let!(:shipment_item_3) do
+      FactoryGirl.create(:shipment_item, shipment: shipment,
+                                         order_item: order_item,
+                                         shipped_quantity: 1)
+    end
+  end
+
+  describe '#total_shipped_quantity' do
+    include_context :partial_shipment
+
+    it 'is the total quantity of the item that has been shipped' do
+      expect(order_item.total_shipped_quantity).to eq 2
+    end
+  end
+
+  context 'when no items have shipped' do
+    include_context :processing
+
+    describe '#all_items_shipped?' do
+      it 'is false' do
+        expect(order_item).not_to be_all_items_shipped
+      end
+    end
+    describe '#some_items_shipped?' do
+      it 'is false' do
+        expect(order_item).not_to be_some_items_shipped
+      end
+    end
+  end
+
+  context 'when some but not all items have shipped' do
+    include_context :partial_shipment
+
+    describe '#all_items_shipped?' do
+      it 'is false' do
+        expect(order_item).not_to be_all_items_shipped
+      end
+    end
+    describe '#some_items_shipped?' do
+      it 'is true' do
+        expect(order_item).to be_some_items_shipped
+      end
+    end
+  end
+
+  context 'when all items have shipped' do
+    include_context :full_shipment
+
+    describe '#all_items_shipped?' do
+      it 'is true' do
+        expect(order_item).to be_all_items_shipped
+      end
+    end
+    describe '#some_items_shipped?' do
+      it 'is true' do
+        expect(order_item).to be_some_items_shipped
+      end
+    end
+  end
 end

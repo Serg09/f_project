@@ -23,6 +23,7 @@ class OrderItem < ActiveRecord::Base
   include AASM
 
   belongs_to :order
+  has_many :shipment_items
 
   before_create :set_line_item_number
 
@@ -81,6 +82,18 @@ class OrderItem < ActiveRecord::Base
     ((price || 0) * quantity) +
       (freight_charge || 0) +
       (tax || 0)
+  end
+
+  def total_shipped_quantity
+    shipment_items.reduce(0){|s, i| s + i.shipped_quantity}
+  end
+
+  def all_items_shipped?
+    total_shipped_quantity >= quantity
+  end
+
+  def some_items_shipped?
+    total_shipped_quantity > 0
   end
 
   private
