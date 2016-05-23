@@ -22,5 +22,9 @@ FactoryGirl.define do
     factory :exported_order do
       status 'exported'
     end
+
+    factory :processing_order do
+      status 'processing'
+    end
   end
 end
