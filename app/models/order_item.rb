@@ -14,6 +14,9 @@
 #  tax                 :decimal(, )
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
+#  status              :string(30)       default("new"), not null
+#  accepted_quantity   :integer
+#  shipped_quantity    :integer
 #
 
 class OrderItem < ActiveRecord::Base
