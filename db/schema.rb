@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160519220122) do
+ActiveRecord::Schema.define(version: 20160523195807) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,6 +68,26 @@ ActiveRecord::Schema.define(version: 20160519220122) do
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree
+
+  create_table "shipments", force: :cascade do |t|
+    t.integer  "order_id",                               null: false
+    t.string   "external_id",                            null: false
+    t.date     "ship_date",                              null: false
+    t.integer  "quantity",                               null: false
+    t.decimal  "weight"
+    t.decimal  "freight_charge"
+    t.decimal  "handling_charge"
+    t.boolean  "collect_freight",        default: false, null: false
+    t.string   "freight_responsibility"
+    t.string   "cancel_code"
+    t.string   "cancel_reason"
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "shipments", ["external_id"], name: "index_shipments_on_external_id", using: :btree
+  add_index "shipments", ["order_id"], name: "index_shipments_on_order_id", using: :btree
+  add_index "shipments", ["ship_date"], name: "index_shipments_on_ship_date", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                             default: "", null: false
