@@ -44,6 +44,23 @@ module Lsi
     end
 
     def process_item(record)
+      order_item = @order.items.find_by(line_item_no: record[:line_item_no])
+      if order_item
+        @shipment_item = @shipment.items.create! order_item: order_item,
+                                                external_line_no: record[:lsi_line_item_no],
+                                                sku: record[:sku_10] || record[:sku_13],
+                                                price: record[:price],
+                                                shipped_quantity: record[:shipped_quantity],
+                                                cancel_code: record[:cancel_code],
+                                                cancel_reason: record[:cancel_reason]
+        if item.all_items_shipped?
+          item.ship
+        elsif item.some_items_shipped?
+          item.ship_partial
+        end
+      else
+        Rails.logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"
+      end
     end
 
     def process_package(record)

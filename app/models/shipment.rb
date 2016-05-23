@@ -20,6 +20,7 @@
 
 class Shipment < ActiveRecord::Base
   belongs_to :order
+  has_many :items, class_name: 'ShipmentItem'
 
   validates_presence_of :order_id, :external_id, :ship_date, :quantity
 end
