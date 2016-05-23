@@ -163,6 +163,13 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#shipments' do
+    it 'is a list of shipments in fulfillment of the order' do
+      order = Order.new attributes
+      expect(order).to have(0).shipments
+    end
+  end
+
   describe '#total' do
     let (:order) { FactoryGirl.create(:order) }
     let!(:i1) do FactoryGirl.create(:order_item, order: order,

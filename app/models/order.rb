@@ -23,6 +23,7 @@ class Order < ActiveRecord::Base
   include AASM
 
   has_many :items, class_name: 'OrderItem'
+  has_many :shipments
   belongs_to :batch
 
   validates_presence_of :customer_name,
