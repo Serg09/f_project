@@ -42,6 +42,13 @@ RSpec.describe ShipmentItem, type: :model do
     end
   end
 
+  describe '#order_item' do
+    it 'is a reference to the order item to which the item belongs' do
+      item = ShipmentItem.new attributes
+      expect(item.order_item).to eq order_item
+    end
+  end
+
   describe '#shipped_quantity' do
     it 'is required' do
       item = ShipmentItem.new attributes.except(:shipped_quantity)

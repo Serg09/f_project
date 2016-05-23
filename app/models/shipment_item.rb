@@ -17,6 +17,7 @@
 
 class ShipmentItem < ActiveRecord::Base
   belongs_to :shipment
+  belongs_to :order_item
 
   validates_presence_of :shipment_id, :order_item_id, :shipped_quantity
 end
