@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 describe Lsi::AsnProcessor do
+  let!(:order1) { FactoryGirl.create(:processing_order) }
+  let!(:order2) { FactoryGirl.create(:processing_order) }
+  let!(:order3) { FactoryGirl.create(:processing_order) }
+  let!(:order4) { FactoryGirl.create(:processing_order) }
+  let!(:order5) { FactoryGirl.create(:processing_order) }
+
   let (:filename) { 'lsi_advanced_shipping_notification_sample.txt' }
   let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', filename)) }
   let (:processor) { Lsi::AsnProcessor.new(file_content) }
@@ -10,7 +16,7 @@ describe Lsi::AsnProcessor do
       it 'creates a shipment record' do
         expect do
           processor.process
-        end.to change(Shipment, :count).by(1)
+        end.to change(Shipment, :count).by(4)
       end
     end
     context 'with an item-level record' do
