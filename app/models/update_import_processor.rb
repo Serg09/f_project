@@ -11,8 +11,8 @@ class UpdateImportProcessor
 
     REMOTE_FILE_PROVIDER.get_and_delete_files('outgoing') do |file, filename|
       Rails.logger.info "importing file #{filename}"
-      Document.create source: 'lsi', filename: filename, content: file
       processor(file, filename).process
+      Document.create source: 'lsi', filename: filename, content: file
     end
 
     Rails.logger.debug "end UpdateImportProcessor::perform"
