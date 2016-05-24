@@ -2,9 +2,9 @@ require 'rails_helper'
 
 describe Lsi::AsnProcessor do
   let!(:order1) { FactoryGirl.create(:processing_order) }
-  let!(:order_item_1_1) { FactoryGirl.create(:processing_order_item, order: order1) }
+  let!(:order_item_1_1) { FactoryGirl.create(:processing_order_item, order: order1, quantity: 50) }
   let!(:order2) { FactoryGirl.create(:processing_order) }
-  let!(:order_item_2_1) { FactoryGirl.create(:processing_order_item, order: order2) }
+  let!(:order_item_2_1) { FactoryGirl.create(:processing_order_item, order: order2, quantity: 20) }
   let!(:order3) { FactoryGirl.create(:processing_order) }
   let!(:order_item_3_1) { FactoryGirl.create(:processing_order_item, order: order3) }
   let!(:order4) { FactoryGirl.create(:processing_order) }
@@ -47,16 +47,32 @@ describe Lsi::AsnProcessor do
         it 'updates the status of the corresponding order item to "shipped"' do
           expect do
             processor.process
+            order_item_1_1.reload
           end.to change(order_item_1_1, :status).from('processing').to('shipped')
         end
       end
+
       context 'that partially fulfills the line item' do
-        it 'updates the status of the corresponding order item to "partially_shipped"'
+        it 'updates the status of the corresponding order item to "partially_shipped"' do
+          expect do
+            processor.process
+            order_item_2_1.reload
+          end.to change(order_item_2_1, :status).from('processing').to('partially_shipped')
+        end
       end
     end
+
     context 'with a package-level record' do
-      it 'creates a shipment package record'
-      it 'links the new package record to the shipment item record'
+      it 'creates a shipment package record' do
+        expect do
+          processor.process
+        end.to change(Package, :count).by(12)
+      end
+
+      it 'links the new package record to the shipment item record' do
+        processor.process
+        expect(order_item_1_1.shipment_items.first).to have(1).package
+      end
     end
   end
 end

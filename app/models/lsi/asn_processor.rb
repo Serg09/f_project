@@ -53,10 +53,10 @@ module Lsi
                                                 shipped_quantity: record[:shipped_quantity],
                                                 cancel_code: record[:cancel_code],
                                                 cancel_reason: record[:cancel_reason]
-        if item.all_items_shipped?
-          item.ship
-        elsif item.some_items_shipped?
-          item.ship_partial
+        if order_item.all_items_shipped?
+          order_item.ship!
+        elsif order_item.some_items_shipped?
+          order_item.ship_part!
         end
       else
         Rails.logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"
