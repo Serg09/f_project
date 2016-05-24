@@ -43,3 +43,5 @@ end
 
 REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('ftp://localhost/', 'jdoe', 'please01')
 LSI_CLIENT_ID = 654321
+
+ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Ftp.new('ftp://localhost/', 'jdoe', 'please01')

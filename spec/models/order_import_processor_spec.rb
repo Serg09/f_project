@@ -4,6 +4,7 @@ describe OrderImportProcessor do
   let (:ftp) { double('ftp') }
   before(:each) do
     allow(Net::FTP).to receive(:open).and_yield(ftp)
+    allow(ftp).to receive(:delete)
   end
 
   describe '::perform' do
@@ -15,7 +16,7 @@ describe OrderImportProcessor do
 
     context 'when 3DM orders are present' do
       let (:filename) { 'order20160302.csv' }
-      let (:file_content) { Rails.root.join('spec', 'fixtures', 'files', '3dm_order.csv') }
+      let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', '3dm_order.csv')) }
       before(:each) do
         allow(ftp).to receive(:chdir)
         allow(ftp).to receive(:list).and_return([filename])
@@ -23,12 +24,15 @@ describe OrderImportProcessor do
       end
 
       it 'passes 3DM files to the 3DM order processor' do
-        expect(ThreeDM::OrderProcessor).to receive(:new).with(file_content)
-        expect_any_instance_of(ThreeDM::OrderProcessor).to receive(:process)
+        expect(ThreeDM::OrderImporter).to receive(:new).with(file_content).and_call_original
+        expect_any_instance_of(ThreeDM::OrderImporter).to receive(:process)
         OrderImportProcessor.perform
       end
 
-      it 'deletes the file from the FTP server'
+      it 'deletes the file from the FTP server' do
+        expect(ftp).to receive(:delete).with(filename)
+        OrderImportProcessor.perform
+      end
     end
   end
 end
