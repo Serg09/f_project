@@ -55,4 +55,11 @@ RSpec.describe ShipmentItem, type: :model do
       expect(item).to have_at_least(1).error_on :shipped_quantity
     end
   end
+
+  describe '#packages' do
+    it 'is a list of packages associated with the item' do
+      item = ShipmentItem.new attributes
+      expect(item).to have(0).packages
+    end
+  end
 end

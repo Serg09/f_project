@@ -64,6 +64,10 @@ module Lsi
     end
 
     def process_package(record)
+      @shipment_item.packages.create! package_id: record[:carton_id],
+                                      tracking_number: record[:tracking_number],
+                                      quantity: record[:packed_quantity],
+                                      weight: record[:carton_weight]
     end
   end
 end
