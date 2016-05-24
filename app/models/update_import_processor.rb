@@ -1,13 +1,18 @@
 class UpdateImportProcessor
   @queue = :normal
 
+  PROCESSOR_MAP = {
+    '.PPR' => Lsi::PoaProcessor,
+    '.PBS' => Lsi::AsnProcessor
+  }
+
   def self.perform
     Rails.logger.debug "start UpdateImportProcessor::perform"
 
     REMOTE_FILE_PROVIDER.get_and_delete_files('outgoing') do |file, filename|
       Rails.logger.info "importing file #{filename}"
+      processor(file, filename).process
       Document.create source: 'lsi', filename: filename, content: file
-      process_file file
     end
 
     Rails.logger.debug "end UpdateImportProcessor::perform"
@@ -15,26 +20,10 @@ class UpdateImportProcessor
 
   private
 
-  # processes the file
-  #
-  # return true to indicate the remote file should be deleted
-  def self.process_file(file)
-    reader = Lsi::PoaReader.new(file)
-    reader.read.reduce(true){|result, r| process_record(r) && result}
-  end
-
-  def self.process_record(record)
-
-    Rails.logger.info "processing order #{record[:order_id]}"
-
-    order = Order.find(record[:order_id])
-    if record[:errors].present?
-      order.error = record[:errors].join("\n")
-      order.reject!
-    else
-      order.acknowledge!
-    end
-  rescue => e
-    Rails.logger.error "Unable to process POA record #{record.inspect} #{e.class.name} - #{e.message}\n  #{e.backtrace.join("\n  ")}"
+  def self.processor(file, filename)
+    ext = File.extname(filename)
+    processor_class = PROCESSOR_MAP[ext]
+    raise "Unrecognized file extension \"#{ext}\"." unless processor_class
+    processor = processor_class.new(file)
   end
 end

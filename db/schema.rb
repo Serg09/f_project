@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160518213629) do
+ActiveRecord::Schema.define(version: 20160524033647) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,17 +31,20 @@ ActiveRecord::Schema.define(version: 20160518213629) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                       null: false
-    t.integer  "line_item_no",                   null: false
-    t.string   "sku",                 limit: 30, null: false
+    t.integer  "order_id",                                       null: false
+    t.integer  "line_item_no",                                   null: false
+    t.string   "sku",                 limit: 30,                 null: false
     t.string   "description",         limit: 50
-    t.integer  "quantity",                       null: false
+    t.integer  "quantity",                                       null: false
     t.decimal  "price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.string   "status",              limit: 30, default: "new", null: false
+    t.integer  "accepted_quantity"
+    t.integer  "shipped_quantity"
   end
 
   add_index "order_items", ["order_id", "line_item_no"], name: "index_order_items_on_order_id_and_line_item_no", unique: true, using: :btree
@@ -65,6 +68,56 @@ ActiveRecord::Schema.define(version: 20160518213629) do
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree
+
+  create_table "packages", force: :cascade do |t|
+    t.integer  "shipment_item_id", null: false
+    t.string   "package_id"
+    t.string   "tracking_number"
+    t.integer  "quantity"
+    t.decimal  "weight"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "packages", ["package_id"], name: "index_packages_on_package_id", using: :btree
+  add_index "packages", ["shipment_item_id"], name: "index_packages_on_shipment_item_id", using: :btree
+  add_index "packages", ["tracking_number"], name: "index_packages_on_tracking_number", using: :btree
+
+  create_table "shipment_items", force: :cascade do |t|
+    t.integer  "shipment_id",      null: false
+    t.integer  "order_item_id",    null: false
+    t.integer  "external_line_no", null: false
+    t.string   "sku",              null: false
+    t.decimal  "price"
+    t.integer  "shipped_quantity", null: false
+    t.string   "cancel_code"
+    t.string   "cancel_reason"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "shipment_items", ["shipment_id", "order_item_id"], name: "index_shipment_items_on_shipment_id_and_order_item_id", using: :btree
+  add_index "shipment_items", ["sku"], name: "index_shipment_items_on_sku", using: :btree
+
+  create_table "shipments", force: :cascade do |t|
+    t.integer  "order_id",                               null: false
+    t.string   "external_id",                            null: false
+    t.date     "ship_date",                              null: false
+    t.integer  "quantity",                               null: false
+    t.decimal  "weight"
+    t.decimal  "freight_charge"
+    t.decimal  "handling_charge"
+    t.boolean  "collect_freight",        default: false, null: false
+    t.string   "freight_responsibility"
+    t.string   "cancel_code"
+    t.string   "cancel_reason"
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "shipments", ["external_id"], name: "index_shipments_on_external_id", using: :btree
+  add_index "shipments", ["order_id"], name: "index_shipments_on_order_id", using: :btree
+  add_index "shipments", ["ship_date"], name: "index_shipments_on_ship_date", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                             default: "", null: false

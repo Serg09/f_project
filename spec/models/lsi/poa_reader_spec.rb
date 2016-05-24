@@ -1,27 +1,26 @@
 require 'rails_helper'
 
 describe Lsi::PoaReader do
-  let (:file_path) { Rails.root.join('spec', 'fixtures', 'files', 'lsi_purchase_order_acknowledgment.txt') }
+  let (:filename) { 'lsi_purchase_order_acknowledgment_sample.txt' }
+  let (:file_path) { Rails.root.join('spec', 'fixtures', 'files', filename) }
   let (:content) { File.read(file_path) }
+  let (:reader) { Lsi::PoaReader.new(content) }
 
-  it 'yields a sequence of records idenitying orders' do
-    reader = Lsi::PoaReader.new(content)
-    records = []
-    reader.read do |record|
-      records << record
+  it 'yields record for each line in the file' do
+    expect(reader.read).to have(7).items
+  end
+
+  it 'does not log warnings when things work well' do
+    expect(Rails.logger).not_to receive(:warn)
+    reader.read
+  end
+
+  context 'when the reported record count does not match the number of records' do
+    let (:filename) { 'lsi_purchase_order_acknowledgment_missing_record.txt' }
+
+    it 'warns if the number of recrds read does not match the batch footer' do
+      expect(Rails.logger).to receive(:warn).with("The actual record count (4) does not match the reported record count (5)")
+      reader.read
     end
-    expect(records).to eq [
-      {
-        batch_id: 1,
-        order_id: 1,
-        order_date: Date.new(2016, 2, 27)
-      },
-      {
-        batch_id: 1,
-        order_id: 2,
-        order_date: Date.new(2016, 2, 28),
-        errors: ["Unrecognized ISBN"]
-      }
-    ]
   end
 end

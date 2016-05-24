@@ -163,6 +163,13 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#shipments' do
+    it 'is a list of shipments in fulfillment of the order' do
+      order = Order.new attributes
+      expect(order).to have(0).shipments
+    end
+  end
+
   describe '#total' do
     let (:order) { FactoryGirl.create(:order) }
     let!(:i1) do FactoryGirl.create(:order_item, order: order,
@@ -207,6 +214,24 @@ RSpec.describe Order, type: :model do
       expect do
         order.acknowledge
       end.to change(order, :status).from('exported').to('processing')
+    end
+  end
+
+  describe '#<<' do
+    let (:order) { FactoryGirl.create(:new_order) }
+    let (:sku) { '1234567890123' }
+
+    it 'adds a item to the order' do
+      expect do
+        order << sku
+      end.to change(order.items, :count).by(1)
+    end
+
+    it 'returns the new item' do
+      item = order << sku
+      expect(item).to be_a OrderItem
+      expect(item.sku).to eq sku
+      expect(item.quantity).to eq 1
     end
   end
 

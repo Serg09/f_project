@@ -23,6 +23,7 @@ class Order < ActiveRecord::Base
   include AASM
 
   has_many :items, class_name: 'OrderItem'
+  has_many :shipments
   belongs_to :batch
 
   validates_presence_of :customer_name,
@@ -57,11 +58,17 @@ class Order < ActiveRecord::Base
       transitions from: :exported, to: :processing
     end
     event :reject do
-      transitions from: :exported, to: :rejected
+      transitions from: [:processing, :exported], to: :rejected
     end
   end
 
   def total
     items.reduce(0){|sum, i| sum + i.total}
+  end
+
+  def <<(sku)
+    items.create!(sku: sku,
+                  quantity: 1,
+                  price: 0)
   end
 end

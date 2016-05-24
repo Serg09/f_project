@@ -14,10 +14,16 @@
 #  tax                 :decimal(, )
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
+#  status              :string(30)       default("new"), not null
+#  accepted_quantity   :integer
+#  shipped_quantity    :integer
 #
 
 class OrderItem < ActiveRecord::Base
+  include AASM
+
   belongs_to :order
+  has_many :shipment_items
 
   before_create :set_line_item_number
 
@@ -39,12 +45,55 @@ class OrderItem < ActiveRecord::Base
 
   before_validation :set_defaults
 
+  aasm(:status, whiny_transitions: false) do
+    state :new, initial: true
+    state :processing, :partially_shipped, :shipped, :rejected, :back_ordered, :cancelled
+
+    event :acknowledge do
+      transitions from: :new, to: :processing
+    end
+
+    event :ship_part do
+      transitions from: :processing, to: :partially_shipped
+    end
+
+    event :ship do
+      transitions from: [:processing, :partially_shipped], to: :shipped
+    end
+
+    event :reject do
+      before{ self.accepted_quantity = 0 }
+      transitions from: :new, to: :rejected
+    end
+
+    event :cancel do
+      before{ self.accepted_quantity = 0 }
+      transitions from: :new, to: :cancelled
+    end
+
+    event :back_order do
+      transitions from: :new, to: :back_ordered
+    end
+  end
+
   def total
     return 0 unless quantity.present? && quantity > 0
 
     ((price || 0) * quantity) +
       (freight_charge || 0) +
       (tax || 0)
+  end
+
+  def total_shipped_quantity
+    shipment_items.reduce(0){|s, i| s + i.shipped_quantity}
+  end
+
+  def all_items_shipped?
+    total_shipped_quantity >= quantity
+  end
+
+  def some_items_shipped?
+    total_shipped_quantity > 0
   end
 
   private

@@ -11,5 +11,9 @@ FactoryGirl.define do
     discount_percentage 0.00
     freight_charge { Faker::Number.decimal(2) }
     tax { Faker::Number.decimal(2) }
+
+    factory :processing_order_item do
+      status 'processing'
+    end
   end
 end

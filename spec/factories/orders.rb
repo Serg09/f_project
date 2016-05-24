@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :order do
+  factory :order, aliases: [:new_order] do
     transient do
       item_count 0
     end
@@ -21,6 +21,10 @@ FactoryGirl.define do
 
     factory :exported_order do
       status 'exported'
+    end
+
+    factory :processing_order do
+      status 'processing'
     end
   end
 end
