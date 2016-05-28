@@ -11,6 +11,8 @@
 #
 
 class Book < ActiveRecord::Base
+  has_many :identifiers, class_name: 'BookIdentifier'
+
   validates_presence_of :isbn, :title, :format
   validates_length_of :isbn, maximum: 13
   validates_length_of :title, maximum: 250

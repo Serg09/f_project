@@ -56,6 +56,13 @@ RSpec.describe Client, type: :model do
     end
   end
 
+  describe '#book_identifier' do
+    it 'is a list of book identifiers defined by the client' do
+      client = Client.new attributes
+      expect(client).to have(0).book_identifiers
+    end
+  end
+
   describe '#import_orders' do
     let (:client) { FactoryGirl.create(:client, order_import_processor_class: 'ThreeDM::OrderImporter') }
     let (:content) { 'this is fake content' }

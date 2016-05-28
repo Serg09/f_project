@@ -49,4 +49,11 @@ RSpec.describe Book, type: :model do
       expect(book).to have_at_least(1).error_on :format
     end
   end
+
+  describe '#identifier' do
+    it 'is a list of client-defined identifier' do
+      book = Book.new attributes
+      expect(book).to have(0).identifier
+    end
+  end
 end
