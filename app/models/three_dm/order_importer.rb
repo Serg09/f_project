@@ -1,4 +1,5 @@
 require 'csv'
+require 'pp'
 
 module ThreeDM
   class OrderImporter
@@ -62,9 +63,17 @@ module ThreeDM
       @order = create_or_keep_order(order_map)
 
       item_map = to_item_map(row)
-      #add_order_item(item_map)
-    #rescue => e
-    #  Rails.logger.error "Unable to import row #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}\n  #{row.inspect}"
+      add_order_item(item_map)
+    end
+
+    def add_order_item(item_map)
+      item = @order.items.lazy.select{|i| i.sku == item_map[:sku]}.first
+      if item
+        item.quantity += item_map[:quantity].to_i
+        item.save!
+      else
+        @order.items.create! item_map
+      end
     end
 
     def create_or_keep_order(order_map)
@@ -77,6 +86,14 @@ module ThreeDM
 
     def to_order_map(row)
       map_fields(row, self.class.order_field_map) #TODO Add the client ID
+    end
+
+    def count
+      @count ||= 0
+    end
+
+    def count=(value)
+      @count = value
     end
 
     def to_item_map(row)

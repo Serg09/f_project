@@ -32,16 +32,16 @@ class OrderItem < ActiveRecord::Base
                         :quantity
 
   validates_length_of :sku, maximum: 30
-  validates_length_of :description, maximum: 50
+  validates_length_of :description, maximum: 250
 
   validates_uniqueness_of :sku, scope: :order_id
 
   validates_numericality_of :quantity, greater_than: 0, on: :create
   validates_numericality_of :quantity, greater_than: -1, on: :update
-  validates_numericality_of [:price,
-                             :discount_percentage,
-                             :freight_charge,
-                             :tax], greater_than_or_equal_to: 0
+  [:price,
+   :discount_percentage,
+   :freight_charge,
+   :tax].each{|f| validates_numericality_of f, greater_than_or_equal_to: 0, if: f}
 
   before_validation :set_defaults
 

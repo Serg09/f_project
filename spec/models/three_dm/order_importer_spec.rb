@@ -11,5 +11,15 @@ describe ThreeDM::OrderImporter do
         importer.process
       end.to change(Order, :count).by(5)
     end
+
+    it 'creates the specified order item records' do
+      expect do
+        importer.process
+      end.to change(OrderItem, :count).by(14)
+    end
+
+    it 'resolves SKUs correctly'
+
+    it 'consolodates line items having the same SKU'
   end
 end
