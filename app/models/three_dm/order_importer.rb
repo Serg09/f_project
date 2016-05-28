@@ -2,6 +2,41 @@ require 'csv'
 
 module ThreeDM
   class OrderImporter
+    def self.order_field_map
+      @order_field_map ||= {}
+    end
+
+    def self.item_field_map
+      @item_field_map ||= {}
+    end
+
+    def self.add_order_field_mapping(external_field, internal_field)
+      order_field_map[external_field] = internal_field
+    end
+
+    def self.add_item_field_mapping(external_field, internal_field)
+      item_field_map[external_field] = internal_field
+    end
+
+    add_order_field_mapping(:orderid, :client_order_id)
+    add_order_field_mapping(:oemail, :customer_email)
+    add_order_field_mapping(:oshipmethod, :ship_method_id)
+    add_order_field_mapping([:oshipfirstname, :oshiplastname], :customer_name)
+    add_order_field_mapping(:oshipaddress, :address_1)
+    add_order_field_mapping(:oshipaddress2, :address_2)
+    add_order_field_mapping(:oshipcity, :city)
+    add_order_field_mapping(:oshipstate, :state)
+    add_order_field_mapping(:oshipzip, :postal_code)
+    add_order_field_mapping(:oshipcountry, :country_code)
+    add_order_field_mapping(:oshipphone, :telephone)
+
+    add_item_field_mapping(:itemid, :sku)
+    add_item_field_mapping(:itemname, :description)
+    add_item_field_mapping(:numitems, :quantity)
+    add_item_field_mapping(:unit_price, :price)
+    add_item_field_mapping(:weight, :weight)
+
+
     def initialize(content)
       @content = content
     end
@@ -21,30 +56,39 @@ module ThreeDM
     private
 
     def process_row(row)
-      @order = create_or_keep_order(row)
-      #add_order_item(row)
-    rescue => e
-      Rails.logger.error "Unable to import row #{row.inspect}"
+      order_map = to_order_map(row)
+      @order = create_or_keep_order(order_map)
+
+      item_map = to_item_map(row)
+      #add_order_item(item_map)
+    #rescue => e
+    #  Rails.logger.error "Unable to import row #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}\n  #{row.inspect}"
     end
 
-    def create_order(row)
-      #TODO Add :client_order_id, :client_id
-      Order.create! customer_name: "#{row[:ofirstname]} #{row[:olastname]}",
-                    address_1: row[:oaddress],
-                    address_2: row[:oaddress2],
-                    city: row[:ocity],
-                    state: row[:ostate],
-                    postal_code: row[:ozip],
-                    country_code: row[:ocountry],
-                    order_date: row[:odate],
-                    telephone: row[:ophone]
-    end
-
-    def create_or_keep_order(row)
-      if @order.try(:customer_order_id) == row[:orderid]
+    def create_or_keep_order(order_map)
+      if @order.try(:client_order_id) == order_map[:client_order_id]
         @order
       else
-        create_order(row)
+        Order.create! order_map
+      end
+    end
+
+    def to_order_map(row)
+      map_fields(row, self.class.order_field_map) #TODO Add the client ID
+    end
+
+    def to_item_map(row)
+      map_fields row, self.class.item_field_map
+    end
+
+    def map_fields(row, field_map)
+      field_map.reduce({}) do |result, pair|
+        if pair.first.is_a? Array
+          result[pair.second] = pair.first.map{|k| row[k]}.join(" ")
+        else
+          result[pair.second] = row[pair.first]
+        end
+        result
       end
     end
   end
