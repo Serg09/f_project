@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe OrderImportProcessor do
+  let!(:client) { FactoryGirl.create(:client, abbreviation: '3dm') }
   let (:ftp) { double('ftp') }
   before(:each) do
     allow(Net::FTP).to receive(:open).and_yield(ftp)
@@ -24,7 +25,10 @@ describe OrderImportProcessor do
       end
 
       it 'passes 3DM files to the 3DM order processor' do
-        expect(ThreeDM::OrderImporter).to receive(:new).with(file_content).and_call_original
+        expect(ThreeDM::OrderImporter).to \
+          receive(:new).
+            with(file_content, client).
+            and_call_original
         expect_any_instance_of(ThreeDM::OrderImporter).to receive(:process)
         OrderImportProcessor.perform
       end

@@ -1,17 +1,14 @@
 class OrderImportProcessor
   @queue = :normal
 
-  PROCESSOR_MAP = {
-    '3dm' => ThreeDM::OrderImporter
-  }
-
   def self.perform
     Rails.logger.debug "start OrderImportProcessor::perform"
-    PROCESSOR_MAP.each do |folder, processor_class|
+    Client.all.each do |client|
+      folder = client.abbreviation
       ORDER_IMPORT_FILE_PROVIDER.get_and_delete_files(folder) do |content, filename|
         Rails.logger.info "importing order file #{filename}"
         begin
-          processor_class.new(content).process
+          client.import(content)
         rescue => e
           Rails.logger.error "Error importing order #{filename} in folder #{folder}. #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
         end

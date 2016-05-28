@@ -19,6 +19,7 @@ module ThreeDM
     end
 
     add_order_field_mapping(:orderid, :client_order_id)
+    add_order_field_mapping(:odate, :order_date)
     add_order_field_mapping(:oemail, :customer_email)
     add_order_field_mapping(:oshipmethod, :ship_method_id)
     add_order_field_mapping([:oshipfirstname, :oshiplastname], :customer_name)
@@ -37,8 +38,9 @@ module ThreeDM
     add_item_field_mapping(:weight, :weight)
 
 
-    def initialize(content)
+    def initialize(content, client)
       @content = content
+      @client = client
     end
 
     def process
@@ -69,7 +71,7 @@ module ThreeDM
       if @order.try(:client_order_id) == order_map[:client_order_id]
         @order
       else
-        Order.create! order_map
+        Order.create! order_map.merge(client: @client)
       end
     end
 
