@@ -7,16 +7,37 @@ describe ThreeDM::OrderImporter do
 
   shared_context :books do
     let!(:bcd_10)  { FactoryGirl.create(:book, title: "Building A Discipling Culture (2nd Edition) Bundle of 10") }
+    let!(:bcd_10_id) { bcd_10.identifiers.create!(client: client, code: 'BCD-10') }
+
     let!(:bdc)  { FactoryGirl.create(:book, title: "Building a Discipling Culture (2nd Edition)") }
+    let!(:bcd_id) { bdc.identifiers.create!(client: client, code: 'BCD') }
+
     let!(:ffms)  { FactoryGirl.create(:book, title: "Five Fold Ministry Survey") }
+    let!(:ffms_id) { ffms.identifiers.create!(client: client, code: 'FFMS') }
+
     let!(:hlg)  { FactoryGirl.create(:book, title: "HBUNS Huddle Leader Guide") }
+    let!(:hlg_id) { hlg.identifiers.create!(client: client, code: 'HLG') }
+
     let!(:hbuns)  { FactoryGirl.create(:book, title: "Huddle Bundle - Standard") }
+    let!(:hbuns_id) { hbuns.identifiers.create!(client: client, code: 'HBUNS') }
+
     let!(:hpg)  { FactoryGirl.create(:book, title: "Huddle Participant Guide") }
+    let!(:hpg_id) { hpg.identifiers.create!(client: client, code: 'HPG') }
+
     let!(:lkm)  { FactoryGirl.create(:book, title: "Leading Kingdom Movements") }
+    let!(:lkm_id) { lkm.identifiers.create!(client: client, code: 'LKM') }
+
     let!(:ckp)  { FactoryGirl.create(:book, title: "Covenant & Kingdom - The DNA of the Bible") }
+    let!(:ckp_id) { ckp.identifiers.create!(client: client, code: 'CKP') }
+
     let!(:lcbun)  { FactoryGirl.create(:book, title: "Learning Community Bundle") }
+    let!(:lcbun_id) { lcbun.identifiers.create!(client: client, code: 'LCBUN') }
+
     let!(:lmc) { FactoryGirl.create(:book, title: "Leading Missional Communities") }
+    let!(:lmc_id) { lmc.identifiers.create!(client: client, code: 'LMC') }
+
     let!(:mml) { FactoryGirl.create(:book, title: "Multiplying Missional Leaders") }
+    let!(:mml_id) { mml.identifiers.create!(client: client, code: 'MML') }
   end
 
   describe '#process' do

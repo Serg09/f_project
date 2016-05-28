@@ -11,12 +11,23 @@ module ThreeDM
       @item_field_map ||= {}
     end
 
-    def self.add_order_field_mapping(external_field, internal_field)
-      order_field_map[external_field] = internal_field
+    def self.add_order_field_mapping(external_field, internal_field, transform = nil)
+      add_field_mapping order_field_map, external_field, internal_field, transform
     end
 
-    def self.add_item_field_mapping(external_field, internal_field)
-      item_field_map[external_field] = internal_field
+    def self.add_item_field_mapping(external_field, internal_field, transform = nil)
+      add_field_mapping item_field_map, external_field, internal_field, transform
+    end
+
+    def resolve_sku(sku)
+      identifier = @client.book_identifiers.find_by(code: sku)
+      raise "Unrecognized book identifier \"#{sku}\"" unless identifier
+      identifier.book.isbn
+    end
+
+    FieldMapping = Struct.new(:key, :transform)
+    def self.add_field_mapping(map, external_field, internal_field, transform = nil)
+      map[external_field] = FieldMapping.new(internal_field, transform || ->(v){v})
     end
 
     add_order_field_mapping(:orderid, :client_order_id)
@@ -32,12 +43,11 @@ module ThreeDM
     add_order_field_mapping(:oshipcountry, :country_code)
     add_order_field_mapping(:oshipphone, :telephone)
 
-    add_item_field_mapping(:itemid, :sku)
+    add_item_field_mapping(:itemid, :sku, ->(itemid){resolve_sku(itemid)})
     add_item_field_mapping(:itemname, :description)
     add_item_field_mapping(:numitems, :quantity)
     add_item_field_mapping(:unit_price, :price)
     add_item_field_mapping(:weight, :weight)
-
 
     def initialize(content, client)
       @content = content
@@ -102,10 +112,13 @@ module ThreeDM
 
     def map_fields(row, field_map)
       field_map.reduce({}) do |result, pair|
-        if pair.first.is_a? Array
-          result[pair.second] = pair.first.map{|k| row[k]}.join(" ")
+        external_field = pair.first
+        mapping = pair.second
+        if external_field.is_a? Array
+          #TODO how to support transforms on concantenations?
+          result[mapping.key] = external_field.map{|k| row[k]}.join(" ")
         else
-          result[pair.second] = row[pair.first]
+          result[mapping.key] = mapping.transform.call(row[external_field])
         end
         result
       end
