@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: books
+#
+#  id         :integer          not null, primary key
+#  isbn       :string(13)       not null
+#  title      :string(250)      not null
+#  format     :string(100)      not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class Book < ActiveRecord::Base
   validates_presence_of :isbn, :title, :format
   validates_length_of :isbn, maximum: 13

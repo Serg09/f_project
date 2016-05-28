@@ -2,11 +2,12 @@
 #
 # Table name: clients
 #
-#  id           :integer          not null, primary key
-#  name         :string(100)      not null
-#  abbreviation :string(5)        not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
+#  id                           :integer          not null, primary key
+#  name                         :string(100)      not null
+#  abbreviation                 :string(5)        not null
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  order_import_processor_class :string(250)
 #
 
 class Client < ActiveRecord::Base

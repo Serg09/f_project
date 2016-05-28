@@ -6,7 +6,7 @@
 #  order_id            :integer          not null
 #  line_item_no        :integer          not null
 #  sku                 :string(30)       not null
-#  description         :string(50)
+#  description         :string(250)
 #  quantity            :integer          not null
 #  price               :decimal(, )
 #  discount_percentage :decimal(, )
@@ -17,6 +17,7 @@
 #  status              :string(30)       default("new"), not null
 #  accepted_quantity   :integer
 #  shipped_quantity    :integer
+#  weight              :decimal(, )
 #
 
 class OrderItem < ActiveRecord::Base

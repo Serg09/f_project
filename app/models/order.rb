@@ -7,7 +7,7 @@
 #  address_1       :string(50)       not null
 #  address_2       :string(50)
 #  city            :string(50)
-#  state           :string(2)
+#  state           :string(100)      not null
 #  postal_code     :string(10)
 #  country_code    :string(3)
 #  telephone       :string(25)
