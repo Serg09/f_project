@@ -16,7 +16,7 @@ describe OrderImportProcessor do
 
     context 'when 3DM orders are present' do
       let (:filename) { 'order20160302.csv' }
-      let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', '3dm_order.csv')) }
+      let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', '3dm_orders.csv')) }
       before(:each) do
         allow(ftp).to receive(:chdir)
         allow(ftp).to receive(:list).and_return([filename])
