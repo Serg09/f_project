@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160528161027) do
+ActiveRecord::Schema.define(version: 20160528190125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,17 @@ ActiveRecord::Schema.define(version: 20160528161027) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
   end
+
+  create_table "books", force: :cascade do |t|
+    t.string   "isbn",       limit: 13,  null: false
+    t.string   "title",      limit: 250, null: false
+    t.string   "format",     limit: 100, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "books", ["isbn"], name: "index_books_on_isbn", unique: true, using: :btree
+  add_index "books", ["title"], name: "index_books_on_title", using: :btree
 
   create_table "clients", force: :cascade do |t|
     t.string   "name",                         limit: 100, null: false
@@ -42,18 +53,18 @@ ActiveRecord::Schema.define(version: 20160528161027) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                                       null: false
-    t.integer  "line_item_no",                                   null: false
-    t.string   "sku",                 limit: 30,                 null: false
-    t.string   "description",         limit: 50
-    t.integer  "quantity",                                       null: false
+    t.integer  "order_id",                                        null: false
+    t.integer  "line_item_no",                                    null: false
+    t.string   "sku",                 limit: 30,                  null: false
+    t.string   "description",         limit: 250
+    t.integer  "quantity",                                        null: false
     t.decimal  "price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.string   "status",              limit: 30, default: "new", null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "status",              limit: 30,  default: "new", null: false
     t.integer  "accepted_quantity"
     t.integer  "shipped_quantity"
     t.decimal  "weight"
