@@ -1,11 +1,52 @@
 require 'rails_helper'
 
 RSpec.describe Order, type: :model do
-  let (:attributes) { FactoryGirl.attributes_for(:order) }
+  let (:client) { FactoryGirl.create(:client) }
+  let (:attributes) do
+    {
+      client_id: client.id,
+      client_order_id: '000001',
+      customer_name: 'John Doe',
+      address_1: '1234 MAIN ST',
+      address_2: 'APT 227',
+      city: 'Dallas',
+      state: 'TX',
+      postal_code: '75200',
+      country_code: 'US',
+      order_date: '2016-03-02',
+      telephone: '214-555-1212'
+    }
+  end
 
   it 'can be created from valid attributes' do
     order = Order.new attributes
     expect(order).to be_valid
+  end
+
+  describe '#client_id' do
+    it 'is required' do
+      order = Order.new attributes.except(:client_id)
+      expect(order).to have_at_least(1).error_on :client_id
+    end
+
+    it 'cannot be more than 100 characters' do
+      order = Order.new attributes.merge(client_order_id: 'X' * 101)
+      expect(order).to have_at_least(1).error_on :client_order_id
+    end
+  end
+
+  describe '#client' do
+    it 'refers to the client to which the order belongs' do
+      order = Order.new attributes
+      expect(order.client).to eq client
+    end
+  end
+
+  describe '#client_order_id' do
+    it 'is required' do
+      order = Order.new attributes.except(:client_order_id)
+      expect(order).to have_at_least(1).error_on :client_order_id
+    end
   end
 
   describe '#customer_name' do
@@ -22,6 +63,13 @@ RSpec.describe Order, type: :model do
     it 'cannot be more than 50 characters' do
       order = Order.new attributes.merge(customer_name: 'x' * 51)
       expect(order).to have_at_least(1).error_on :customer_name
+    end
+  end
+
+  describe '#customer_email' do
+    it 'cannot be more than 100 characters' do
+      order = Order.new attributes.merge(customer_email: 'X' * 101)
+      expect(order).to have_at_least(1).error_on :customer_email
     end
   end
 
