@@ -125,18 +125,8 @@ RSpec.describe Order, type: :model do
       expect(order).to have_at_least(1).error_on :state
     end
 
-    it 'can be 2 characters' do
-      order = Order.new attributes.merge(state: 'x' * 2)
-      expect(order).to be_valid
-    end
-
-    it 'cannot be more than 2 characters' do
-      order = Order.new attributes.merge(state: 'x' * 3)
-      expect(order).to have_at_least(1).error_on :state
-    end
-
-    it 'cannot be less than 2 characters' do
-      order = Order.new attributes.merge(state: 'x')
+    it 'cannot be more than 100 characters' do
+      order = Order.new attributes.merge(state: 'x' * 101)
       expect(order).to have_at_least(1).error_on :state
     end
   end

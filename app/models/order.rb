@@ -47,9 +47,9 @@ class Order < ActiveRecord::Base
                        :city],
                        maximum: 50
   validates_length_of [:client_order_id,
-                       :customer_email],
+                       :customer_email,
+                       :state],
                        maximum: 100
-  validates_length_of :state, is: 2
   validates_length_of :postal_code, maximum: 10
   validates_length_of :country_code, minimum: 2, maximum: 3
   validates_length_of :telephone, maximum: 25
