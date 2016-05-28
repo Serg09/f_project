@@ -55,4 +55,25 @@ RSpec.describe Client, type: :model do
       expect(client).to have_at_least(1).error_on :order_import_processor_class
     end
   end
+
+  describe '#import_orders' do
+    let (:client) { FactoryGirl.create(:client, order_import_processor_class: 'ThreeDM::OrderImporter') }
+    let (:content) { 'this is fake content' }
+    it 'invokes #process on an instance of the processor' do
+      expect(ThreeDM::OrderImporter).to \
+        receive(:new).
+          with(content, client).
+          and_call_original
+      client.import_orders(content)
+    end
+  end
+
+  describe '::order_importers' do
+    let (:c1) { FactoryGirl.create(:client) }
+    let (:c2) { FactoryGirl.create(:client, order_import_processor_class: 'SomeClass') }
+
+    it 'returns a list of clients that have order importers defines' do
+      expect(Client.order_importers).to eq [c2]
+    end
+  end
 end

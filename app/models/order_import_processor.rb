@@ -3,12 +3,12 @@ class OrderImportProcessor
 
   def self.perform
     Rails.logger.debug "start OrderImportProcessor::perform"
-    Client.all.each do |client|
+    Client.order_importers.each do |client|
       folder = client.abbreviation
       ORDER_IMPORT_FILE_PROVIDER.get_and_delete_files(folder) do |content, filename|
         Rails.logger.info "importing order file #{filename}"
         begin
-          client.import(content)
+          client.import_orders(content)
         rescue => e
           Rails.logger.error "Error importing order #{filename} in folder #{folder}. #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
         end

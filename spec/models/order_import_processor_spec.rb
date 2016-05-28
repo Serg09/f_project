@@ -1,7 +1,10 @@
 require 'rails_helper'
 
 describe OrderImportProcessor do
-  let!(:client) { FactoryGirl.create(:client, abbreviation: '3dm') }
+  let!(:client) do
+    FactoryGirl.create(:client, abbreviation: '3dm',
+                                order_import_processor_class: 'ThreeDM::OrderImporter')
+  end
   let (:ftp) { double('ftp') }
   before(:each) do
     allow(Net::FTP).to receive(:open).and_yield(ftp)
