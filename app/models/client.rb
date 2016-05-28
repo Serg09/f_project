@@ -13,5 +13,6 @@ class Client < ActiveRecord::Base
   validates_presence_of :name, :abbreviation
   validates_length_of :name, maximum: 100
   validates_length_of :abbreviation, maximum: 5
+  validates_length_of :order_import_processor_class, maximum: 250
   validates_uniqueness_of [:name, :abbreviation]
 end

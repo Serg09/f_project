@@ -48,4 +48,11 @@ RSpec.describe Client, type: :model do
       expect(c2).to have_at_least(1).error_on :abbreviation
     end
   end
+
+  describe '#order_import_processor_class' do
+    it 'cannot be longer than 250 characters' do
+      client = Client.new attributes.merge(order_import_processor_class: 'X' * 251)
+      expect(client).to have_at_least(1).error_on :order_import_processor_class
+    end
+  end
 end
