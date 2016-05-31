@@ -68,6 +68,11 @@ describe ThreeDM::OrderImporter do
       end
     end
 
-    it 'consolodates line items having the same SKU'
+    it 'consolodates line items having the same SKU' do
+      importer.process
+      order = Order.find_by(client_order_id: '35743')
+      item = order.items.find_by(sku: hpg.isbn)
+      expect(item.quantity).to eq 30
+    end
   end
 end
