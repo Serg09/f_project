@@ -43,7 +43,7 @@ module ThreeDM
     add_order_field_mapping(:oshipcountry, :country_code)
     add_order_field_mapping(:oshipphone, :telephone)
 
-    add_item_field_mapping(:itemid, :sku, ->(itemid){resolve_sku(itemid)})
+    add_item_field_mapping(:itemid, :sku, :resolve_sku)
     add_item_field_mapping(:itemname, :description)
     add_item_field_mapping(:numitems, :quantity)
     add_item_field_mapping(:unit_price, :price)
@@ -118,7 +118,12 @@ module ThreeDM
           #TODO how to support transforms on concantenations?
           result[mapping.key] = external_field.map{|k| row[k]}.join(" ")
         else
-          result[mapping.key] = mapping.transform.call(row[external_field])
+          raw_value = row[external_field]
+          if mapping.transform.is_a? Symbol
+            result[mapping.key] = send(mapping.transform, raw_value)
+          else
+            result[mapping.key] = mapping.transform.call(raw_value)
+          end
         end
         result
       end
