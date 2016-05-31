@@ -7,10 +7,10 @@ describe ThreeDM::OrderImporter do
 
   shared_context :books do
     let!(:bcd_10)  { FactoryGirl.create(:book, title: "Building A Discipling Culture (2nd Edition) Bundle of 10") }
-    let!(:bcd_10_id) { bcd_10.identifiers.create!(client: client, code: 'BCD-10') }
+    let!(:bcd_10_id) { bcd_10.identifiers.create!(client: client, code: 'BDC-10') }
 
     let!(:bdc)  { FactoryGirl.create(:book, title: "Building a Discipling Culture (2nd Edition)") }
-    let!(:bcd_id) { bdc.identifiers.create!(client: client, code: 'BCD') }
+    let!(:bcd_id) { bdc.identifiers.create!(client: client, code: 'BDC') }
 
     let!(:ffms)  { FactoryGirl.create(:book, title: "Five Fold Ministry Survey") }
     let!(:ffms_id) { ffms.identifiers.create!(client: client, code: 'FFMS') }
@@ -41,6 +41,8 @@ describe ThreeDM::OrderImporter do
   end
 
   describe '#process' do
+    include_context :books
+
     it 'creates the specified order records' do
       expect do
         importer.process
@@ -54,8 +56,6 @@ describe ThreeDM::OrderImporter do
     end
 
     context 'when books are defined' do
-      include_context :books
-
       it 'resolves SKUs correctly' do
         importer.process
         order = Order.find_by(client_order_id: '35771')
