@@ -21,8 +21,14 @@ module RemoteFileProvider
     def get_and_delete_files(directory = nil)
       Net::FTP.open(@url, @username, @password) do |ftp|
         ftp.chdir(directory) if directory
-        ftp.list.each do |filename|
-          if yield ftp.gettextfile(filename), filename
+        ftp.nlst.each do |filename|
+
+          content = ""
+          ftp.gettextfile(filename) do |line|
+            content << line
+          end
+
+          if yield content, filename
             ftp.delete filename
           end
         end
