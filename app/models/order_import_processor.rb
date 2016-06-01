@@ -5,6 +5,7 @@ class OrderImportProcessor
     Rails.logger.debug "start OrderImportProcessor::perform"
     Client.order_importers.each do |client|
       folder = client.abbreviation
+      Rails.logger.debug "import orders from #{client.name} (#{folder})"
       ORDER_IMPORT_FILE_PROVIDER.get_and_delete_files(folder) do |content, filename|
         Rails.logger.info "importing order file #{filename}"
         begin
