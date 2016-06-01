@@ -42,8 +42,8 @@ Rails.application.configure do
 end
 
 #REMOTE_FILE_PROVIDER = RemoteFileProvider::Nil.new
-REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('ftp://localhost/', 'lsi_client', 'please01')
+REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'lsi_client', 'please01')
 LSI_CLIENT_ID = 654321
 
 #ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Nil.new
-ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Ftp.new('ftp://localhost/', 'cs_fulfillment', 'please01')
+ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'cs_fulfillment', 'please01')
