@@ -36,7 +36,7 @@
         %th Email
         %td= link_to @order.customer_email, "mailto:#{@order.customer_email}"
   .col-md-1
-    =link_to 'Back', orders_path, class: 'btn btn-primary', title: 'Click here to return to the list of orders.'
+    =link_to 'Back', orders_path(status: @order.status), class: 'btn btn-primary', title: 'Click here to return to the list of orders.'
 .row
   .col-md-12
     %table.table.table-striped
