@@ -25,7 +25,8 @@ module RemoteFileProvider
 
           content = ""
           ftp.gettextfile(filename) do |line|
-            content << line
+            content << line.rstrip
+            content << "\r\n"
           end
 
           if yield content, filename
