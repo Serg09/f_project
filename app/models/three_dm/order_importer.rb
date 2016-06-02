@@ -56,14 +56,21 @@ module ThreeDM
 
     def process
       headers = nil
-      CSV.parse(@content) do |row|
-        if headers.nil?
-          headers = row
-        else
-          hash = [headers, row].transpose.to_h.with_indifferent_access
-          process_row(hash)
+
+      Order.transaction do
+        CSV.parse(@content) do |row|
+          if headers.nil?
+            headers = row
+          else
+            hash = [headers, row].transpose.to_h.with_indifferent_access
+            process_row(hash)
+          end
         end
       end
+      true
+    rescue => e
+      Rails.logger.error "Error importing order file #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
+      false
     end
 
     private
