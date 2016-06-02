@@ -25,13 +25,19 @@ module ThreeDM
       identifier.book.isbn
     end
 
+    def parse_date(value)
+      match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.match(value)
+      raise "Invalid order date \"#{value}\"" unless match
+      Date.new(match[3].to_i, match[1].to_i, match[2].to_i)
+    end
+
     FieldMapping = Struct.new(:key, :transform)
     def self.add_field_mapping(map, external_field, internal_field, transform = nil)
       map[external_field] = FieldMapping.new(internal_field, transform || ->(v){v})
     end
 
     add_order_field_mapping(:orderid, :client_order_id)
-    add_order_field_mapping(:odate, :order_date)
+    add_order_field_mapping(:odate, :order_date, :parse_date)
     add_order_field_mapping(:oemail, :customer_email)
     add_order_field_mapping(:oshipmethod, :ship_method_id)
     add_order_field_mapping([:oshipfirstname, :oshiplastname], :customer_name)

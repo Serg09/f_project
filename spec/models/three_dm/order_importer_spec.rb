@@ -49,6 +49,11 @@ describe ThreeDM::OrderImporter do
       end.to change(Order, :count).by(5)
     end
 
+    it 'parses dates correctly' do
+      importer.process
+      expect(Order.find_by(client_order_id: '35771').order_date).to eq Date.new(2016, 5, 1)
+    end
+
     it 'creates the specified order item records' do
       expect do
         importer.process
