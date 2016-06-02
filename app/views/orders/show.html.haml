@@ -13,6 +13,9 @@
         %th Order date
         %td= format_date(@order.order_date)
       %tr
+        %th Client Order No
+        %td= @order.client_order_id
+      %tr
         %th Status
         %td= @order.status
   .col-md-6
