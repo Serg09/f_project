@@ -97,6 +97,11 @@ class OrderItem < ActiveRecord::Base
     total_shipped_quantity > 0
   end
 
+  def extended_price
+    return 0 unless price.present? && quantity.present?
+    price * quantity
+  end
+
   private
 
   def set_defaults
