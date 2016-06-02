@@ -15,7 +15,7 @@ describe ExportProcessor do
       context 'on success' do
         before(:each) do
           allow(ftp).to receive(:chdir)
-          allow(ftp).to receive(:puttextfile)
+          allow(ftp).to receive(:puttextcontent)
         end
 
         it 'creates an order batch' do
@@ -25,7 +25,7 @@ describe ExportProcessor do
         end
 
         it 'uploads the order batch to the destination in the "incoming" folder' do
-          expect(ftp).to receive(:puttextfile) do |localfile, remotefile|
+          expect(ftp).to receive(:puttextcontent) do |localfile, remotefile|
             expect(remotefile).to eq 'PPO.M03021230'
           end
           Timecop.freeze(DateTime.parse('2016-03-02 06:30:42 CST')) do

@@ -1,5 +1,11 @@
 require 'net/ftp'
 
+class Net::FTP
+  def puttextcontent(content, remotefile, &block)
+    storlines "STOR " + remotefile, content, &block
+  end
+end
+
 module RemoteFileProvider
   class Ftp
     def initialize(url, username, password)
@@ -11,7 +17,7 @@ module RemoteFileProvider
     def send_file(local_file, remote_file_name, directory = nil)
       Net::FTP.open(@url, @username, @password) do |ftp|
         ftp.chdir(directory) if directory
-        ftp.puttextfile(local_file, remote_file_name)
+        ftp.puttextcontent(local_file, remote_file_name)
       end
     end
 
