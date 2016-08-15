@@ -12,6 +12,7 @@ SimpleNavigation::Configuration.run do |navigation|
                            highlights_on: Regexp.new(status.to_s)
         end
       end
+      primary.item :products, 'Products', products_path
       primary.item :sign_out, 'Sign out', destroy_user_session_path, method: :delete
     else
       primary.item :sign_in, 'Sign in', new_user_session_path
