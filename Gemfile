@@ -59,6 +59,7 @@ group :development do
   gem 'spring'
   gem 'annotate'
   gem 'launchy'
+  gem 'rails-erd'
 end
 
 group :test do
