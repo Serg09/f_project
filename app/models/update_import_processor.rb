@@ -16,6 +16,10 @@ class UpdateImportProcessor
     end
 
     Rails.logger.debug "end UpdateImportProcessor::perform"
+    true
+  rescue => e
+    Rails.logger.error "Error importing order updates. #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    false
   end
 
   private

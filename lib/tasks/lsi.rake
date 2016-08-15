@@ -6,6 +6,6 @@ namespace :lsi do
 
   desc 'Re-exports new batches'
   task retry: :environment do
-    Resque.enqueue ExportProcessor, retry: true
+    Resque.enqueue ExportProcessor, {retry: true}
   end
 end

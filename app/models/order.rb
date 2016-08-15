@@ -2,21 +2,25 @@
 #
 # Table name: orders
 #
-#  id            :integer          not null, primary key
-#  customer_name :string(50)       not null
-#  address_1     :string(50)       not null
-#  address_2     :string(50)
-#  city          :string(50)
-#  state         :string(2)
-#  postal_code   :string(10)
-#  country_code  :string(3)
-#  telephone     :string(25)
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  order_date    :date             not null
-#  batch_id      :integer
-#  status        :string(30)       default("new"), not null
-#  error         :text
+#  id              :integer          not null, primary key
+#  customer_name   :string(50)       not null
+#  address_1       :string(50)       not null
+#  address_2       :string(50)
+#  city            :string(50)
+#  state           :string(100)      not null
+#  postal_code     :string(10)
+#  country_code    :string(3)
+#  telephone       :string(25)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  order_date      :date             not null
+#  batch_id        :integer
+#  status          :string(30)       default("new"), not null
+#  error           :text
+#  client_id       :integer          not null
+#  client_order_id :string(100)      not null
+#  customer_email  :string(100)
+#  ship_method_id  :integer
 #
 
 class Order < ActiveRecord::Base
@@ -25,8 +29,11 @@ class Order < ActiveRecord::Base
   has_many :items, class_name: 'OrderItem'
   has_many :shipments
   belongs_to :batch
+  belongs_to :client
 
-  validates_presence_of :customer_name,
+  validates_presence_of :client_id,
+                        :client_order_id,
+                        :customer_name,
                         :order_date,
                         :address_1,
                         :city,
@@ -39,7 +46,10 @@ class Order < ActiveRecord::Base
                        :address_2,
                        :city],
                        maximum: 50
-  validates_length_of :state, is: 2
+  validates_length_of [:client_order_id,
+                       :customer_email,
+                       :state],
+                       maximum: 100
   validates_length_of :postal_code, maximum: 10
   validates_length_of :country_code, minimum: 2, maximum: 3
   validates_length_of :telephone, maximum: 25

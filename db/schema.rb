@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160524033647) do
+ActiveRecord::Schema.define(version: 20160528193927) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,39 @@ ActiveRecord::Schema.define(version: 20160524033647) do
     t.datetime "updated_at",                 null: false
   end
 
+  create_table "book_identifiers", force: :cascade do |t|
+    t.integer  "client_id",             null: false
+    t.integer  "book_id",               null: false
+    t.string   "code",       limit: 20, null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "book_identifiers", ["book_id"], name: "index_book_identifiers_on_book_id", using: :btree
+  add_index "book_identifiers", ["client_id", "code"], name: "index_book_identifiers_on_client_id_and_code", unique: true, using: :btree
+
+  create_table "books", force: :cascade do |t|
+    t.string   "isbn",       limit: 13,  null: false
+    t.string   "title",      limit: 250, null: false
+    t.string   "format",     limit: 100, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "books", ["isbn"], name: "index_books_on_isbn", unique: true, using: :btree
+  add_index "books", ["title"], name: "index_books_on_title", using: :btree
+
+  create_table "clients", force: :cascade do |t|
+    t.string   "name",                         limit: 100, null: false
+    t.string   "abbreviation",                 limit: 5,   null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.string   "order_import_processor_class", limit: 250
+  end
+
+  add_index "clients", ["abbreviation"], name: "index_clients_on_abbreviation", unique: true, using: :btree
+  add_index "clients", ["name"], name: "index_clients_on_name", unique: true, using: :btree
+
   create_table "documents", force: :cascade do |t|
     t.string   "source"
     t.string   "filename"
@@ -31,43 +64,51 @@ ActiveRecord::Schema.define(version: 20160524033647) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                                       null: false
-    t.integer  "line_item_no",                                   null: false
-    t.string   "sku",                 limit: 30,                 null: false
-    t.string   "description",         limit: 50
-    t.integer  "quantity",                                       null: false
+    t.integer  "order_id",                                        null: false
+    t.integer  "line_item_no",                                    null: false
+    t.string   "sku",                 limit: 30,                  null: false
+    t.string   "description",         limit: 250
+    t.integer  "quantity",                                        null: false
     t.decimal  "price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.string   "status",              limit: 30, default: "new", null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "status",              limit: 30,  default: "new", null: false
     t.integer  "accepted_quantity"
     t.integer  "shipped_quantity"
+    t.decimal  "weight"
   end
 
   add_index "order_items", ["order_id", "line_item_no"], name: "index_order_items_on_order_id_and_line_item_no", unique: true, using: :btree
   add_index "order_items", ["sku"], name: "index_order_items_on_sku", using: :btree
 
   create_table "orders", force: :cascade do |t|
-    t.string   "customer_name", limit: 50,                 null: false
-    t.string   "address_1",     limit: 50,                 null: false
-    t.string   "address_2",     limit: 50
-    t.string   "city",          limit: 50
-    t.string   "state",         limit: 2
-    t.string   "postal_code",   limit: 10
-    t.string   "country_code",  limit: 3
-    t.string   "telephone",     limit: 25
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
-    t.date     "order_date",                               null: false
+    t.string   "customer_name",   limit: 50,                  null: false
+    t.string   "address_1",       limit: 50,                  null: false
+    t.string   "address_2",       limit: 50
+    t.string   "city",            limit: 50
+    t.string   "state",           limit: 100,                 null: false
+    t.string   "postal_code",     limit: 10
+    t.string   "country_code",    limit: 3
+    t.string   "telephone",       limit: 25
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.date     "order_date",                                  null: false
     t.integer  "batch_id"
-    t.string   "status",        limit: 30, default: "new", null: false
+    t.string   "status",          limit: 30,  default: "new", null: false
     t.text     "error"
+    t.integer  "client_id",                                   null: false
+    t.string   "client_order_id", limit: 100,                 null: false
+    t.string   "customer_email",  limit: 100
+    t.integer  "ship_method_id"
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree
+  add_index "orders", ["client_id"], name: "index_orders_on_client_id", using: :btree
+  add_index "orders", ["client_order_id"], name: "index_orders_on_client_order_id", unique: true, using: :btree
+  add_index "orders", ["ship_method_id"], name: "index_orders_on_ship_method_id", using: :btree
 
   create_table "packages", force: :cascade do |t|
     t.integer  "shipment_item_id", null: false

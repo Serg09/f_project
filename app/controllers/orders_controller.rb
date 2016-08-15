@@ -1,5 +1,6 @@
 class OrdersController < ApplicationController
   before_filter :authenticate_user!
+  before_filter :load_order, only: [:show]
 
   def index
     @orders = Order.
@@ -8,5 +9,11 @@ class OrdersController < ApplicationController
   end
 
   def show
+  end
+
+  private
+
+  def load_order
+    @order = Order.find(params[:id])
   end
 end

@@ -2,9 +2,11 @@ class ExportProcessor
   @queue = :normal
 
   def self.perform(options = {})
+    options = (options || {}).with_indifferent_access
+
     Rails.logger.debug "start ExportProcessor::perform"
 
-    batches = if options['retry']
+    batches = if options[:retry]
                 Batch.by_status('new')
               else
                 [Batch.batch_orders].compact

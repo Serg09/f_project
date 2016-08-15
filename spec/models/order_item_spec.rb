@@ -66,8 +66,8 @@ RSpec.describe OrderItem, type: :model do
   end
 
   describe '#description' do
-    it 'cannot be longer than 50 characters' do
-      item = OrderItem.new attributes.merge(description: 'x' * 51)
+    it 'cannot be longer than 250 characters' do
+      item = OrderItem.new attributes.merge(description: 'x' * 251)
       expect(item).to have_at_least(1).error_on :description
     end
   end

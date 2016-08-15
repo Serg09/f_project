@@ -6,7 +6,7 @@
 #  order_id            :integer          not null
 #  line_item_no        :integer          not null
 #  sku                 :string(30)       not null
-#  description         :string(50)
+#  description         :string(250)
 #  quantity            :integer          not null
 #  price               :decimal(, )
 #  discount_percentage :decimal(, )
@@ -17,6 +17,7 @@
 #  status              :string(30)       default("new"), not null
 #  accepted_quantity   :integer
 #  shipped_quantity    :integer
+#  weight              :decimal(, )
 #
 
 class OrderItem < ActiveRecord::Base
@@ -32,16 +33,16 @@ class OrderItem < ActiveRecord::Base
                         :quantity
 
   validates_length_of :sku, maximum: 30
-  validates_length_of :description, maximum: 50
+  validates_length_of :description, maximum: 250
 
   validates_uniqueness_of :sku, scope: :order_id
 
   validates_numericality_of :quantity, greater_than: 0, on: :create
   validates_numericality_of :quantity, greater_than: -1, on: :update
-  validates_numericality_of [:price,
-                             :discount_percentage,
-                             :freight_charge,
-                             :tax], greater_than_or_equal_to: 0
+  [:price,
+   :discount_percentage,
+   :freight_charge,
+   :tax].each{|f| validates_numericality_of f, greater_than_or_equal_to: 0, if: f}
 
   before_validation :set_defaults
 
@@ -94,6 +95,11 @@ class OrderItem < ActiveRecord::Base
 
   def some_items_shipped?
     total_shipped_quantity > 0
+  end
+
+  def extended_price
+    return 0 unless price.present? && quantity.present?
+    price * quantity
   end
 
   private

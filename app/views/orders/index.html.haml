@@ -7,9 +7,13 @@
     %th Order date
     %th Customer name
     %th Total
+    %th &nbsp;
   -@orders.each do |order|
     %tr
       %td= format_date(order.order_date)
       %td= order.customer_name
       %td= number_to_currency(order.total)
+      %td
+        =link_to order_path(order), class: 'btn btn-xs btn-info', title: 'Click here to view the order details' do
+          %span.glyphicon.glyphicon-zoom-in{ 'aria-hidden' => true }
 =will_paginate @orders, renderer: BootstrapPagination::Rails

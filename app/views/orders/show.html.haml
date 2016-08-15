@@ -1,2 +1,69 @@
-%h1 Orders#show
-%p Find me in app/views/orders/show.html.haml
+=content_for :page_title do
+  Order #{h '%06d' % @order.id}
+
+-if @order.error
+  .alert.alert-danger=@order.error
+.row
+  .col-md-5
+    %table.table
+      %tr
+        %th Client
+        %td= @order.client.name
+      %tr
+        %th Order date
+        %td= format_date(@order.order_date)
+      %tr
+        %th Client Order No
+        %td= @order.client_order_id
+      %tr
+        %th Status
+        %td= @order.status
+  .col-md-6
+    %table.table
+      %tr
+        %th Customer
+        %td= @order.customer_name
+      %tr
+        %th Address
+        %td
+          =@order.address_1
+          %br
+          -if @order.address_2.present?
+            =@order.address_2
+            %br
+          #{h @order.city}, #{h @order.state}  #{h @order.postal_code}
+      %tr
+        %th Telephone
+        %td= @order.telephone
+      %tr
+        %th Email
+        %td= link_to @order.customer_email, "mailto:#{@order.customer_email}"
+  .col-md-1
+    =link_to 'Back', orders_path(status: @order.status), class: 'btn btn-primary', title: 'Click here to return to the list of orders.'
+.row
+  .col-md-12
+    %table.table.table-striped
+      %tr
+        %th No
+        %th SKU
+        %th Description
+        %th Qty
+        %th Unit price
+        %th Ext. price
+        %th Freight
+        %th Tot. price
+        %th Weight
+        %th Status
+
+      -@order.items.each do |item|
+        %tr
+          %td= item.line_item_no
+          %td= item.sku
+          %td= item.description
+          %td= item.quantity
+          %td= number_to_currency(item.price)
+          %td= number_to_currency(item.extended_price)
+          %td= number_to_currency(item.freight_charge)
+          %td= number_to_currency(item.total)
+          %td= item.weight
+          %td= item.status
