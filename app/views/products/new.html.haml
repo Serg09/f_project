@@ -1,2 +1,7 @@
-%h1 Products#new
-%p Find me in app/views/products/new.html.haml
+-content_for :page_title do
+  New product
+
+.row
+  .col-md-6
+    =form_for(@product) do |f|
+      =render 'form_fields', f: f, product: @product

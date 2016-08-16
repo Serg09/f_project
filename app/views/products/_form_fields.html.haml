@@ -1,0 +1,13 @@
+.form-group{ class: form_group_class(product, :sku) }
+  =f.label :sku, 'SKU', class: 'control-label'
+  =f.text_field :sku, maxlength: 20, class: 'form-control'
+  =help_blocks(product, :sku)
+.form-group{ class: form_group_class(product, :description) }
+  =f.label :description, class: 'control-label'
+  =f.text_field :description, max: 20, class: 'form-control'
+  =help_blocks(product, :description)
+.form-group{ class: form_group_class(product, :price) }
+  =f.label :price, class: 'control-label'
+  =f.number_field :price, max: 20, class: 'form-control', step: 0.01
+  =help_blocks(product, :price)
+=f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the product.'

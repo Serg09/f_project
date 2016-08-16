@@ -1,4 +1,3 @@
-@wip
 Feature: Add product
   As an administrator
   In order to make something available for purchase
@@ -22,6 +21,6 @@ Feature: Add product
     And I fill in "Price" with "19.99"
     And I click "Save"
     Then I should see "Products" within the page title
-    And I should see the following products table
-      | Description   | Price |
-      | Deluxe Widget | 19.99 |
+    And I should see the following product table
+      | SKU    | Description   | Price |
+      | 123456 | Deluxe Widget | 19.99 |

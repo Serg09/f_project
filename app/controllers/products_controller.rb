@@ -5,12 +5,14 @@ class ProductsController < ApplicationController
   respond_to :html
 
   def index
+    @products = Product.paginate(page: params[:page])
   end
 
   def show
   end
 
   def new
+    @product = Product.new
   end
 
   def create

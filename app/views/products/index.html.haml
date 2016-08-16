@@ -1,2 +1,17 @@
-%h1 Products#index
-%p Find me in app/views/products/index.html.haml
+-content_for :page_title do
+  Products
+
+.row
+  .col-md-6
+    %table#product-table.table.table-striped.table-hover
+      %tr
+        %th SKU
+        %th Description
+        %th Price
+      -@products.each do |product|
+        %tr
+          %td= product.sku
+          %td= product.description
+          %td= number_to_currency(product.price, unit: '')
+    =link_to 'Add', new_product_path, class: 'btn btn-primary', title: 'Click here to add a new product.'
+    =will_paginate @products, renderer: BootstrapPagination::Rails
