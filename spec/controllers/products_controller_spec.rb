@@ -11,6 +11,9 @@ RSpec.describe ProductsController, type: :controller do
   end
 
   context 'for an authenticated user' do
+    let (:user) { FactoryGirl.create(:user) }
+    before(:each) { sign_in user }
+
     describe "GET #index" do
       it "returns http success" do
         get :index
@@ -20,7 +23,7 @@ RSpec.describe ProductsController, type: :controller do
 
     describe "GET #show" do
       it "returns http success" do
-        get :show
+        get :show, id: product
         expect(response).to have_http_status(:success)
       end
     end
@@ -47,7 +50,7 @@ RSpec.describe ProductsController, type: :controller do
 
     describe "GET #edit" do
       it "returns http success" do
-        get :edit
+        get :edit, id: product
         expect(response).to have_http_status(:success)
       end
     end
@@ -57,7 +60,7 @@ RSpec.describe ProductsController, type: :controller do
         expect do
           patch :update, id: product, product: attributes
           product.reload
-        end.to change(product, description).to(product[:description])
+        end.to change(product, :description).to(attributes[:description])
       end
 
       it 'redirects to the product index page' do
