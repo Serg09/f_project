@@ -8,10 +8,14 @@
         %th SKU
         %th Description
         %th Price
+        %th &nbsp;
       -@products.each do |product|
         %tr
           %td= product.sku
           %td= product.description
           %td= number_to_currency(product.price, unit: '')
+          %td
+            =link_to edit_product_path(product), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit this product.' do
+              %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
     =link_to 'Add', new_product_path, class: 'btn btn-primary', title: 'Click here to add a new product.'
     =will_paginate @products, renderer: BootstrapPagination::Rails

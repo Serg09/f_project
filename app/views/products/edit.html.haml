@@ -1,2 +1,7 @@
-%h1 Products#edit
-%p Find me in app/views/products/edit.html.haml
+-content_for :page_title do
+  Edit product
+
+.row
+  .col-md-6
+    =form_for(@product) do |f|
+      =render 'form_fields', f: f, product: @product
