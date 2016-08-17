@@ -68,6 +68,21 @@ RSpec.describe ProductsController, type: :controller do
         expect(response).to redirect_to products_path
       end
     end
+
+    describe 'DELETE #destroy' do
+      let!(:product) { FactoryGirl.create(:product) }
+
+      it 'removes the specified product' do
+        expect do
+          delete :destroy, id: product
+        end.to change(Product, :count).by(-1)
+      end
+
+      it 'redirects to the product index page' do
+        delete :destroy, id: product
+        expect(response).to redirect_to(products_path)
+      end
+    end
   end
 
   context 'for an unauthenticated user' do
@@ -122,6 +137,21 @@ RSpec.describe ProductsController, type: :controller do
 
       it "redirects to the sign in page" do
         patch :update, id: product, product: attributes
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    describe 'DELETE #destroy' do
+      let!(:product) { FactoryGirl.create(:product) }
+
+      it 'does not remove the specified product' do
+        expect do
+          delete :destroy, id: product
+        end.not_to change(Product, :count)
+      end
+
+      it 'redirects to the sign in page' do
+        delete :destroy, id: product
         expect(response).to redirect_to(new_user_session_path)
       end
     end

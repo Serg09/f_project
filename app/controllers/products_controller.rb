@@ -30,6 +30,11 @@ class ProductsController < ApplicationController
     respond_with @product, location: products_path
   end
 
+  def destroy
+    flash[:notice] = 'The product was removed successfully.' if @product.destroy
+    respond_with @product, location: products_path
+  end
+
   private
 
   def load_product
