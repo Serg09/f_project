@@ -20,6 +20,12 @@ When /^I click "([^"]+)"$/ do |locator|
   click_on locator
 end
 
+When /^I click the (.*) button$/ do |button_description|
+  selector = ".#{description_to_id(button_description)}-button"
+  button = page.find(selector)
+  button.click
+end
+
 Then /^I should see the following (.*) table$/ do |description, expected_table|
   id = "##{description_to_id(description)}-table"
   html_table = find(id)

@@ -7,5 +7,14 @@ module ContentHelpers
     rows = html_table.all('tr')
     rows.map{|row| row.all('td,th').map{|c| c.text.strip}}
   end
+
+  def table_as_maps(table)
+    keys = table.raw.first.map{|key| key.downcase.underscore.to_sym}
+    table.raw.drop(1).map do |array|
+      Hash[*keys.zip(array).flatten]
+    end.each do |attributes|
+      yield attributes if block_given?
+    end
+  end
 end
 World(ContentHelpers)
