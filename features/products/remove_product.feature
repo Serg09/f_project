@@ -1,4 +1,3 @@
-@wip
 Feature: Remove a product
   As an administrator
   In order to remove a product added by mistake
