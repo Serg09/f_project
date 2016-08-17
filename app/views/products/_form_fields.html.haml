@@ -1,6 +1,6 @@
 .form-group{ class: form_group_class(product, :sku) }
   =f.label :sku, 'SKU', class: 'control-label'
-  =f.text_field :sku, maxlength: 20, class: 'form-control'
+  =f.text_field :sku, maxlength: 20, class: 'form-control', autofocus: true
   =help_blocks(product, :sku)
 .form-group{ class: form_group_class(product, :description) }
   =f.label :description, class: 'control-label'
