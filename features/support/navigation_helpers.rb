@@ -13,8 +13,15 @@ module NavigationHelpers
     when "notification area" then "#notifications"
     when "page title" then "#page-title"
     when "main content" then "#main-content"
+    when /(\d(?:st|nd|rd|th)) (.+) row/ then "##{hyphenize($2)}-table tr:nth-child(#{$1.to_i + 1})"
     else raise "unrecognized location description \"#{location_description}\"."
     end
+  end
+
+  private
+
+  def hyphenize(words)
+    words.gsub(/\s/, "-")
   end
 end
 World(NavigationHelpers)
