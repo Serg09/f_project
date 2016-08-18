@@ -6,16 +6,19 @@ describe Lsi::BatchWriter do
       FactoryGirl.create(:batch, orders: [order])
     end
   end
+  let (:shipping_address) do
+    FactoryGirl.create :address, line_1: '1234 Main St',
+                                 line_2: 'Apt 227',
+                                 city: 'Dallas',
+                                 state: 'TX',
+                                 postal_code: '75200',
+                                 country_code: 'US'
+  end
   let (:order) do
-    FactoryGirl.create(:order, order_date: '2016-02-27',
-                                customer_name: 'John Doe',
-                                address_1: '1234 Main St',
-                                address_2: 'Apt 227',
-                                city: 'Dallas',
-                                state: 'TX',
-                                postal_code: '75200',
-                                country_code: 'USA',
-                                telephone: '214-555-1212')
+    FactoryGirl.create :order, order_date: '2016-02-27',
+                               customer_name: 'John Doe',
+                               telephone: '214-555-1212',
+                               shipping_address: shipping_address
   end
   let!(:item) do
     FactoryGirl.create(:order_item, order: order,
