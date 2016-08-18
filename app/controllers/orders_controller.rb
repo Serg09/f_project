@@ -17,8 +17,7 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = Order.new order_params
-    flash[:notice] = 'The order was created successfuly.' if @order.save
+    flash[:notice] = 'The order was created successfuly.' if create_order
     respond_with @order, location: orders_path
   end
 
@@ -49,17 +48,44 @@ class OrdersController < ApplicationController
 
   private
 
+  def create_order
+    Order.transaction do
+      @address = Address.new shipping_address_params
+      @order = Order.new order_params.merge(shipping_address: @address)
+      if @address.save && @order.save
+        return true
+      else
+        raise ActiveRecord::Rollback
+      end
+    end
+    false
+  end
+
   def load_order
     @order = Order.find(params[:id])
   end
 
+  def shipping_address_params
+    params.require(:shipping_address).
+      permit(:line_1,
+             :line_2,
+             :city,
+             :state,
+             :postal_code,
+             :country_code).
+      merge(recipient: params[:order][:customer_name])
+  end
+
   def order_params
-    params.require(:order).permit(:order_date,
-                                  :client_id,
-                                  :customer_name,
-                                  :customer_email,
-                                  :telephone).tap do |attr|
-                                    attr[:order_date] = Date.strptime(attr[:order_date], '%m/%d/%Y')
-                                  end
+    params.require(:order).
+      permit(:order_date,
+             :client_id,
+             :client_order_id,
+             :customer_name,
+             :customer_email,
+             :telephone).
+      tap do |attr|
+        attr[:order_date] = Date.strptime(attr[:order_date], '%m/%d/%Y')
+      end
   end
 end

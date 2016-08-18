@@ -9,15 +9,17 @@ RSpec.describe OrdersController, type: :controller do
     {
       order_date: '3/2/2016',
       customer_name: 'Sally Readerton',
-      client_id: client.id
+      client_id: client.id,
+      client_order_id: '9090',
+      telephone: '214-555-1212'
     }
   end
 
   let (:shipping_address_attributes) do
     {
       recipient: 'Sally Readerton',
-      address_1: '1234 Main St',
-      address_2: 'Apt 227',
+      line_1: '1234 Main St',
+      line_2: 'Apt 227',
       city: 'Dallas',
       state: 'TX',
       postal_code: '75200',
@@ -66,11 +68,6 @@ RSpec.describe OrdersController, type: :controller do
           post :create, order: attributes, shipping_address: shipping_address_attributes
         end.to change(Address, :count).by(1)
       end
-
-      it 'links the new address record to the new order record' #do
-      #  post :create, order: attributes, shipping_address: shipping_address_attributes
-      #  expect(Order.last..shipping_address_id).to eq(Address.last.id)
-      #end
     end
 
     context 'for a new order' do
