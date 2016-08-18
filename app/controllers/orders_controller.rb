@@ -1,4 +1,6 @@
 class OrdersController < ApplicationController
+  respond_to :html
+
   before_filter :authenticate_user!
   before_filter :load_order, only: [:show, :edit, :update, :destroy]
 
@@ -21,9 +23,19 @@ class OrdersController < ApplicationController
   end
 
   def edit
+    unless can? :update, @order
+      redirect_to order_path(@order), alert: 'This order cannot be edited.'
+    end
   end
 
   def update
+    if can? :update, @order
+      @order.update_attributes order_params
+      flash[:notice] = 'The order was updated successfully.' if @order.save
+      respond_with @order, location: orders_path
+    else
+      redirect_to order_path(@order), alert: 'This order cannot be edited.'
+    end
   end
 
   def destroy
@@ -31,7 +43,7 @@ class OrdersController < ApplicationController
       flash[:notice] = 'The order was removed successfully.' if @order.delete
       respond_with @order, location: orders_path
     else
-      redirect_to order_path(@order), alert: 'This order cannot be removed'
+      redirect_to order_path(@order), alert: 'This order cannot be removed.'
     end
   end
 
@@ -46,6 +58,8 @@ class OrdersController < ApplicationController
                                   :client_id,
                                   :customer_name,
                                   :customer_email,
-                                  :telephone)
+                                  :telephone).tap do |attr|
+                                    attr[:order_date] = Date.strptime(attr[:order_date], '%m/%d/%Y')
+                                  end
   end
 end
