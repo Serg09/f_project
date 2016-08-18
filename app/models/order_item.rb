@@ -6,7 +6,7 @@
 #  order_id            :integer          not null
 #  line_item_no        :integer          not null
 #  sku                 :string(30)       not null
-#  description         :string(250)
+#  description         :string(50)
 #  quantity            :integer          not null
 #  price               :decimal(, )
 #  discount_percentage :decimal(, )
