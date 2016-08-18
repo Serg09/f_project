@@ -139,6 +139,8 @@ RSpec.describe OrdersController, type: :controller do
       end
 
       describe 'DELETE #destroy' do
+        let!(:order) { FactoryGirl.create(:order) }
+
         it 'redirects to the order show page' do
           delete :destroy, id: order
           expect(response).to redirect_to order_path(order)
@@ -232,6 +234,8 @@ RSpec.describe OrdersController, type: :controller do
     end
 
     describe 'DELETE #destroy' do
+      let!(:order) { FactoryGirl.create(:order) }
+
       it "redirects to the sign in page" do
         delete :destroy, id: order
         expect(response).to redirect_to new_user_session_path
