@@ -5,6 +5,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     state { Faker::Address.state }
     postal_code { Faker::Address.postcode }
+    country_code 'US'
     recipient { Faker::Name.name }
   end
 end
