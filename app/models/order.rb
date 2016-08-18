@@ -81,4 +81,8 @@ class Order < ActiveRecord::Base
                   quantity: 1,
                   price: 0)
   end
+
+  def updatable?
+    new?
+  end
 end

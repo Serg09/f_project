@@ -293,4 +293,46 @@ RSpec.describe Order, type: :model do
       expect(Order.unbatched.map(&:id)).to contain_exactly o2.id, o4.id
     end
   end
+
+  shared_examples 'an immutable order' do
+    describe 'updatable?' do
+      it 'returns false' do
+        expect(order).not_to be_updatable
+      end
+    end
+  end
+
+  context 'that is new' do
+    let (:order) { FactoryGirl.create(:new_order) }
+
+    describe 'updatable?' do
+      it 'returns true' do
+        expect(order).to be_updatable
+      end
+    end
+  end
+
+  context 'that is exported' do
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(:exported_order) }
+    end
+  end
+
+  context 'that is processing' do
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(:processing_order) }
+    end
+  end
+
+  context 'that is shipped' do
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(:shipped_order) }
+    end
+  end
+
+  context 'that is rejected' do
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(:rejected_order) }
+    end
+  end
 end
