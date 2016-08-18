@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160818194754) do
+ActiveRecord::Schema.define(version: 20160818213516) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -76,18 +76,18 @@ ActiveRecord::Schema.define(version: 20160818194754) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                                        null: false
-    t.integer  "line_item_no",                                    null: false
-    t.string   "sku",                 limit: 30,                  null: false
-    t.string   "description",         limit: 250
-    t.integer  "quantity",                                        null: false
+    t.integer  "order_id",                                       null: false
+    t.integer  "line_item_no",                                   null: false
+    t.string   "sku",                 limit: 30,                 null: false
+    t.string   "description",         limit: 50
+    t.integer  "quantity",                                       null: false
     t.decimal  "price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.string   "status",              limit: 30,  default: "new", null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.string   "status",              limit: 30, default: "new", null: false
     t.integer  "accepted_quantity"
     t.integer  "shipped_quantity"
     t.decimal  "weight"
@@ -97,24 +97,19 @@ ActiveRecord::Schema.define(version: 20160818194754) do
   add_index "order_items", ["sku"], name: "index_order_items_on_sku", using: :btree
 
   create_table "orders", force: :cascade do |t|
-    t.string   "customer_name",   limit: 50,                  null: false
-    t.string   "address_1",       limit: 50,                  null: false
-    t.string   "address_2",       limit: 50
-    t.string   "city",            limit: 50
-    t.string   "state",           limit: 100,                 null: false
-    t.string   "postal_code",     limit: 10
-    t.string   "country_code",    limit: 3
-    t.string   "telephone",       limit: 25
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.date     "order_date",                                  null: false
+    t.string   "customer_name",       limit: 50,                  null: false
+    t.string   "telephone",           limit: 25
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.date     "order_date",                                      null: false
     t.integer  "batch_id"
-    t.string   "status",          limit: 30,  default: "new", null: false
+    t.string   "status",              limit: 30,  default: "new", null: false
     t.text     "error"
-    t.integer  "client_id",                                   null: false
-    t.string   "client_order_id", limit: 100,                 null: false
-    t.string   "customer_email",  limit: 100
+    t.integer  "client_id",                                       null: false
+    t.string   "client_order_id",     limit: 100,                 null: false
+    t.string   "customer_email",      limit: 100
     t.integer  "ship_method_id"
+    t.integer  "shipping_address_id",                             null: false
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree
