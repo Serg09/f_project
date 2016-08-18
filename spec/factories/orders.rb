@@ -21,12 +21,10 @@ FactoryGirl.define do
       end
     end
 
-    factory :exported_order do
-      status 'exported'
-    end
-
-    factory :processing_order do
-      status 'processing'
+    %w(exported processing shipped rejected).each do |status|
+      factory "#{status}_order".to_sym do
+        status status
+      end
     end
   end
 end
