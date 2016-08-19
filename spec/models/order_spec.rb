@@ -2,13 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Order, type: :model do
   let (:client) { FactoryGirl.create(:client) }
+  let (:shipping_address) { FactoryGirl.create(:address) }
   let (:attributes) do
     {
       client_id: client.id,
       client_order_id: '000001',
       customer_name: 'John Doe',
       order_date: '2016-03-02',
-      telephone: '214-555-1212'
+      telephone: '214-555-1212',
+      shipping_address_id: shipping_address.id
     }
   end
 
@@ -40,6 +42,12 @@ RSpec.describe Order, type: :model do
     it 'is required' do
       order = Order.new attributes.except(:client_order_id)
       expect(order).to have_at_least(1).error_on :client_order_id
+    end
+
+    it 'must be unique' do
+      o1 = Order.create! attributes
+      o2 = Order.new attributes
+      expect(o2).to have(1).error_on :client_order_id
     end
   end
 

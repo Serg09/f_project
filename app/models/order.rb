@@ -38,6 +38,7 @@ class Order < ActiveRecord::Base
                        :customer_email],
                        maximum: 100
   validates_length_of :telephone, maximum: 25
+  validates_uniqueness_of :client_order_id
 
   scope :by_order_date, ->{order('order_date desc')}
   scope :by_status, ->(status){where(status: status)}

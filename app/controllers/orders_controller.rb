@@ -14,11 +14,18 @@ class OrdersController < ApplicationController
   end
 
   def new
+    @order = Order.new order_date: Date.today
+    @shipping_address = Address.new
   end
 
   def create
-    flash[:notice] = 'The order was created successfuly.' if create_order
-    respond_with @order, location: orders_path
+    if create_order
+      flash[:notice] = 'The order was created successfully.'
+      respond_with @order, location: orders_path(status: :new)
+    else
+      # respond_with doesn't seem to work with nested objects
+      render :new
+    end
   end
 
   def edit
@@ -50,9 +57,9 @@ class OrdersController < ApplicationController
 
   def create_order
     Order.transaction do
-      @address = Address.new shipping_address_params
-      @order = Order.new order_params.merge(shipping_address: @address)
-      if @address.save && @order.save
+      @shipping_address = Address.new shipping_address_params
+      @order = Order.new order_params.merge(shipping_address: @shipping_address)
+      if @shipping_address.save && @order.save
         return true
       else
         raise ActiveRecord::Rollback
@@ -85,7 +92,9 @@ class OrdersController < ApplicationController
              :customer_email,
              :telephone).
       tap do |attr|
-        attr[:order_date] = Date.strptime(attr[:order_date], '%m/%d/%Y')
+        if attr[:order_date].present?
+          attr[:order_date] = Chronic.parse(attr[:order_date])
+        end
       end
   end
 end

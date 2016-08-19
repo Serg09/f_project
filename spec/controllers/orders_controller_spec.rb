@@ -52,9 +52,9 @@ RSpec.describe OrdersController, type: :controller do
     end
 
     describe 'POST #create' do
-      it 'redirects to the order index page' do
+      it 'redirects to the new order index page' do
         post :create, order: attributes, shipping_address: shipping_address_attributes
-        expect(response).to redirect_to orders_path
+        expect(response).to redirect_to orders_path(status: :new)
       end
 
       it 'creates an order record' do
