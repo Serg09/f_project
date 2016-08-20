@@ -5,12 +5,14 @@
 %table#order-table.table.table-striped.table-hover
   %tr
     %th Order date
+    %th Client
     %th Customer name
     %th Total
     %th &nbsp;
   -@orders.each do |order|
     %tr
       %td= format_date(order.order_date)
+      %td= order.client.name
       %td= order.customer_name
       %td= number_to_currency(order.total)
       %td
