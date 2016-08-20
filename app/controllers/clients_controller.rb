@@ -5,6 +5,7 @@ class ClientsController < ApplicationController
   respond_to :html
 
   def index
+    @clients = Client.all.paginate page: params[:page]
   end
 
   def show

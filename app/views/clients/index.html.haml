@@ -1,2 +1,15 @@
-%h1 Clients#index
-%p Find me in app/views/clients/index.html.haml
+-content_for :page_title do
+  Clients
+
+.row
+  .col-md-6
+    %table#client-table.table.table-striped
+      %tr
+        %th Name
+        %th Abbreviation
+      -@clients.each do |client|
+        %tr
+          %td= client.name
+          %td= client.abbreviation
+    =will_paginate @clients, renderer: BootstrapPagination::Rails
+    =link_to 'Add', new_client_path, class: 'btn btn-primary', title: 'Click here to add a new client.'
