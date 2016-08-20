@@ -1,0 +1,5 @@
+-content_for :page_title do
+  New order
+
+=form_for(@order) do |f|
+  =render 'form_fields', f: f, order: @order, shipping_address: @shipping_address

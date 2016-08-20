@@ -29,7 +29,7 @@ class Batch < ActiveRecord::Base
     return nil unless Order.unbatched.any?
 
     batch = Batch.create!
-    Order.unbatched.each{|o| batch.orders << o}
+    Order.ready_for_export.each{|o| batch.orders << o}
     batch
   end
 end

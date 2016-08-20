@@ -26,6 +26,10 @@ When /^I click the (.*) button$/ do |button_description|
   button.click
 end
 
+When /^I select "([^"]+)" from the "([^"]+)" list$/ do |value, locator|
+  select value, from: locator
+end
+
 Then /^I should see the following (.*) table$/ do |description, expected_table|
   id = "##{description_to_id(description)}-table"
   html_table = find(id)

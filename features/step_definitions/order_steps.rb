@@ -9,3 +9,11 @@ Given /^"([^"]+)" ordered "([^"]+)" - "([^"]+)" for (#{DOLLAR_AMOUNT}) on (#{DAT
                                          tax: price * 0.0825,
                                          freight_charge: 0)
 end
+
+Given /^there are the following orders$/ do |table|
+  table_as_maps(table) do |attributes|
+    client = Client.find_by name: attributes[:client]
+    client ||= FactoryGirl.create :client, name: attributes[:client]
+    FactoryGirl.create :order, attributes.merge(client: client)
+  end
+end

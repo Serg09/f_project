@@ -11,10 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160816031213) do
+ActiveRecord::Schema.define(version: 20160820145559) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "addresses", force: :cascade do |t|
+    t.string   "recipient",    limit: 100, null: false
+    t.string   "line_1",       limit: 100, null: false
+    t.string   "line_2",       limit: 100
+    t.string   "city",         limit: 100, null: false
+    t.string   "state",        limit: 20,  null: false
+    t.string   "postal_code",  limit: 10,  null: false
+    t.string   "country_code", limit: 2,   null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
 
   create_table "batches", force: :cascade do |t|
     t.string   "status",     default: "new", null: false
@@ -85,24 +97,19 @@ ActiveRecord::Schema.define(version: 20160816031213) do
   add_index "order_items", ["sku"], name: "index_order_items_on_sku", using: :btree
 
   create_table "orders", force: :cascade do |t|
-    t.string   "customer_name",   limit: 50,                  null: false
-    t.string   "address_1",       limit: 50,                  null: false
-    t.string   "address_2",       limit: 50
-    t.string   "city",            limit: 50
-    t.string   "state",           limit: 100,                 null: false
-    t.string   "postal_code",     limit: 10
-    t.string   "country_code",    limit: 3
-    t.string   "telephone",       limit: 25
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.date     "order_date",                                  null: false
+    t.string   "customer_name",       limit: 50,                        null: false
+    t.string   "telephone",           limit: 25
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.date     "order_date",                                            null: false
     t.integer  "batch_id"
-    t.string   "status",          limit: 30,  default: "new", null: false
+    t.string   "status",              limit: 30,  default: "incipient", null: false
     t.text     "error"
-    t.integer  "client_id",                                   null: false
-    t.string   "client_order_id", limit: 100,                 null: false
-    t.string   "customer_email",  limit: 100
+    t.integer  "client_id",                                             null: false
+    t.string   "client_order_id",     limit: 100,                       null: false
+    t.string   "customer_email",      limit: 100
     t.integer  "ship_method_id"
+    t.integer  "shipping_address_id",                                   null: false
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree

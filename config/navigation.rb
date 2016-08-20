@@ -3,9 +3,9 @@ SimpleNavigation::Configuration.run do |navigation|
   navigation.items do |primary|
     primary.dom_class = 'nav navbar-nav'
     if user_signed_in?
-      primary.item :orders, 'Orders', orders_path(status: :new) do |orders_item|
+      primary.item :orders, 'Orders', orders_path(status: :incipient) do |orders_item|
         orders_item.dom_class = 'nav nav-tabs'
-        [:new, :exported, :processing, :shipped, :rejected].each do |status|
+        Order::STATUSES.each do |status|
           orders_item.item status,
                            status.to_s.capitalize,
                            orders_path(status: status),

@@ -77,6 +77,13 @@ class Lsi::BatchWriter
 
   private
 
+  COUNTRY_CODES = {
+    'US' => 'USA'
+  }
+  def map_country_code(country_code)
+    COUNTRY_CODES.fetch(country_code, country_code)
+  end
+
   def purchase_order_number(order)
     alpha_of_length('%09d' % order.id, 15)
   end
@@ -129,16 +136,16 @@ class Lsi::BatchWriter
     io.print ' ' * 25 # Internal use only
     io.print alpha_of_length(order.customer_name, 35)
     io.print ' ' * 15 # Internal use only
-    io.print alpha_of_length(order.address_1, 35) # address line 1
+    io.print alpha_of_length(order.shipping_address.line_1, 35) # address line 1
     io.print ' ' * 15 # Internal use only
-    io.print alpha_of_length(order.address_2, 35) # address line 2
+    io.print alpha_of_length(order.shipping_address.line_2, 35) # address line 2
     io.print ' ' * 15 # Internal use only
     io.print ' ' * 35 # address line 3
     io.print ' ' * 65 # Internal use only
-    io.print alpha_of_length(order.city, 30)        # city
-    io.print alpha_of_length(order.state, 2)        # state
-    io.print alpha_of_length(order.postal_code, 9)  # postal code
-    io.print alpha_of_length(order.country_code, 3) # country code
+    io.print alpha_of_length(order.shipping_address.city, 30)        # city
+    io.print alpha_of_length(order.shipping_address.state, 2)        # state
+    io.print alpha_of_length(order.shipping_address.postal_code, 9)  # postal code
+    io.print alpha_of_length(map_country_code(order.shipping_address.country_code), 3) # country code
     io.print alpha_of_length(order.telephone.gsub(/\D/, ''), 15)   # phone number
     io.print ' ' * 5  # Internal use only
     io.puts ''

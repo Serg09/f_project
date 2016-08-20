@@ -1,0 +1,7 @@
+-content_for :page_title do
+  Edit order
+
+.row
+  .col-md-12
+    =form_for(@order) do |f|
+      =render 'form_fields', f: f, order: @order, shipping_address: @order.shipping_address

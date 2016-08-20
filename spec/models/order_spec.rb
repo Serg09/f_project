@@ -2,19 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Order, type: :model do
   let (:client) { FactoryGirl.create(:client) }
+  let (:shipping_address) { FactoryGirl.create(:address) }
   let (:attributes) do
     {
       client_id: client.id,
       client_order_id: '000001',
       customer_name: 'John Doe',
-      address_1: '1234 MAIN ST',
-      address_2: 'APT 227',
-      city: 'Dallas',
-      state: 'TX',
-      postal_code: '75200',
-      country_code: 'US',
       order_date: '2016-03-02',
-      telephone: '214-555-1212'
+      telephone: '214-555-1212',
+      shipping_address_id: shipping_address.id
     }
   end
 
@@ -47,6 +43,12 @@ RSpec.describe Order, type: :model do
       order = Order.new attributes.except(:client_order_id)
       expect(order).to have_at_least(1).error_on :client_order_id
     end
+
+    it 'must be unique' do
+      o1 = Order.create! attributes
+      o2 = Order.new attributes
+      expect(o2).to have(1).error_on :client_order_id
+    end
   end
 
   describe '#customer_name' do
@@ -70,103 +72,6 @@ RSpec.describe Order, type: :model do
     it 'cannot be more than 100 characters' do
       order = Order.new attributes.merge(customer_email: 'X' * 101)
       expect(order).to have_at_least(1).error_on :customer_email
-    end
-  end
-
-  describe '#address_1' do
-    it 'is required' do
-      order = Order.new attributes.except(:address_1)
-      expect(order).to have_at_least(1).error_on :address_1
-    end
-
-    it 'can be 50 characters' do
-      order = Order.new attributes.merge(address_1: 'x' * 50)
-      expect(order).to be_valid
-    end
-
-    it 'cannot be more than 50 characters' do
-      order = Order.new attributes.merge(address_1: 'x' * 51)
-      expect(order).to have_at_least(1).error_on :address_1
-    end
-  end
-
-  describe '#address_2' do
-    it 'can be 50 characters' do
-      order = Order.new attributes.merge(address_2: 'x' * 50)
-      expect(order).to be_valid
-    end
-
-    it 'cannot be more than 50 characters' do
-      order = Order.new attributes.merge(address_2: 'x' * 51)
-      expect(order).to have_at_least(1).error_on :address_2
-    end
-  end
-
-  describe '#city' do
-    it 'is required' do
-      order = Order.new attributes.except(:city)
-      expect(order).to have_at_least(1).error_on :city
-    end
-
-    it 'can be 50 characters' do
-      order = Order.new attributes.merge(city: 'x' * 50)
-      expect(order).to be_valid
-    end
-
-    it 'cannot be more than 50 characters' do
-      order = Order.new attributes.merge(city: 'x' * 51)
-      expect(order).to have_at_least(1).error_on :city
-    end
-  end
-
-  describe '#state' do
-    it 'is required' do
-      order = Order.new attributes.except(:state)
-      expect(order).to have_at_least(1).error_on :state
-    end
-
-    it 'cannot be more than 100 characters' do
-      order = Order.new attributes.merge(state: 'x' * 101)
-      expect(order).to have_at_least(1).error_on :state
-    end
-  end
-
-  describe '#postal_code' do
-    it 'is required' do
-      order = Order.new attributes.except(:postal_code)
-      expect(order).to have_at_least(1).error_on :postal_code
-    end
-
-    it 'can be 10 characters' do
-      order = Order.new attributes.merge(postal_code: 'x' * 10)
-      expect(order).to be_valid
-    end
-
-    it 'cannot be more than 10 characters' do
-      order = Order.new attributes.merge(postal_code: 'x' * 11)
-      expect(order).to have_at_least(1).error_on :postal_code
-    end
-  end
-
-  describe '#country_code' do
-    it 'is required' do
-      order = Order.new attributes.except(:country_code)
-      expect(order).to have_at_least(1).error_on :country_code
-    end
-
-    it 'can be 3 characters' do
-      order = Order.new attributes.merge(country_code: 'x' * 3)
-      expect(order).to be_valid
-    end
-
-    it 'cannot be more than 3 characters' do
-      order = Order.new attributes.merge(country_code: 'x' * 4)
-      expect(order).to have_at_least(1).error_on :country_code
-    end
-
-    it 'cannot be less than 2 characters' do
-      order = Order.new attributes.merge(country_code: 'x')
-      expect(order).to have_at_least(1).error_on :country_code
     end
   end
 
@@ -237,15 +142,6 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  describe '#export' do
-    let (:order) { FactoryGirl.create(:order) }
-    it 'changes the status to "exported"' do
-      expect do
-        order.export
-      end.to change(order, :status).from('new').to('exported')
-    end
-  end
-
   describe '#acknowledge' do
     let (:order) { FactoryGirl.create(:exported_order) }
     it 'changes the status to "processing"' do
@@ -256,7 +152,7 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#<<' do
-    let (:order) { FactoryGirl.create(:new_order) }
+    let (:order) { FactoryGirl.create(:incipient_order) }
     let (:sku) { '1234567890123' }
 
     it 'adds a item to the order' do
@@ -291,6 +187,162 @@ RSpec.describe Order, type: :model do
 
     it 'returns a list of orders that have not been assigned to a batch' do
       expect(Order.unbatched.map(&:id)).to contain_exactly o2.id, o4.id
+    end
+  end
+
+  shared_examples 'an immutable order' do
+    describe 'updatable?' do
+      it 'returns false' do
+        expect(order).not_to be_updatable
+      end
+    end
+  end
+
+  shared_examples 'a submittable order' do
+    describe '#submit' do
+      it 'returns true' do
+        expect(order.submit).to be true
+      end
+
+      it 'changes the state to "submitted"' do
+        expect do
+          order.submit
+        end.to change(order, :status).to('submitted')
+      end
+    end
+  end
+
+  shared_examples 'an unsubmittable order' do
+    describe '#submit' do
+      it 'returns false' do
+        expect(order.submit).to be false
+      end
+
+      it 'does not change the state' do
+        expect do
+          order.submit
+        end.not_to change(order, :status)
+      end
+    end
+  end
+
+  shared_examples 'an exportable order' do
+    describe '#export' do
+      it 'returns true' do
+        expect(order.export).to be true
+      end
+
+      it 'changes the status to "exported"' do
+        expect do
+          order.export
+        end.to change(order, :status).to('exported')
+      end
+    end
+  end
+
+  shared_examples 'an unexportable order' do
+    describe '#export' do
+      it 'returns false' do
+        expect(order.export).to be false
+      end
+
+      it 'does not changes the status' do
+        expect do
+          order.export
+        end.not_to change(order, :status)
+      end
+    end
+  end
+
+  context 'that is incipient' do
+    let (:factory_key) { :incipient_order }
+    let (:order) { FactoryGirl.create(factory_key) }
+
+    describe 'updatable?' do
+      it 'returns true' do
+        expect(order).to be_updatable
+      end
+    end
+
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+
+    context 'and ready for submission' do
+      it_behaves_like 'a submittable order' do
+        let (:order) { FactoryGirl.create(factory_key, item_count: 1) }
+      end
+    end
+
+    context 'but not ready for submission' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create(factory_key) }
+      end
+    end
+  end
+
+  context 'that is submitted' do
+    let (:factory_key) { :submitted_order }
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an exportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+  end
+
+  context 'that is exported' do
+    let (:factory_key) { :exported_order }
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+  end
+
+  context 'that is processing' do
+    let (:factory_key) { :processing_order }
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+  end
+
+  context 'that is shipped' do
+    let (:factory_key) { :shipped_order }
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+  end
+
+  context 'that is rejected' do
+    let (:factory_key) { :rejected_order }
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
     end
   end
 end

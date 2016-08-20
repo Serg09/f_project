@@ -9,7 +9,7 @@ module ContentHelpers
   end
 
   def table_as_maps(table)
-    keys = table.raw.first.map{|key| key.downcase.underscore.to_sym}
+    keys = table.raw.first.map{|key| key.gsub(/\s+/, '_').downcase.underscore.to_sym}
     table.raw.drop(1).map do |array|
       Hash[*keys.zip(array).flatten]
     end.each do |attributes|

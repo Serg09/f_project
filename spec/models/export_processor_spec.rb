@@ -5,7 +5,7 @@ describe ExportProcessor do
 
   context 'when unbatched orders are present' do
     let (:ftp) { double('ftp') }
-    let!(:order1) { FactoryGirl.create(:order, item_count: 1) }
+    let!(:order1) { FactoryGirl.create(:submitted_order, item_count: 1) }
     before(:each) do
       expect(Net::FTP).to receive(:open).and_yield(ftp)
     end
@@ -57,7 +57,7 @@ describe ExportProcessor do
 
   context 'when no unbatched orders are present' do
     let (:batch) { FactoryGirl.create(:batch) }
-    let!(:order) { FactoryGirl.create(:order, batch: batch) }
+    let!(:order) { FactoryGirl.create(:submitted_order, batch: batch) }
 
     describe '#perform' do
       it 'does not create a batch record' do

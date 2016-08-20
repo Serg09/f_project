@@ -14,6 +14,8 @@ gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
+gem 'jquery-ui-rails'
+
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -31,6 +33,8 @@ gem 'will_paginate-bootstrap'
 gem 'resque'
 gem 'resque-scheduler'
 gem 'aasm'
+gem 'cancan'
+gem 'chronic'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
