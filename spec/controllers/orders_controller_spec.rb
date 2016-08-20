@@ -54,7 +54,7 @@ RSpec.describe OrdersController, type: :controller do
     describe 'POST #create' do
       it 'redirects to the new order index page' do
         post :create, order: attributes, shipping_address: shipping_address_attributes
-        expect(response).to redirect_to orders_path(status: :new)
+        expect(response).to redirect_to orders_path(status: :incipient)
       end
 
       it 'creates an order record' do
@@ -71,7 +71,7 @@ RSpec.describe OrdersController, type: :controller do
     end
 
     context 'for a new order' do
-      let!(:order) { FactoryGirl.create(:new_order) }
+      let!(:order) { FactoryGirl.create(:incipient_order) }
 
       describe 'GET #edit' do
         it 'is successfull' do
@@ -83,7 +83,7 @@ RSpec.describe OrdersController, type: :controller do
       describe 'PATCH #update' do
         it 'redirects to the order index page' do
           patch :update, id: order, order: attributes, shipping_address: shipping_address_attributes
-          expect(response).to redirect_to orders_path(status: :new)
+          expect(response).to redirect_to orders_path(status: :incipient)
         end
 
         it 'updates the order' do
@@ -97,7 +97,7 @@ RSpec.describe OrdersController, type: :controller do
       describe 'DELETE #destroy' do
         it 'redirects to the order index page' do
           delete :destroy, id: order
-          expect(response).to redirect_to orders_path(status: :new)
+          expect(response).to redirect_to orders_path(status: :incipient)
         end
 
         it 'removes the order record' do
@@ -237,7 +237,7 @@ RSpec.describe OrdersController, type: :controller do
     end
 
     describe 'DELETE #destroy' do
-      let!(:order) { FactoryGirl.create(:new_order) }
+      let!(:order) { FactoryGirl.create(:incipient_order) }
 
       it "redirects to the sign in page" do
         delete :destroy, id: order

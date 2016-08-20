@@ -21,7 +21,7 @@ class OrdersController < ApplicationController
   def create
     if create_order
       flash[:notice] = 'The order was created successfully.'
-      respond_with @order, location: orders_path(status: :new)
+      respond_with @order, location: orders_path(status: :incipient)
     else
       # respond_with doesn't seem to work with nested objects
       render :new
@@ -38,7 +38,7 @@ class OrdersController < ApplicationController
     if can? :update, @order
       @order.update_attributes order_params
       flash[:notice] = 'The order was updated successfully.' if @order.save
-      respond_with @order, location: orders_path(status: :new)
+      respond_with @order, location: orders_path(status: :incipient)
     else
       redirect_to order_path(@order), alert: 'This order cannot be edited.'
     end
@@ -47,7 +47,7 @@ class OrdersController < ApplicationController
   def destroy
     if can? :destroy, @order
       flash[:notice] = 'The order was removed successfully.' if @order.delete
-      respond_with @order, location: orders_path(status: :new)
+      respond_with @order, location: orders_path(status: :incipient)
     else
       redirect_to order_path(@order), alert: 'This order cannot be removed.'
     end

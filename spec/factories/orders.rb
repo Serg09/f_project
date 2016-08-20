@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :order, aliases: [:new_order] do
+  factory :order, aliases: [:incipient_order] do
     transient do
       item_count 0
     end
@@ -16,7 +16,7 @@ FactoryGirl.define do
       end
     end
 
-    %w(exported processing shipped rejected).each do |status|
+    %w(submitted exported processing shipped rejected).each do |status|
       factory "#{status}_order".to_sym do
         status status
       end

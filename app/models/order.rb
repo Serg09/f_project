@@ -44,11 +44,19 @@ class Order < ActiveRecord::Base
   scope :by_status, ->(status){where(status: status)}
   scope :unbatched, ->{where(batch_id: nil)}
 
+  STATUSES = [:incipient, :submitted, :exported, :processing, :shipped, :rejected]
   aasm(:status, whiny_transitions: false) do
-    state :new, initial: true
-    state :exported, :processing, :shipped, :rejected
+    state :incipient, initial: true
+    state :submitted
+    state :exported
+    state :processing
+    state :shipped
+    state :rejected
+    event :submit do
+      transitions from: :incipient, to: :submitted, if: :ready_for_submission?
+    end
     event :export do
-      transitions from: :new, to: :exported
+      transitions from: :submitted, to: :exported
     end
     event :acknowledge do
       transitions from: :exported, to: :processing
@@ -69,6 +77,12 @@ class Order < ActiveRecord::Base
   end
 
   def updatable?
-    new?
+    incipient?
+  end
+
+  private
+
+  def ready_for_submission?
+    items.length > 0
   end
 end

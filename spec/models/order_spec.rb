@@ -142,15 +142,6 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  describe '#export' do
-    let (:order) { FactoryGirl.create(:order) }
-    it 'changes the status to "exported"' do
-      expect do
-        order.export
-      end.to change(order, :status).from('new').to('exported')
-    end
-  end
-
   describe '#acknowledge' do
     let (:order) { FactoryGirl.create(:exported_order) }
     it 'changes the status to "processing"' do
@@ -161,7 +152,7 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#<<' do
-    let (:order) { FactoryGirl.create(:new_order) }
+    let (:order) { FactoryGirl.create(:incipient_order) }
     let (:sku) { '1234567890123' }
 
     it 'adds a item to the order' do
@@ -207,37 +198,151 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  context 'that is new' do
-    let (:order) { FactoryGirl.create(:new_order) }
+  shared_examples 'a submittable order' do
+    describe '#submit' do
+      it 'returns true' do
+        expect(order.submit).to be true
+      end
+
+      it 'changes the state to "submitted"' do
+        expect do
+          order.submit
+        end.to change(order, :status).to('submitted')
+      end
+    end
+  end
+
+  shared_examples 'an unsubmittable order' do
+    describe '#submit' do
+      it 'returns false' do
+        expect(order.submit).to be false
+      end
+
+      it 'does not change the state' do
+        expect do
+          order.submit
+        end.not_to change(order, :status)
+      end
+    end
+  end
+
+  shared_examples 'an exportable order' do
+    describe '#export' do
+      it 'returns true' do
+        expect(order.export).to be true
+      end
+
+      it 'changes the status to "exported"' do
+        expect do
+          order.export
+        end.to change(order, :status).to('exported')
+      end
+    end
+  end
+
+  shared_examples 'an unexportable order' do
+    describe '#export' do
+      it 'returns false' do
+        expect(order.export).to be false
+      end
+
+      it 'does not changes the status' do
+        expect do
+          order.export
+        end.not_to change(order, :status)
+      end
+    end
+  end
+
+  context 'that is incipient' do
+    let (:factory_key) { :incipient_order }
+    let (:order) { FactoryGirl.create(factory_key) }
 
     describe 'updatable?' do
       it 'returns true' do
         expect(order).to be_updatable
       end
     end
+
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+
+    context 'and ready for submission' do
+      it_behaves_like 'a submittable order' do
+        let (:order) { FactoryGirl.create(factory_key, item_count: 1) }
+      end
+    end
+
+    context 'but not ready for submission' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create(factory_key) }
+      end
+    end
+  end
+
+  context 'that is submitted' do
+    let (:factory_key) { :submitted_order }
+    it_behaves_like 'an immutable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an exportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
   end
 
   context 'that is exported' do
+    let (:factory_key) { :exported_order }
     it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(:exported_order) }
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
     end
   end
 
   context 'that is processing' do
+    let (:factory_key) { :processing_order }
     it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(:processing_order) }
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
     end
   end
 
   context 'that is shipped' do
+    let (:factory_key) { :shipped_order }
     it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(:shipped_order) }
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
     end
   end
 
   context 'that is rejected' do
+    let (:factory_key) { :rejected_order }
     it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(:rejected_order) }
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unsubmittable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
+    end
+    it_behaves_like 'an unexportable order' do
+      let (:order) { FactoryGirl.create(factory_key) }
     end
   end
 end

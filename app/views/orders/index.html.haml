@@ -17,7 +17,7 @@
       %td= number_to_currency(order.total)
       %td
         .btn-group
-          -if order.new?
+          -if order.incipient?
             =link_to edit_order_path(order), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit the order details' do
               %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
           -else
