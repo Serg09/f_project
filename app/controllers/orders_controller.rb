@@ -38,7 +38,7 @@ class OrdersController < ApplicationController
     if can? :update, @order
       @order.update_attributes order_params
       flash[:notice] = 'The order was updated successfully.' if @order.save
-      respond_with @order, location: orders_path
+      respond_with @order, location: orders_path(status: :new)
     else
       redirect_to order_path(@order), alert: 'This order cannot be edited.'
     end

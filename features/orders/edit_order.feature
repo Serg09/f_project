@@ -1,4 +1,3 @@
-@wip
 Feature: Edit an order
   As an administrator
   In order to correct a mistake in an order
@@ -28,7 +27,6 @@ Feature: Edit an order
     And I click "Save"
     Then I should see "The order was updated successfully." within the notification area
     And I should see "Orders" within the page title
-    And I should see the following order table
     And I should see the following order table
       | Order date | Client          | Customer name   |
       |   3/2/2016 | ACME Publishing | Billy Bookworm  |

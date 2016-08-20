@@ -21,7 +21,7 @@
       =f.text_field :telephone, class: 'form-control'
       =help_blocks(order, :telephone)
   .col-md-6
-    =fields_for(:shipping_address) do |saf|
+    =fields_for(:shipping_address, shipping_address) do |saf|
       %fieldset
         %legend Shipping address
         .form-group{ class: form_group_class(shipping_address, :line_1) }

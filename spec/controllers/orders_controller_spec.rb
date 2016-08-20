@@ -83,7 +83,7 @@ RSpec.describe OrdersController, type: :controller do
       describe 'PATCH #update' do
         it 'redirects to the order index page' do
           patch :update, id: order, order: attributes, shipping_address: shipping_address_attributes
-          expect(response).to redirect_to orders_path
+          expect(response).to redirect_to orders_path(status: :new)
         end
 
         it 'updates the order' do
