@@ -47,7 +47,7 @@ class OrdersController < ApplicationController
   def destroy
     if can? :destroy, @order
       flash[:notice] = 'The order was removed successfully.' if @order.delete
-      respond_with @order, location: orders_path
+      respond_with @order, location: orders_path(status: :new)
     else
       redirect_to order_path(@order), alert: 'This order cannot be removed.'
     end

@@ -97,7 +97,7 @@ RSpec.describe OrdersController, type: :controller do
       describe 'DELETE #destroy' do
         it 'redirects to the order index page' do
           delete :destroy, id: order
-          expect(response).to redirect_to orders_path
+          expect(response).to redirect_to orders_path(status: :new)
         end
 
         it 'removes the order record' do

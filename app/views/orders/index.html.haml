@@ -16,11 +16,14 @@
       %td= order.customer_name
       %td= number_to_currency(order.total)
       %td
-        -if order.new?
-          =link_to edit_order_path(order), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit the order details' do
-            %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
-        -else
-          =link_to order_path(order), class: 'btn btn-xs btn-info', title: 'Click here to view the order details' do
-            %span.glyphicon.glyphicon-zoom-in{ 'aria-hidden' => true }
+        .btn-group
+          -if order.new?
+            =link_to edit_order_path(order), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit the order details' do
+              %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
+          -else
+            =link_to order_path(order), class: 'btn btn-xs btn-info', title: 'Click here to view the order details' do
+              %span.glyphicon.glyphicon-zoom-in{ 'aria-hidden' => true }
+          =link_to order_path(order), method: :delete, class: 'btn btn-xs btn-danger delete-button', title: 'Click here to remove this order.', 'data-confirm' => 'Are you sure you want to delete this order?' do
+            %span.glyphicon.glyphicon-remove{ 'aria-hidden' => true }
 =will_paginate @orders, renderer: BootstrapPagination::Rails
 =link_to 'Add', new_order_path, class: 'btn btn-primary', title: 'Click here to create an order'
