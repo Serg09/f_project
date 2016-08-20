@@ -34,9 +34,9 @@ RSpec.describe Batch, type: :model do
   describe '::batch_orders' do
     context 'when unbatched orders are present' do
       let (:existing_batch) { FactoryGirl.create(:batch) }
-      let!(:batched_order) { FactoryGirl.create(:order, batch: existing_batch) }
+      let!(:batched_order) { FactoryGirl.create(:exported_order, batch: existing_batch) }
 
-      let!(:o1) { FactoryGirl.create(:order, item_count: 1) }
+      let!(:o1) { FactoryGirl.create(:submitted_order, item_count: 1) }
 
       it 'creates a new batch' do
         expect do

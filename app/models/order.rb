@@ -43,6 +43,7 @@ class Order < ActiveRecord::Base
   scope :by_order_date, ->{order('order_date desc')}
   scope :by_status, ->(status){where(status: status)}
   scope :unbatched, ->{where(batch_id: nil)}
+  scope :ready_for_export, ->{unbatched.where(status: :submitted)}
 
   STATUSES = [:incipient, :submitted, :exported, :processing, :shipped, :rejected]
   aasm(:status, whiny_transitions: false) do

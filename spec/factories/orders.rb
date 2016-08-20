@@ -16,7 +16,7 @@ FactoryGirl.define do
       end
     end
 
-    %w(submitted exported processing shipped rejected).each do |status|
+    Order::STATUSES.reject{|s| s == :incipient}.each do |status|
       factory "#{status}_order".to_sym do
         status status
       end
