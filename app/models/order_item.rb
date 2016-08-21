@@ -37,8 +37,8 @@ class OrderItem < ActiveRecord::Base
 
   validates_uniqueness_of :sku, scope: :order_id
 
-  validates_numericality_of :quantity, greater_than: 0, on: :create
-  validates_numericality_of :quantity, greater_than: -1, on: :update
+  validates_numericality_of :quantity, greater_than: 0, on: :create, if: :quantity
+  validates_numericality_of :quantity, greater_than: -1, on: :update, if: :quantity
   [:unit_price,
    :discount_percentage,
    :freight_charge,

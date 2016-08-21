@@ -27,7 +27,7 @@ Feature: Add an order item
     When I click the edit button within the 1st order row
     Then I should see "Edit order" within the page title
     And I click "Add" within the main content
-    Then I should see "Add order item" within the page title
+    Then I should see "New order item" within the page title
 
     When I fill in "SKU" with "123456"
     And I fill in "Quantity" with "2"
