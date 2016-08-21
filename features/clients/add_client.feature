@@ -1,4 +1,3 @@
-@wip
 Feature: Add a client
   As an administrator
   In order to work with a client

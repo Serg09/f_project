@@ -1,2 +1,7 @@
 -content_for :page_title do
   New client
+
+.row
+  .col-md-6
+    =form_for(@client) do |f|
+      =render 'form_fields', f: f, client: @client
