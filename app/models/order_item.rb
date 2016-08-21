@@ -8,7 +8,7 @@
 #  sku                 :string(30)       not null
 #  description         :string(50)
 #  quantity            :integer          not null
-#  price               :decimal(, )
+#  unit_price          :decimal(, )
 #  discount_percentage :decimal(, )
 #  freight_charge      :decimal(, )
 #  tax                 :decimal(, )
@@ -39,7 +39,7 @@ class OrderItem < ActiveRecord::Base
 
   validates_numericality_of :quantity, greater_than: 0, on: :create
   validates_numericality_of :quantity, greater_than: -1, on: :update
-  [:price,
+  [:unit_price,
    :discount_percentage,
    :freight_charge,
    :tax].each{|f| validates_numericality_of f, greater_than_or_equal_to: 0, if: f}
@@ -77,10 +77,8 @@ class OrderItem < ActiveRecord::Base
     end
   end
 
-  def total
-    return 0 unless quantity.present? && quantity > 0
-
-    ((price || 0) * quantity) +
+  def total_price
+    (extended_price || 0) +
       (freight_charge || 0) +
       (tax || 0)
   end
@@ -98,8 +96,8 @@ class OrderItem < ActiveRecord::Base
   end
 
   def extended_price
-    return 0 unless price.present? && quantity.present?
-    price * quantity
+    return 0 unless unit_price.present? && quantity.present?
+    unit_price * quantity
   end
 
   private

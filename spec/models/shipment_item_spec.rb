@@ -11,7 +11,7 @@ RSpec.describe ShipmentItem, type: :model do
       order_item_id: order_item.id,
       external_line_no: 1,
       sku: sku,
-      price: 19.99,
+      unit_price: 19.99,
       shipped_quantity: 1
     }
   end

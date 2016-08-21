@@ -7,7 +7,7 @@ FactoryGirl.define do
     sku { Faker::Code.isbn }
     description { Faker::Book.title }
     quantity { Faker::Number.between(1, 5) }
-    price { Faker::Number.decimal(2) }
+    unit_price { Faker::Number.decimal(2) }
     discount_percentage 0.00
     freight_charge { Faker::Number.decimal(2) }
     tax { Faker::Number.decimal(2) }

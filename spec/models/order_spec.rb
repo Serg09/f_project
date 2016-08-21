@@ -117,13 +117,13 @@ RSpec.describe Order, type: :model do
     let (:order) { FactoryGirl.create(:order) }
     let!(:i1) do FactoryGirl.create(:order_item, order: order,
                                                  quantity: 1,
-                                                 price: 20,
+                                                 unit_price: 20,
                                                  freight_charge: 3,
                                                  tax: 1.5)
     end
     let!(:i2) do FactoryGirl.create(:order_item, order: order,
                                                  quantity: 1,
-                                                 price: 30,
+                                                 unit_price: 30,
                                                  freight_charge: nil,
                                                  tax: nil)
     end

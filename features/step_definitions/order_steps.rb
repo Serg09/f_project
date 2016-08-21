@@ -5,7 +5,7 @@ Given /^"([^"]+)" ordered "([^"]+)" - "([^"]+)" for (#{DOLLAR_AMOUNT}) on (#{DAT
                                          sku: sku,
                                          quantity: 1,
                                          description: description,
-                                         price: price,
+                                         unit_price: price,
                                          tax: price * 0.0825,
                                          freight_charge: 0)
 end

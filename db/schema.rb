@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160820145559) do
+ActiveRecord::Schema.define(version: 20160821021956) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20160820145559) do
     t.string   "sku",                 limit: 30,                 null: false
     t.string   "description",         limit: 50
     t.integer  "quantity",                                       null: false
-    t.decimal  "price"
+    t.decimal  "unit_price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
@@ -146,7 +146,7 @@ ActiveRecord::Schema.define(version: 20160820145559) do
     t.integer  "order_item_id",    null: false
     t.integer  "external_line_no", null: false
     t.string   "sku",              null: false
-    t.decimal  "price"
+    t.decimal  "unit_price"
     t.integer  "shipped_quantity", null: false
     t.string   "cancel_code"
     t.string   "cancel_reason"

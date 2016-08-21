@@ -25,7 +25,7 @@ describe Lsi::BatchWriter do
                                     line_item_no: 1,
                                     sku: '325253259-X',
                                     quantity: 1,
-                                    price: 19.99,
+                                    unit_price: 19.99,
                                     discount_percentage: 0.10,
                                     freight_charge: 1.99,
                                     tax: 1.65)

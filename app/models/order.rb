@@ -68,13 +68,13 @@ class Order < ActiveRecord::Base
   end
 
   def total
-    items.reduce(0){|sum, i| sum + i.total}
+    items.reduce(0){|sum, i| sum + i.total_price}
   end
 
   def <<(sku)
     items.create!(sku: sku,
                   quantity: 1,
-                  price: 0)
+                  unit_price: 0)
   end
 
   def updatable?

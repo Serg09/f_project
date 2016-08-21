@@ -62,7 +62,7 @@ module ThreeDM
     add_item_field_mapping(:itemid, :sku, :resolve_sku)
     add_item_field_mapping(:itemname, :description)
     add_item_field_mapping(:numitems, :quantity)
-    add_item_field_mapping(:unitprice, :price)
+    add_item_field_mapping(:unitprice, :unit_price)
     add_item_field_mapping(:weight, :weight)
     add_item_field_mapping(:itemShipCost, :freight_charge)
 

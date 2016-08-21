@@ -7,7 +7,7 @@
 #  order_item_id    :integer          not null
 #  external_line_no :integer          not null
 #  sku              :string           not null
-#  price            :decimal(, )
+#  unit_price       :decimal(, )
 #  shipped_quantity :integer          not null
 #  cancel_code      :string
 #  cancel_reason    :string

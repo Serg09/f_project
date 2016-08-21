@@ -49,7 +49,7 @@ module Lsi
         @shipment_item = @shipment.items.create! order_item: order_item,
                                                 external_line_no: record[:lsi_line_item_no],
                                                 sku: record[:sku_10] || record[:sku_13],
-                                                price: record[:price],
+                                                unit_price: record[:price],
                                                 shipped_quantity: record[:shipped_quantity],
                                                 cancel_code: record[:cancel_code],
                                                 cancel_reason: record[:cancel_reason]
