@@ -1,2 +1,7 @@
-%h1 Clients#edit
-%p Find me in app/views/clients/edit.html.haml
+-content_for :page_title do
+  Edit client
+
+.row
+  .col-md-6
+    =form_for(@client) do |f|
+      =render 'form_fields', f: f, client: @client

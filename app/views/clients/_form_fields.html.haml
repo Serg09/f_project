@@ -4,6 +4,6 @@
   =help_blocks(client, :new)
 .form-group{ class: form_group_class(client, :abbreviation) }
   =f.label :abbreviation, class: 'control-label'
-  =f.text_field :abbreviation, class: 'form-control', autofocus: true, maxlength: 5
+  =f.text_field :abbreviation, class: 'form-control', maxlength: 5
   =help_blocks(client, :new)
 =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the client.'

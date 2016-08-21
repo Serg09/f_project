@@ -7,9 +7,14 @@
       %tr
         %th Name
         %th Abbr.
+        %th &nbsp;
       -@clients.each do |client|
         %tr
           %td= client.name
           %td= client.abbreviation
+          %td
+            .btn-group
+              =link_to edit_client_path(client), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit this client.' do
+                %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
     =will_paginate @clients, renderer: BootstrapPagination::Rails
     =link_to 'Add', new_client_path, class: 'btn btn-primary', title: 'Click here to add a new client.'
