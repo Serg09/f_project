@@ -9,7 +9,7 @@
 #  updated_at          :datetime         not null
 #  order_date          :date             not null
 #  batch_id            :integer
-#  status              :string(30)       default("new"), not null
+#  status              :string(30)       default("incipient"), not null
 #  error               :text
 #  client_id           :integer          not null
 #  client_order_id     :string(100)      not null
