@@ -1,7 +1,7 @@
 Feature: Add a client
   As an administrator
   In order to work with a client
-  I need to able to a a record for the client in the system
+  I need to able to add a record for the client in the system
 
   Scenario: A user adds a client
     Given there is a user with email "john@doe.com" and password "please01"
