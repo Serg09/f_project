@@ -5,3 +5,7 @@ end
 DOLLAR_AMOUNT = Transform /^\$(\d+(?:\.\d{2}))?$/ do |string_amount|
   BigDecimal.new(string_amount)
 end
+
+CLIENT = Transform /^client "([^"]+)"$/ do |name|
+  Client.find_by(name: name) || FactoryGirl.create(:client, name: name)
+end

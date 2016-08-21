@@ -76,18 +76,18 @@ ActiveRecord::Schema.define(version: 20160821021956) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                                       null: false
-    t.integer  "line_item_no",                                   null: false
-    t.string   "sku",                 limit: 30,                 null: false
-    t.string   "description",         limit: 50
-    t.integer  "quantity",                                       null: false
+    t.integer  "order_id",                                        null: false
+    t.integer  "line_item_no",                                    null: false
+    t.string   "sku",                 limit: 30,                  null: false
+    t.string   "description",         limit: 250
+    t.integer  "quantity",                                        null: false
     t.decimal  "unit_price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.string   "status",              limit: 30, default: "new", null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "status",              limit: 30,  default: "new", null: false
     t.integer  "accepted_quantity"
     t.integer  "shipped_quantity"
     t.decimal  "weight"

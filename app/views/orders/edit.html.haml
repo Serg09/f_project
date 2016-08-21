@@ -5,3 +5,23 @@
   .col-md-12
     =form_for(@order) do |f|
       =render 'form_fields', f: f, order: @order, shipping_address: @order.shipping_address
+.row
+  .col-md-12
+    %h2 Items
+    %table#order-item.table.table-striped
+      %tr
+        %th SKU
+        %th Description
+        %th.text-right Unit price
+        %th.text-right Qty
+        %th.text-right Ext. price
+        %th.text-right Total price
+      -@order.items.each do |item|
+        %tr
+          %td= item.sku
+          %td= item.description
+          %td= number_to_currency(item.unit_price, unit: '')
+          %td= item.quantity
+          %td= number_to_currency(item.extended_price, unit: '')
+          %td= number_to_currency(item.total_price, unit: '')
+    =link_to 'Add', new_order_order_item_path(@order), class: 'btn btn-info', title: 'Click here to add an item to the order.'
