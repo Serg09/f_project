@@ -1,0 +1,22 @@
+-content_for :page_title do
+  Clients
+
+.row
+  .col-md-6
+    %table#client-table.table.table-striped
+      %tr
+        %th Name
+        %th Abbr.
+        %th &nbsp;
+      -@clients.each do |client|
+        %tr
+          %td= client.name
+          %td= client.abbreviation
+          %td
+            .btn-group
+              =link_to edit_client_path(client), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit this client.' do
+                %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
+              =link_to client_path(client), method: :delete, class: 'btn btn-xs btn-danger delete-button', title: 'Click here to remove this client.', 'data-confirm' => 'Are you sure you want to delete this client?' do
+                %span.glyphicon.glyphicon-remove{ 'aria-hidden' => true }
+    =will_paginate @clients, renderer: BootstrapPagination::Rails
+    =link_to 'Add', new_client_path, class: 'btn btn-primary', title: 'Click here to add a new client.'

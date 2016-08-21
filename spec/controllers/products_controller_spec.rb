@@ -95,7 +95,7 @@ RSpec.describe ProductsController, type: :controller do
 
     describe "GET #show" do
       it "redirects to the sign in page" do
-        get :show
+        get :show, id: product
         expect(response).to redirect_to(new_user_session_path)
       end
     end
@@ -122,7 +122,7 @@ RSpec.describe ProductsController, type: :controller do
 
     describe "GET #edit" do
       it "redirects to the sign in page" do
-        get :edit
+        get :edit, id: product
         expect(response).to redirect_to(new_user_session_path)
       end
     end

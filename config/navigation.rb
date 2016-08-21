@@ -3,6 +3,7 @@ SimpleNavigation::Configuration.run do |navigation|
   navigation.items do |primary|
     primary.dom_class = 'nav navbar-nav'
     if user_signed_in?
+      primary.item :clients, 'Clients', clients_path
       primary.item :orders, 'Orders', orders_path(status: :incipient) do |orders_item|
         orders_item.dom_class = 'nav nav-tabs'
         Order::STATUSES.each do |status|
