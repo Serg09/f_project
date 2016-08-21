@@ -16,5 +16,7 @@
             .btn-group
               =link_to edit_client_path(client), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit this client.' do
                 %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
+              =link_to client_path(client), method: :delete, class: 'btn btn-xs btn-danger delete-button', title: 'Click here to remove this client.', 'data-confirm' => 'Are you sure you want to delete this client?' do
+                %span.glyphicon.glyphicon-remove{ 'aria-hidden' => true }
     =will_paginate @clients, renderer: BootstrapPagination::Rails
     =link_to 'Add', new_client_path, class: 'btn btn-primary', title: 'Click here to add a new client.'
