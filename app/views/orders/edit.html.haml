@@ -16,6 +16,7 @@
         %th.text-right Qty
         %th.text-right Ext. price
         %th.text-right Total price
+        %th &nbsp;
       -@order.items.each do |item|
         %tr
           %td= item.sku
@@ -24,4 +25,8 @@
           %td= item.quantity
           %td= number_to_currency(item.extended_price, unit: '')
           %td= number_to_currency(item.total_price, unit: '')
+          %td
+            .btn-group
+              =link_to edit_order_item_path(item), class: 'btn btn-xs btn-info edit-button', title: 'Click here to edit this order item.' do
+                %span.glyphicon.glyphicon-pencil{ 'aria-hidden' => true }
     =link_to 'Add', new_order_order_item_path(@order), class: 'btn btn-info', title: 'Click here to add an item to the order.'
