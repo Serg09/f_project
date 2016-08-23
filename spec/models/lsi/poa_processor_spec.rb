@@ -5,11 +5,15 @@ describe Lsi::PoaProcessor do
   let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', filename)) }
   let (:processor) { Lsi::PoaProcessor.new(file_content) }
 
+  let (:sku_1) { '1123456789' }
+  let (:sku_2) { '123456987X' }
+  let!(:product_1) { FactoryGirl.create(:product, sku: sku_1) }
+  let!(:product_2) { FactoryGirl.create(:product, sku: sku_2) }
   let (:order1) { FactoryGirl.create(:exported_order) }
-  let!(:item1_1) { order1 << '1123456789' }
+  let!(:item1_1) { order1 << sku_1 }
   let (:order2) { FactoryGirl.create(:exported_order) }
-  let!(:item2_1) { order2 << '1123456789' }
-  let!(:item2_2) { order2 << '123456987X' }
+  let!(:item2_1) { order2 << sku_1 }
+  let!(:item2_2) { order2 << sku_2  }
   let!(:batch) { FactoryGirl.create(:batch, orders: [order1, order2]) }
 
 

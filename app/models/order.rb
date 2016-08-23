@@ -71,10 +71,19 @@ class Order < ActiveRecord::Base
     items.reduce(0){|sum, i| sum + i.total_price}
   end
 
+  def add_item(sku, quantity = 1)
+    product = Product.find_by(sku: sku)
+    items.create! sku: product.sku,
+                  description: product.description,
+                  quantity: quantity,
+                  unit_price: product.price
+  rescue StandardError => e
+    Rails.logger.warn "Error adding product with SKU #{sku} to order #{id}. #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    nil
+  end
+
   def <<(sku)
-    items.create!(sku: sku,
-                  quantity: 1,
-                  unit_price: 0)
+    add_item sku
   end
 
   def updatable?
