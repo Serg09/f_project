@@ -75,6 +75,14 @@ RSpec.describe Client, type: :model do
     end
   end
 
+  describe '#orders' do
+    let (:client) { FactoryGirl.create(:client) }
+
+    it 'is a list of orders for the client' do
+      expect(client).to have(0).orders
+    end
+  end
+
   describe '::order_importers' do
     let (:c1) { FactoryGirl.create(:client) }
     let (:c2) { FactoryGirl.create(:client, order_import_processor_class: 'SomeClass') }

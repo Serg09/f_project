@@ -1,0 +1,9 @@
+.form-group{ class: form_group_class(order_item, :sku) }
+  =f.label :sku, 'SKU', class: 'control-label'
+  =f.text_field :sku, class: 'form-control', maxlength: 20, autofocus: true
+  =help_blocks(order_item, :sku)
+.form-group{ class: form_group_class(order_item, :quantity) }
+  =f.label :quantity, class: 'control-label'
+  =f.number_field :quantity, class: 'form-control', min: 1, max: 999
+  =help_blocks(order_item, :quantity)
+=f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the order item.'

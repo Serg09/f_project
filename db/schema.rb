@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160821021956) do
+ActiveRecord::Schema.define(version: 20160823231941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,7 +132,7 @@ ActiveRecord::Schema.define(version: 20160821021956) do
   add_index "packages", ["tracking_number"], name: "index_packages_on_tracking_number", using: :btree
 
   create_table "products", force: :cascade do |t|
-    t.string   "sku",         limit: 20,                          null: false
+    t.string   "sku",         limit: 30,                          null: false
     t.string   "description", limit: 256,                         null: false
     t.decimal  "price",                   precision: 9, scale: 2
     t.datetime "created_at",                                      null: false

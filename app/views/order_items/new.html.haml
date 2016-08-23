@@ -1,0 +1,7 @@
+-content_for :page_title do
+  New order item
+
+.row
+  .col-md-6
+    =form_for([@order, @order_item]) do |f|
+      =render 'form_fields', f: f, order_item: @order_item

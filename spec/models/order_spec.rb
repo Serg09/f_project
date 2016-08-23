@@ -151,9 +151,56 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#add_item' do
+    let!(:product) { FactoryGirl.create(:product) }
+    let (:order) { FactoryGirl.create(:incipient_order) }
+
+    context 'with a valid SKU' do
+      it 'adds an item to the order' do
+        expect do
+          order.add_item product.sku
+        end.to change(order.items, :count).by(1)
+      end
+
+      it 'returns the item' do
+        item = order.add_item product.sku
+        expect(item).not_to be_nil
+        expect(item).to be_a OrderItem
+      end
+
+      it 'set the description based on the specified product' do
+        item = order.add_item product.sku
+        expect(item.description).to eq product.description
+      end
+
+      it 'sets the price based on the specified product' do
+        item = order.add_item product.sku
+        expect(item.unit_price).to eq product.price
+      end
+
+      it 'defaults to a quantity of 1' do
+        item = order.add_item product.sku
+        expect(item.quantity).to eq 1
+      end
+    end
+
+    context 'with an invalid SKU' do
+      it 'does not add an item to the order' do
+        expect do
+          order.add_item 'notavalidsku'
+        end.not_to change(order.items, :count)
+      end
+
+      it 'returns nil' do
+        expect(order.add_item('notavalidsku')).to be_nil
+      end
+    end
+  end
+
   describe '#<<' do
     let (:order) { FactoryGirl.create(:incipient_order) }
     let (:sku) { '1234567890123' }
+    let!(:product) { FactoryGirl.create(:product, sku: sku) }
 
     it 'adds a item to the order' do
       expect do

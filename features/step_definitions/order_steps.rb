@@ -17,3 +17,8 @@ Given /^there are the following orders$/ do |table|
     FactoryGirl.create :order, attributes.merge(client: client)
   end
 end
+
+Given /^(#{CLIENT}) has an order on (#{DATE})$/ do |client, order_date|
+  FactoryGirl.create :incipient_order, client: client,
+                                       order_date: order_date
+end

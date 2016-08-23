@@ -12,6 +12,7 @@
 
 class Client < ActiveRecord::Base
   has_many :book_identifiers
+  has_many :orders
 
   validates_presence_of :name, :abbreviation
   validates_length_of :name, maximum: 100

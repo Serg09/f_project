@@ -1,24 +1,24 @@
 .row
   .col-md-6
-    .form-group{ class: form_group_class(order, :order_date) }
-      =f.label :order_date, class: 'control-label'
-      =f.text_field :order_date, class: 'form-control date-field', autofocus: true
-      =help_blocks(order, :order_date)
+    .form-group{ class: form_group_class(order, :customer_name) }
+      =f.label :customer_name, class: 'control-label'
+      =f.text_field :customer_name, class: 'form-control', maxlength: 50, autofocus: true
+      =help_blocks(order, :customer_name)
     .form-group{ class: form_group_class(order, :client_id) }
       =f.label :client_id, class: 'control-label'
       =f.select :client_id, options_from_collection_for_select(Client.all, :id, :name, order.client_id), {}, class: 'form-control'
       =help_blocks(order, :client_id)
+    .form-group{ class: form_group_class(order, :order_date) }
+      =f.label :order_date, class: 'control-label'
+      =f.text_field :order_date, class: 'form-control date-field', maxlength: 10
+      =help_blocks(order, :order_date)
     .form-group{ class: form_group_class(order, :client_order_id) }
       =f.label :client_order_id, 'Client order ID', class: 'control-label'
-      =f.text_field :client_order_id, class: 'form-control'
+      =f.text_field :client_order_id, class: 'form-control', maxlength: 100
       =help_blocks(order, :client_order_id)
-    .form-group{ class: form_group_class(order, :customer_name) }
-      =f.label :customer_name, class: 'control-label'
-      =f.text_field :customer_name, class: 'form-control'
-      =help_blocks(order, :customer_name)
     .form-group{ class: form_group_class(order, :telephone) }
       =f.label :telephone, class: 'control-label'
-      =f.text_field :telephone, class: 'form-control'
+      =f.text_field :telephone, class: 'form-control', maxlength: 25
       =help_blocks(order, :telephone)
   .col-md-6
     =fields_for(:shipping_address, shipping_address) do |saf|
@@ -26,30 +26,30 @@
         %legend Shipping address
         .form-group{ class: form_group_class(shipping_address, :line_1) }
           =saf.label :line_1, class: 'control-label'
-          =saf.text_field :line_1, class: 'form-control'
+          =saf.text_field :line_1, class: 'form-control', maxlength: 100
           =help_blocks(shipping_address, :line_1)
         .form-group{ class: form_group_class(shipping_address, :line_2) }
           =saf.label :line_2, class: 'control-label'
-          =saf.text_field :line_2, class: 'form-control'
+          =saf.text_field :line_2, class: 'form-control', maxlength: 100
           =help_blocks(shipping_address, :line_2)
         .row
           .col-sm-5
             .form-group{ class: form_group_class(shipping_address, :city) }
               =saf.label :city, class: 'control-label'
-              =saf.text_field :city, class: 'form-control'
+              =saf.text_field :city, class: 'form-control', maxlength: 100
               =help_blocks(shipping_address, :city)
           .col-sm-3
             .form-group{ class: form_group_class(shipping_address, :state) }
               =saf.label :state, class: 'control-label'
-              =saf.text_field :state, class: 'form-control'
+              =saf.text_field :state, class: 'form-control', maxlength: 20
               =help_blocks(shipping_address, :state)
           .col-sm-4
             .form-group{ class: form_group_class(shipping_address, :postal_code) }
               =saf.label :postal_code, class: 'control-label'
-              =saf.text_field :postal_code, class: 'form-control'
+              =saf.text_field :postal_code, class: 'form-control', maxlength: 10
               =help_blocks(shipping_address, :postal_code)
         .form-group{ class: form_group_class(shipping_address, :country_code) }
           =saf.label :country_code, class: 'control-label'
-          =saf.text_field :country_code, class: 'form-control'
+          =saf.text_field :country_code, class: 'form-control', maxlength: 2
           =help_blocks(shipping_address, :country_code)
 =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the order.'
