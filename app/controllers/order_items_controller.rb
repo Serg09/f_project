@@ -11,7 +11,7 @@ class OrderItemsController < ApplicationController
   end
 
   def create
-    @order_item = @order.items.new order_item_params
+    @order_item = @order.add_item order_item_params[:sku], order_item_params[:quantity]
     flash[:notice] = 'The order item was created successfully.' if @order_item.save
     respond_with @order_item, location: edit_order_path(@order_item.order_id)
   end

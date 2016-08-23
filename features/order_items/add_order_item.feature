@@ -1,4 +1,3 @@
-@wip
 Feature: Add an order item
   As an administrator
   In order to allow the purchase of a product
@@ -35,5 +34,5 @@ Feature: Add an order item
     Then I should see "The order item was created successfully." within the notification area
     And I should see "Edit order" within the page title
     And I should see the following order item table
-      | SKU    | Description   | Unit price | Qty | Ext. Price | Total Price |
+      | SKU    | Description   | Unit price | Qty | Ext. price | Total price |
       | 123456 | Deluxe Widget |      19.99 |   2 |      39.98 |       39.98 |
