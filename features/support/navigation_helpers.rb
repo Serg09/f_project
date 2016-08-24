@@ -10,6 +10,7 @@ module NavigationHelpers
     case location_description
     when "menu" then "#menu"
     when "navigation" then "#menu"
+    when "secondary menu" then ".secondary-nav"
     when "notification area" then "#notifications"
     when "page title" then "#page-title"
     when "main content" then "#main-content"
