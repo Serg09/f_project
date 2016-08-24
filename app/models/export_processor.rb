@@ -7,7 +7,7 @@ class ExportProcessor
     Rails.logger.debug "start ExportProcessor::perform"
 
     batches = if options[:retry]
-                Batch.by_status('new')
+                Batch.by_status('submitted')
               else
                 [Batch.batch_orders].compact
               end
