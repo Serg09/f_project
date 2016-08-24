@@ -6,7 +6,7 @@ SimpleNavigation::Configuration.run do |navigation|
       primary.item :products, 'Products', products_path
       primary.item :clients, 'Clients', clients_path
       primary.item :orders, 'Orders', orders_path(status: :incipient) do |orders_item|
-        orders_item.dom_class = 'nav nav-tabs'
+        orders_item.dom_class = 'nav nav-tabs secondary-nav'
         Order::STATUSES.each do |status|
           orders_item.item status,
                            status.to_s.capitalize,

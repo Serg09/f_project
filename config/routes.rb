@@ -8,6 +8,10 @@ Rails.application.routes.draw do
   resources :clients
   resources :orders do
     resources :order_items, only: [:new, :create]
+    member do
+      patch :submit
+      patch :export
+    end
   end
   resources :order_items, only: [:edit, :update, :destroy]
   resources :products
