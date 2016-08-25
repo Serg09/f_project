@@ -71,7 +71,10 @@ class Order < ActiveRecord::Base
     items.reduce(0){|sum, i| sum + i.total_price}
   end
 
-  def add_item(sku, quantity = 1)
+  def add_item(product_or_sku, quantity = 1)
+    sku = product_or_sku.respond_to?(:sku) ? product_or_sku.sku : product_or_sku
+
+    # Force the lookup here, or allow the call to pass in anything product-like?
     product = Product.find_by(sku: sku)
     items.create! sku: product.sku,
                   description: product.description,
@@ -82,8 +85,8 @@ class Order < ActiveRecord::Base
     nil
   end
 
-  def <<(sku)
-    add_item sku
+  def <<(product_or_sku)
+    add_item product_or_sku
   end
 
   def updatable?
