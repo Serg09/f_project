@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   respond_to :html
 
   before_filter :authenticate_user!
-  before_filter :load_order, only: [:show, :edit, :update, :destroy, :submit]
+  before_filter :load_order, except: [:index, :new, :create]
 
   def index
     @orders = Order.
@@ -58,9 +58,22 @@ class OrdersController < ApplicationController
     respond_with @order do |format|
       format.html do
         if submitted
-          redirect_to orders_path(status: :submitted)
+          redirect_to orders_path(status: :submitted), notice: 'The order was submitted successfully.'
         else
           redirect_to order_path(@order), alert: 'The order could not be submitted.'
+        end
+      end
+    end
+  end
+
+  def export
+    exported = @order.export!
+    respond_with @order do |format|
+      format.html do
+        if exported
+          redirect_to orders_path(status: :exported), notice: 'The order has been marked for export.'
+        else
+          redirect_to order_path(@order), alert: 'The order could not be exported.'
         end
       end
     end
