@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   respond_to :html
 
   before_filter :authenticate_user!
-  before_filter :load_order, only: [:show, :edit, :update, :destroy]
+  before_filter :load_order, only: [:show, :edit, :update, :destroy, :submit]
 
   def index
     @orders = Order.
@@ -50,6 +50,19 @@ class OrdersController < ApplicationController
       respond_with @order, location: orders_path(status: :incipient)
     else
       redirect_to order_path(@order), alert: 'This order cannot be removed.'
+    end
+  end
+
+  def submit
+    submitted = @order.submit!
+    respond_with @order do |format|
+      format.html do
+        if submitted
+          redirect_to orders_path(status: :submitted)
+        else
+          redirect_to order_path(@order), alert: 'The order could not be submitted.'
+        end
+      end
     end
   end
 
