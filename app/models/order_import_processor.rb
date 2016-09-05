@@ -2,10 +2,10 @@ class OrderImportProcessor
   @queue = :normal
 
   def self.perform
-    Rails.logger.debug "start OrderImportProcessor::perform"
+    Rails.logger.info "start OrderImportProcessor::perform"
     Client.order_importers.each do |client|
       folder = client.abbreviation
-      Rails.logger.debug "import orders from #{client.name} (#{folder})"
+      Rails.logger.info "import orders from #{client.name} (#{folder})"
       ORDER_IMPORT_FILE_PROVIDER.get_and_delete_files(folder) do |content, filename|
         Rails.logger.info "importing order file #{filename}"
         begin
@@ -17,6 +17,6 @@ class OrderImportProcessor
       end
     end
 
-    Rails.logger.debug "end OrderImportProcessor::perform"
+    Rails.logger.info "end OrderImportProcessor::perform"
   end
 end
