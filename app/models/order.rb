@@ -49,6 +49,7 @@ class Order < ActiveRecord::Base
   aasm(:status, whiny_transitions: false) do
     state :incipient, initial: true
     state :submitted
+    state :exporting
     state :exported
     state :processing
     state :shipped
@@ -57,7 +58,10 @@ class Order < ActiveRecord::Base
       transitions from: :incipient, to: :submitted, if: :ready_for_submission?
     end
     event :export do
-      transitions from: :submitted, to: :exported
+      transitions from: :submitted, to: :exporting
+    end
+    event :complete_export do
+      transitions from: :exporting, to: :exported
     end
     event :acknowledge do
       transitions from: :exported, to: :processing

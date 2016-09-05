@@ -31,4 +31,4 @@ Feature: Export an order
 
     When I click the export button within the 1st order row
     Then I should see "The order has been marked for export." within the notification area
-    And order for client "ACME Publishing" on 3/2/2016 should be queued for export
+    And order for client "ACME Publishing" on 3/2/2016 should be marked as exporting

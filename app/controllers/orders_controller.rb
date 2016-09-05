@@ -67,6 +67,7 @@ class OrdersController < ApplicationController
   end
 
   def export
+    Resque.enqueue ExportProcessor, order_id: @order.id
     exported = @order.export!
     respond_with @order do |format|
       format.html do
