@@ -1,8 +1,5 @@
 Rails.application.routes.draw do
-  get 'order_items/new'
-
-  get 'order_items/edit'
-
+  mount ResqueWeb::Engine => '/resque_web'
   devise_for :users
 
   resources :clients

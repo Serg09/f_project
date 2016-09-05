@@ -45,7 +45,7 @@ class Order < ActiveRecord::Base
   scope :unbatched, ->{where(batch_id: nil)}
   scope :ready_for_export, ->{unbatched.where(status: :submitted)}
 
-  STATUSES = [:incipient, :submitted, :exported, :processing, :shipped, :rejected]
+  STATUSES = [:incipient, :submitted, :exporting, :exported, :processing, :shipped, :rejected]
   aasm(:status, whiny_transitions: false) do
     state :incipient, initial: true
     state :submitted
@@ -96,8 +96,6 @@ class Order < ActiveRecord::Base
   def updatable?
     incipient?
   end
-
-  private
 
   def ready_for_submission?
     items.length > 0

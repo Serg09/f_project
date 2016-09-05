@@ -23,7 +23,7 @@
             =link_to order_path(order), method: :delete, class: 'btn btn-xs btn-danger delete-button', title: 'Click here to remove this order.', 'data-confirm' => 'Are you sure you want to delete this order?' do
               %span.glyphicon.glyphicon-remove{ 'aria-hidden' => true }
             =link_to submit_order_path(order), method: :patch, class: 'btn btn-xs btn-warning submit-button', title: 'Click here to finalize the order.', 'data-confirm' => 'Are you sure you want to submit this order?' do
-              %span.glyphicon.glyphicon-transfer{ 'aria-hidden' => true }
+              %span.glyphicon.glyphicon-ok{ 'aria-hidden' => true }
           -else
             =link_to order_path(order), class: 'btn btn-xs btn-info', title: 'Click here to view the order details' do
               %span.glyphicon.glyphicon-eye-open{ 'aria-hidden' => true }

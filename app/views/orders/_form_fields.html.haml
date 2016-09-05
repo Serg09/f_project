@@ -53,3 +53,5 @@
           =saf.text_field :country_code, class: 'form-control', maxlength: 2
           =help_blocks(shipping_address, :country_code)
 =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the order.'
+-if @order.ready_for_submission?
+  =link_to 'Submit', submit_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to finalize this order.'
