@@ -72,7 +72,7 @@ class OrdersController < ApplicationController
     respond_with @order do |format|
       format.html do
         if exported
-          redirect_to orders_path(status: :exported), notice: 'The order has been marked for export.'
+          redirect_to orders_path(status: :exporting), notice: 'The order has been marked for export.'
         else
           redirect_to order_path(@order), alert: 'The order could not be exported.'
         end

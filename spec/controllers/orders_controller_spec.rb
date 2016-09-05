@@ -210,21 +210,28 @@ RSpec.describe OrdersController, type: :controller do
       let!(:order) { FactoryGirl.create(:submitted_order) }
 
       describe 'PATCH #export' do
-        it 'redirects to the exported order index page' do
+        it 'redirects to the exporting order index page' do
           patch :export, id: order
-          expect(response).to redirect_to orders_path(status: :exported)
+          expect(response).to redirect_to orders_path(status: :exporting)
         end
 
-        it 'changes the order status to "exported"' do
+        it 'changes the order status to "exporting"' do
           expect do
             patch :export, id: order
             order.reload
-          end.to change(order, :status).to('exported')
+          end.to change(order, :status).to('exporting')
         end
       end
 
       include_examples 'an immutable order'
       include_examples 'an unsubmittable order'
+    end
+
+    context 'for an exporting order' do
+      let!(:order) { FactoryGirl.create(:exported_order) }
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+      include_examples 'an unexportable order'
     end
 
     context 'for an exported order' do
