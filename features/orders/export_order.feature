@@ -1,4 +1,3 @@
-@wip
 Feature: Export an order
   As an administrator
   In order to have an order fulfilled
