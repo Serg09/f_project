@@ -282,7 +282,7 @@ RSpec.describe Order, type: :model do
       it 'changes the status to "exported"' do
         expect do
           order.export
-        end.to change(order, :status).to('exported')
+        end.to change(order, :status).to('exporting')
       end
     end
   end

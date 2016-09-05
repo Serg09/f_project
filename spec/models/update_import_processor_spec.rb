@@ -11,20 +11,12 @@ describe UpdateImportProcessor do
   let (:asn_lines) { asn_file_content.lines }
   let (:asn_remote_filename) { 'M030212304.PBS' }
 
-  let (:ftp) { double('ftp') }
   before(:each) do
-    expect(Net::FTP).to receive(:open).and_yield ftp
-    expect(ftp).to receive(:chdir).with('outgoing')
-    expect(ftp).to receive(:nlst).and_return [poa_remote_filename, asn_remote_filename]
-    expect(ftp).to receive(:gettextfile).
-      with(poa_remote_filename).
-      and_yield(poa_lines[0]).
-      and_yield(poa_lines[1])
-    expect(ftp).to receive(:gettextfile).
-      with(asn_remote_filename).
-        and_yield(asn_lines[0]).
-        and_yield(asn_lines[1])
-    allow(ftp).to receive(:delete)
+    expect(REMOTE_FILE_PROVIDER).to \
+      receive(:get_and_delete_files).
+      with('outgoing').
+      and_yield(poa_file_content, poa_remote_filename).
+      and_yield(asn_file_content, asn_remote_filename)
   end
 
   describe '::perform' do
@@ -38,12 +30,6 @@ describe UpdateImportProcessor do
       expect do
         UpdateImportProcessor.perform
       end.to change(Document, :count).by(2)
-    end
-
-    it 'deletes the remote file' do
-      expect(ftp).to receive(:delete).with(poa_remote_filename)
-      expect(ftp).to receive(:delete).with(asn_remote_filename)
-      UpdateImportProcessor.perform
     end
   end
 end
