@@ -1,7 +1,16 @@
-ExportProcessor:
-  cron: "0 * * * *"
-  queue: normal
+development:
+  ExportProcessor:
+    cron: "*/5 * * * *"
+    queue: normal
 
-UpdateImportProcessor:
-  cron: "30 * * * *"
-  queue: normal
+  UpdateImportProcessor:
+    cron: "*/5 * * * *"
+    queue: normal
+production:
+  ExportProcessor:
+    cron: "0 * * * *"
+    queue: normal
+
+  UpdateImportProcessor:
+    cron: "30 * * * *"
+    queue: normal

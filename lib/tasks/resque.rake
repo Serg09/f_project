@@ -7,9 +7,10 @@ namespace :resque do
     #TODO  add redis cloud initialization
   end
 
-  task :setup_schedule do
+  task setup_schedule: :environment do
     require 'resque-scheduler'
-    Resque.schedule = YAML.load_file(Rails.root.join('config', 'task_schedule.yml'))
+    config = YAML.load_file(Rails.root.join('config', 'task_schedule.yml'))
+    Resque.schedule = config[Rails.env]
   end
 
   task scheduler: :setup_schedule
