@@ -26,7 +26,7 @@ class Batch < ActiveRecord::Base
   scope :by_status, ->(status){where(status: status)}
 
   def self.batch_orders
-    return nil unless Order.unbatched.any?
+    return nil unless Order.ready_for_export.any?
 
     Batch.create!.tap do |b|
       Order.ready_for_export.each{|o| b.orders << o}
