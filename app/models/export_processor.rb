@@ -27,14 +27,9 @@ class ExportProcessor
     batches = fetch_batches
     if batches.any?
       batches.each do |batch|
+        batch.orders.each{|o| o.export!} # TODO Move this into Batch?
         file = create_batch_file(batch)
-
-        Rails.logger.info "created batch file #{file.inspect}"
-
         send_file(file)
-
-        Rails.logger.info "delivered batch file to the remote host"
-
         batch.update_attribute :status, Batch.DELIVERED
         batch.orders.each{|o| o.complete_export!}
 
@@ -70,6 +65,6 @@ class ExportProcessor
   end
 
   def send_file(file)
-    REMOTE_FILE_PROVIDER.send_file(file, remote_file_name, 'incoming')
+    REMOTE_FILE_PROVIDER.send_file(file, remote_file_name, 'lsi_client', 'incoming')
   end
 end
