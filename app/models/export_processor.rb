@@ -28,9 +28,17 @@ class ExportProcessor
     if batches.any?
       batches.each do |batch|
         file = create_batch_file(batch)
+
+        Rails.logger.info "created batch file #{file.inspect}"
+
         send_file(file)
+
+        Rails.logger.info "delivered batch file to the remote host"
+
         batch.update_attribute :status, Batch.DELIVERED
         batch.orders.each{|o| o.complete_export!}
+
+        Rails.logger.info "updated batch and order statuses"
       end
     else
       Rails.logger.info "No orders to export"
