@@ -14,9 +14,9 @@ module RemoteFileProvider
       @password = password
     end
 
-    def send_file(local_file, remote_file_name, directory = nil)
+    def send_file(local_file, remote_file_name, *directories)
       Net::FTP.open(@url, @username, @password) do |ftp|
-        ftp.chdir(directory) if directory
+        directories.each{|d| ftp.chdir d}
         ftp.puttextcontent(local_file, remote_file_name)
       end
     end
@@ -24,9 +24,9 @@ module RemoteFileProvider
     # Yields the files in the specified directory
     #
     # if the block returns true, it also deletes the file
-    def get_and_delete_files(directory = nil)
+    def get_and_delete_files(*directories)
       Net::FTP.open(@url, @username, @password) do |ftp|
-        ftp.chdir(directory) if directory
+        directories.each{|d| ftp.chdir d}
         ftp.nlst.each do |filename|
 
           content = ""
