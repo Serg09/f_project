@@ -21,25 +21,50 @@ module Lsi
         Resque.enqueue_in 5.minutes, AsnWriter, order
       end
     end
+  end
 
-    class OrderTranslator
-      def self.translate(file_content)
-        new(file_content).translate
-      end
-
-      def initialize(file_content)
-        @reader = OrderReader.new(file_content)
-      end
-
-      def translate
-        raise 'Not implemented'
-      end
+  class OrderTranslator
+    ADDRESS_TYPE_MAP = {
+      'ST' => :shipping,
+      'RT' => :return,
+      'CS' => :consolidator
+    }
+    def self.translate(file_content)
+      new(file_content).translate
     end
 
-    class PoaWriter
+    def initialize(file_content)
+      @order = nil
+      @reader = OrderReader.
+        new(file_content).
+        read.
+        reduce([]) do |orders, record|
+          case record[:header]
+          when '$$HDR'
+            Rails.logger.debug "reading order #{record[:order_id]} from purchase order file"
+          when 'H1'
+            @order = record
+            orders << @order
+          when 'H2' # address
+            @order[ADDRESS_TYPE_MAP[record[:address_type]]] = record
+          when 'H3'
+            @order[:notes] = [] unless @order[:notes]
+            @order[:notes] << record
+          when 'D1'
+            @order[:items] = [] unless @order[:items]
+            @order[:items] << record
+          when 'D3'
+            item = @order[:items].detect{|i| i[:line_item_no] == record[:line_item_no]}
+            [:schedule_b, :description, :country_of_origin].each do |key|
+              item[key] = record[key]
+            end
+          end
+          orders
+        end
     end
 
-    class AsnWriter
+    def translate
+      @reader
     end
   end
 end
