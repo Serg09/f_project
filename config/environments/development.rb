@@ -41,7 +41,7 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 end
 
-REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'lsi_client', 'please01')
+REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'lsi_client', 'please01', root_directory: 'lsi_client')
 LSI_CLIENT_ID = 654321
 
-ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'cs_fulfillment', 'please01')
+ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'cs_fulfillment', 'please01', root_directory: 'cs_fulfillment')

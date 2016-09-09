@@ -65,6 +65,6 @@ class ExportProcessor
   end
 
   def send_file(file)
-    REMOTE_FILE_PROVIDER.send_file(file, remote_file_name, 'lsi_client', 'incoming')
+    REMOTE_FILE_PROVIDER.send_file(file, remote_file_name, 'incoming')
   end
 end

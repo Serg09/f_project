@@ -8,14 +8,16 @@ end
 
 module RemoteFileProvider
   class Ftp
-    def initialize(url, username, password)
+    def initialize(url, username, password, options = {})
+      options = options || {}
       @url = url
       @username = username
       @password = password
+      @root_directories = (options[:root_directory] || "").split('/')
     end
 
     def send_file(local_file, remote_file_name, *directories)
-      Net::FTP.open(@url, @username, @password) do |ftp|
+      open do |ftp|
         directories.each{|d| ftp.chdir d}
         ftp.puttextcontent(local_file, remote_file_name)
       end
@@ -25,7 +27,7 @@ module RemoteFileProvider
     #
     # if the block returns true, it also deletes the file
     def get_and_delete_files(*directories)
-      Net::FTP.open(@url, @username, @password) do |ftp|
+      open do |ftp|
         directories.each{|d| ftp.chdir d}
         ftp.nlst.each do |filename|
 
@@ -39,6 +41,15 @@ module RemoteFileProvider
             ftp.delete filename
           end
         end
+      end
+    end
+
+    private
+
+    def open
+      Net::FTP.open(@url, @username, @password) do |ftp|
+        @root_directories.each{|d| ftp.chdir d}
+        yield ftp
       end
     end
   end
