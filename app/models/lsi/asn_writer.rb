@@ -30,10 +30,13 @@ module Lsi
       f = StringIO.new
       write_batch_header f
       write_order_header f
+      record_count = 1
       @order[:items].each do |i|
         write_item f, i
         write_carton f, i
+        record_count += 1
       end
+      write_batch_trailer f, record_count
       f.rewind
       f
     end
@@ -98,6 +101,16 @@ module Lsi
       f.print number_of_length(@order[:batch_id], 10)
       f.print @order[:batch_date_time].strftime('%Y%m%d')
       f.print @order[:batch_date_time].strftime('%H%M%S')
+      f.puts ''
+    end
+
+    def write_batch_trailer(f, record_count)
+      f.print '$$OEF'
+      f.print number_of_length(LSI_CLIENT_ID, 6)
+      f.print number_of_length(@order[:batch_id], 10)
+      f.print @order[:batch_date_time].strftime('%Y%m%d')
+      f.print @order[:batch_date_time].strftime('%H%M%S')
+      f.print number_of_length(record_count, 7)
       f.puts ''
     end
 
