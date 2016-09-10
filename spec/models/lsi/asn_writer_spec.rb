@@ -24,11 +24,7 @@ describe Lsi::AsnWriter do
       writer = Lsi::AsnWriter.new order
       expect(REMOTE_FILE_PROVIDER).to \
         receive(:send_file).
-        with(anything, /^M\d{7}\.PBS$/, 'outgoing') do |content, filename, directory|
-          puts "filename=#{filename}"
-          puts "content"
-          puts content.read
-        end
+        with(anything, /^M\d{7}\.PBS$/, 'outgoing')
       writer.perform
     end
   end
