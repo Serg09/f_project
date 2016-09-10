@@ -1,10 +1,14 @@
 development:
   ExportProcessor:
-    cron: "*/5 * * * *"
+    cron: "*/1 * * * *"
     queue: normal
 
   UpdateImportProcessor:
-    cron: "*/5 * * * *"
+    cron: "*/2 * * * *"
+    queue: normal
+
+  Lsi::LsiSimulator:
+    cron: "*/3 * * * *"
     queue: normal
 production:
   ExportProcessor:
