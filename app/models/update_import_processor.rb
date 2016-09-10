@@ -7,19 +7,23 @@ class UpdateImportProcessor
   }
 
   def self.perform
-    Rails.logger.debug "start UpdateImportProcessor::perform"
+    logger.debug "start UpdateImportProcessor::perform"
 
     REMOTE_FILE_PROVIDER.get_and_delete_files('outgoing') do |file, filename|
-      Rails.logger.info "importing file #{filename}"
+      logger.info "importing file #{filename}"
       processor(file, filename).process
       Document.create source: 'lsi', filename: filename, content: file
     end
 
-    Rails.logger.debug "end UpdateImportProcessor::perform"
+    logger.debug "end UpdateImportProcessor::perform"
     true
   rescue => e
-    Rails.logger.error "Error importing order updates. #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    logger.error "Error importing order updates. #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
     false
+  end
+
+  def self.logger
+    @logger = Rails.logger
   end
 
   private

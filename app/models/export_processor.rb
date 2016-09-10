@@ -7,6 +7,10 @@ class ExportProcessor
     self.order_id = options.fetch(:order_id, nil)
   end
 
+  def logger
+    @logger ||= Rails.logger
+  end
+
   def batches
     @batches ||= fetch_batches
   end
@@ -22,7 +26,7 @@ class ExportProcessor
   end
 
   def perform
-    Rails.logger.info "start ExportProcessor::perform"
+    logger.info "start ExportProcessor::perform"
 
     batches = fetch_batches
     if batches.any?
@@ -33,15 +37,15 @@ class ExportProcessor
         batch.update_attribute :status, Batch.DELIVERED
         batch.orders.each{|o| o.complete_export!}
 
-        Rails.logger.info "updated batch and order statuses"
+        logger.info "updated batch and order statuses"
       end
     else
-      Rails.logger.info "No orders to export"
+      logger.info "No orders to export"
     end
 
-    Rails.logger.info "end ExportProcessor::perform"
+    logger.info "end ExportProcessor::perform"
   rescue => e
-    Rails.logger.error "Unable to complete the export. batches=#{batches.inspect} error: #{e.class.name} : #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    logger.error "Unable to complete the export. batches=#{batches.inspect} error: #{e.class.name} : #{e.message}\n  #{e.backtrace.join("\n  ")}"
   end
 
   def self.perform(options = {})
