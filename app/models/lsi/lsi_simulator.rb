@@ -1,14 +1,18 @@
 module Lsi
-  class PoaSimulator
+  class LsiSimulator
     @queue = :normal
 
     def self.perform
       new.perform
     end
 
+    def logger
+      @logger ||= Rails.logger
+    end
+
     def perform
       REMOTE_FILE_PROVIDER.get_and_delete_files('incoming') do |content, filename|
-        Rails.logger.info "simulating acknowledgement for #{filename}"
+        logger.info "simulating acknowledgement for #{filename}"
         process_file(content)
       end
     end
@@ -41,7 +45,7 @@ module Lsi
         reduce([]) do |orders, record|
           case record[:header]
           when '$$HDR'
-            Rails.logger.debug "reading order #{record[:order_id]} from purchase order file"
+            logger.debug "reading order #{record[:order_id]} from purchase order file"
           when 'H1'
             @order = record
             orders << @order
