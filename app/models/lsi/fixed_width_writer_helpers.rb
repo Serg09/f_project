@@ -6,7 +6,7 @@ module Lsi
     # values to the specified length if the
     # values is longer
     def alpha_of_length(value, length)
-      result = value.upcase
+      result = value.to_s.upcase
       return result if result.length == length
       if result.length < length
         "#{result}#{" " * (length - result.length)}"
