@@ -46,8 +46,11 @@ class Lsi::BatchWriter
   def write(io)
     raise 'Batch has no orders' unless @batch.orders.any?
 
-    write_batch_header(io)
-    @batch.orders.each{|o| write_order(io, o)}
+    write_batch_header io
+    record_count = @batch.orders.reduce(0) do |count, o|
+      count + write_order(io, o)
+    end
+    write_batch_footer io, record_count
   end
 
   private
@@ -72,11 +75,22 @@ class Lsi::BatchWriter
     io.puts ''
   end
 
+  def write_batch_footer(io, record_count)
+    io.print "$$EOF"
+    io.print number_of_length(LSI_CLIENT_ID, 6)
+    io.print number_of_length(@batch.id, 10)
+    io.print @batch.created_at.strftime('%Y%m%d')
+    io.print @batch.created_at.strftime('%H%M%S')
+    io.print number_of_length record_count, 7
+    io.puts ''
+  end
+
   def write_order(io, order)
     write_order_header(io, order)
     write_order_address(io, order)
     write_order_comments(io, order)
     order.items.each{|i| write_order_item(io, i)}
+    3 + order.items.count # return the number of lines written
   end
 
   def write_order_header(io, order)
