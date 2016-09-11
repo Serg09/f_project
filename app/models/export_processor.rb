@@ -8,7 +8,7 @@ class ExportProcessor
   end
 
   def logger
-    @logger ||= Rails.logger
+    @logger ||= Logger.new(STDOUT) #Rails.logger
   end
 
   def batches
@@ -26,7 +26,7 @@ class ExportProcessor
   end
 
   def perform
-    logger.info "start ExportProcessor::perform"
+    logger.debug "start ExportProcessor::perform"
 
     batches = fetch_batches
     if batches.any?
@@ -40,10 +40,10 @@ class ExportProcessor
         logger.info "updated batch and order statuses"
       end
     else
-      logger.info "No orders to export"
+      logger.debug "No orders to export"
     end
 
-    logger.info "end ExportProcessor::perform"
+    logger.debug "end ExportProcessor::perform"
   rescue => e
     logger.error "Unable to complete the export. batches=#{batches.inspect} error: #{e.class.name} : #{e.message}\n  #{e.backtrace.join("\n  ")}"
   end

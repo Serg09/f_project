@@ -7,22 +7,28 @@ module Lsi
     end
 
     def logger
-      @logger ||= Rails.logger
+      @logger ||= Logger.new(STDOUT) #Rails.logger
     end
 
     def perform
+      logger.debug "start Lsi::LsiSimulator#perform"
+
       REMOTE_FILE_PROVIDER.get_and_delete_files('incoming') do |content, filename|
-        logger.info "simulating acknowledgement for #{filename}"
+        logger.debug "simulating acknowledgement for #{filename}"
         process_file(content)
       end
+
+      logger.debug "end Lsi::LsiSimulator#perform"
     end
 
     private
 
     def process_file(content)
       OrderTranslator.translate(content).each do |order|
-        Resque.enqueue_in 2.minutes, PoaWriter, order
-        Resque.enqueue_in 5.minutes, AsnWriter, order
+        Resque.enqueue_in 1.minutes, Lsi::PoaWriter, order
+        logger.debug "enqueued Lsi::PoaWriter for #{order[:order_id]}"
+        Resque.enqueue_in 3.minutes, Lsi::AsnWriter, order
+        logger.debug "enqueued Lsi::AsnWriter for #{order[:order_id]}"
       end
     end
   end
@@ -45,7 +51,7 @@ module Lsi
         reduce([]) do |orders, record|
           case record[:header]
           when '$$HDR'
-            logger.debug "reading order #{record[:order_id]} from purchase order file"
+            logger.debug "start reading batch #{record[:batch_id]} from purchase order file"
           when 'H1'
             @order = record
             orders << @order
@@ -62,6 +68,8 @@ module Lsi
             [:schedule_b, :description, :country_of_origin].each do |key|
               item[key] = record[key]
             end
+          when '$$OEF'
+            logger.debug "end reading batch #{record[:batch_id]} from purchase order file"
           end
           orders
         end

@@ -23,7 +23,7 @@ class UpdateImportProcessor
   end
 
   def self.logger
-    @logger = Rails.logger
+    @logger = Logger.new(STDOUT) #Rails.logger
   end
 
   private
@@ -32,6 +32,7 @@ class UpdateImportProcessor
     ext = File.extname(filename)
     processor_class = PROCESSOR_MAP[ext]
     raise "Unrecognized file extension \"#{ext}\"." unless processor_class
+    logger.info "processing file #{file} with #{processor_class.name}"
     processor = processor_class.new(file)
   end
 end

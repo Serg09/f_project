@@ -9,13 +9,17 @@ module Lsi
       reader.read.reduce(true){|result, r| process_record(r) && result}
     end
 
+    def logger
+      @logger ||= Logger.new(STDOUT) #Rails.logger
+    end
+
     private
 
     def process_record(record)
       order = Order.find(record[:order_id]) if record[:order_id]
       case record[:header]
       when '$$HDR'
-        Rails.logger.info "Processing order acknowledgment batch #{record[:batch_id]}"
+        logger.info "Processing order acknowledgment batch #{record[:batch_id]}"
         true
       when 'H1'
         process_order(record, order)
@@ -27,7 +31,7 @@ module Lsi
         true
       end
     rescue => e
-      Rails.logger.error "Unable to process POA record #{record.inspect} #{e.class.name} - #{e.message}\n  #{e.backtrace.join("\n  ")}"
+      logger.error "Unable to process POA record #{record.inspect} #{e.class.name} - #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
     def process_order(record, order)
@@ -59,7 +63,7 @@ module Lsi
           item.back_order!
         end
       else
-        Rails.logger.warn "Unable to update order item #{item.id} because sku #{item.sku} does not match the specified sku #{sku}."
+        logger.warn "Unable to update order item #{item.id} because sku #{item.sku} does not match the specified sku #{sku}."
       end
     end
   end

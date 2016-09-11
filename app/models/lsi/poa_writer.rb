@@ -7,8 +7,8 @@ module Lsi
 
     @queue = :normal
 
-    def self.perform
-      new(params[:order]).perform
+    def self.perform(order)
+      new(order.with_indifferent_access).perform
     end
 
     @@files = Hash.new{|h, k| h[k] = 0}
@@ -22,8 +22,14 @@ module Lsi
       @order = order
     end
 
+    def logger
+      @logger ||= Logger.new(STDOUT) #Rails.logger
+    end
+
     def perform
-      REMOTE_FILE_PROVIDER.send_file poa_file, PoaWriter.file_name, 'outgoing'
+      file_name = PoaWriter.file_name
+      logger.debug "Write simulated acknowledgement for order #{@order[:order_id]} to #{file_name}"
+      REMOTE_FILE_PROVIDER.send_file poa_file, file_name, 'outgoing'
     end
 
     def poa_file

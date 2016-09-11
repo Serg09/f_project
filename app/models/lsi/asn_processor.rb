@@ -9,13 +9,17 @@ module Lsi
       reader.read.reduce(true){|result, r| process_record(r) && result}
     end
 
+    def logger
+      @logger ||= Logger.new(STDOUT) #Rails.logger
+    end
+
     private
 
     def process_record(record)
       @order = Order.find(record[:order_id]) if record[:order_id]
       case record[:header]
       when '$$HDR'
-        Rails.logger.info "Processing advanced shipping notification for batch #{record[:batch_id]}"
+        logger.info "Processing advanced shipping notification for batch #{record[:batch_id]}"
         true
       when 'O'
         process_order(record)
@@ -27,7 +31,7 @@ module Lsi
         true
       end
     rescue => e
-      Rails.logger.error "Error processing record #{record.inspect} #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+      logger.error "Error processing record #{record.inspect} #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
     def process_order(record)
@@ -59,7 +63,7 @@ module Lsi
           order_item.ship_part!
         end
       else
-        Rails.logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"
+        logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"
       end
     end
 
