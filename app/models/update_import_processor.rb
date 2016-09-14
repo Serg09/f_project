@@ -1,4 +1,6 @@
 class UpdateImportProcessor
+  include LogHelper
+
   @queue = :normal
 
   PROCESSOR_MAP = {
@@ -7,7 +9,11 @@ class UpdateImportProcessor
   }
 
   def self.perform
-    logger.debug "start UpdateImportProcessor::perform"
+    new.perform
+  end
+
+  def perform
+    logger.debug "start UpdateImportProcessor#perform"
 
     REMOTE_FILE_PROVIDER.get_and_delete_files('outgoing') do |file, filename|
       logger.info "importing file #{filename}"
@@ -15,20 +21,16 @@ class UpdateImportProcessor
       Document.create source: 'lsi', filename: filename, content: file
     end
 
-    logger.debug "end UpdateImportProcessor::perform"
+    logger.debug "end UpdateImportProcessor#perform"
     true
   rescue => e
     logger.error "Error importing order updates. #{e.class.name} #{e.message}\n  #{e.backtrace.join("\n  ")}"
     false
   end
 
-  def self.logger
-    @logger = Logger.new(STDOUT) #Rails.logger
-  end
-
   private
 
-  def self.processor(file, filename)
+  def processor(file, filename)
     ext = File.extname(filename)
     processor_class = PROCESSOR_MAP[ext]
     raise "Unrecognized file extension \"#{ext}\"." unless processor_class

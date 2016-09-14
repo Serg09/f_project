@@ -4,6 +4,7 @@ module Lsi
   # This is the simulate LSI behaviors in development
   class AsnWriter
     include FixedWidthWriterHelpers
+    include LogHelper
 
     @queue = :normal
 
@@ -20,10 +21,6 @@ module Lsi
 
     def initialize(batch)
       @batch = batch
-    end
-
-    def logger
-      @logger ||= Logger.new(STDOUT)
     end
 
     def perform

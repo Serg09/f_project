@@ -4,6 +4,7 @@ module Lsi
   # This is to simulate LSI behaviors for development purposes
   class PoaWriter
     include FixedWidthWriterHelpers
+    include LogHelper
 
     @queue = :normal
 
@@ -20,10 +21,6 @@ module Lsi
 
     def initialize(batch)
       @batch = batch
-    end
-
-    def logger
-      @logger ||= Logger.new(STDOUT) #Rails.logger
     end
 
     def perform

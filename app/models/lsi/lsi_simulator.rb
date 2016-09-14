@@ -1,13 +1,11 @@
 module Lsi
   class LsiSimulator
+    include LogHelper
+
     @queue = :normal
 
     def self.perform
       new.perform
-    end
-
-    def logger
-      @logger ||= Logger.new(STDOUT) # Rails.logger
     end
 
     def perform

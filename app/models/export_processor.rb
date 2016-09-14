@@ -1,14 +1,12 @@
 class ExportProcessor
+  include LogHelper
+
   @queue = :normal
 
   attr_accessor :retry_batch, :order_id
   def initialize(options)
     self.retry_batch = options.fetch(:retry, false)
     self.order_id = options.fetch(:order_id, nil)
-  end
-
-  def logger
-    @logger ||= Logger.new(STDOUT) #Rails.logger
   end
 
   def batches
