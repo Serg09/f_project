@@ -7,8 +7,8 @@ module Lsi
 
     @queue = :normal
 
-    def self.perform(order)
-      new(order.with_indifferent_access).perform
+    def self.perform(batch)
+      new(batch.with_indifferent_access).perform
     end
 
     @@files = Hash.new{|h, k| h[k] = 0}
@@ -18,8 +18,8 @@ module Lsi
       "M#{date_part}#{index}.PPR"
     end
 
-    def initialize(order)
-      @order = order
+    def initialize(batch)
+      @batch = batch
     end
 
     def logger
@@ -29,7 +29,7 @@ module Lsi
     def perform
       logger.debug "start Lsi::PoaWriter#perform"
       file_name = PoaWriter.file_name
-      logger.debug "Write simulated acknowledgement for order #{@order[:order_id]} to #{file_name}"
+      logger.debug "Write simulated acknowledgement for batch #{@batch[:batch_id]} to #{file_name}"
       REMOTE_FILE_PROVIDER.send_file poa_file, file_name, 'outgoing'
       logger.debug "end Lsi::PoaWriter#perform"
     rescue => e
@@ -39,50 +39,58 @@ module Lsi
     def poa_file
       f = StringIO.new
       write_batch_header f
-      write_order_header f
-      record_count = 1
-      @order[:items].each do |i|
-        write_item f, i
+      record_count = 0
+      @batch[:orders].each do |order|
+        write_order_header f, order
         record_count += 1
+        order[:items].each do |i|
+          write_item f, i
+          record_count += 1
+        end
       end
       write_batch_trailer f, record_count
       f.rewind
       f
     end
 
+    def batch_date_time
+      @batch_date_time ||= DateTime.parse(@batch[:batch_date_time])
+    end
+
     def write_batch_header(f)
       f.print '$$HDR'
       f.print number_of_length(LSI_CLIENT_ID, 6)
-      f.print number_of_length(@order[:batch_id], 10)
-      f.print @order[:batch_date_time].strftime('%Y%m%d')
-      f.print @order[:batch_date_time].strftime('%H%M%S')
+      f.print number_of_length(@batch[:batch_id], 10)
+      f.print batch_date_time.strftime('%Y%m%d')
+      f.print batch_date_time.strftime('%H%M%S')
       f.puts ''
     end
 
     def write_batch_trailer(f, record_count)
       f.print '$$EOF'
       f.print number_of_length(LSI_CLIENT_ID, 6)
-      f.print number_of_length(@order[:batch_id], 10)
-      f.print @order[:batch_date_time].strftime('%Y%m%d')
-      f.print @order[:batch_date_time].strftime('%H%M%S')
+      f.print number_of_length(@batch[:batch_id], 10)
+      f.print batch_date_time.strftime('%Y%m%d')
+      f.print batch_date_time.strftime('%H%M%S')
       f.print number_of_length(record_count, 7)
       f.puts ''
     end
 
-    def write_order_header(f)
+    def write_order_header(f, order)
       f.print 'H1'
-      f.print number_of_length @order[:batch_id], 10
-      f.print alpha_of_length @order[:order_id], 15
-      f.print @order[:order_date].strftime('%Y%m%d')
-      f.print @order[:order_date].strftime('%H%M%S')
+      f.print number_of_length order[:batch_id], 10
+      f.print alpha_of_length order[:order_id], 15
+      date = Date.parse(order[:order_date])
+      f.print date.strftime('%Y%m%d')
+      f.print date.strftime('%H%M%S')
       f.print blank_of_length 165
       f.puts ''
     end
 
     def write_item(f, item)
       f.print 'D1'
-      f.print number_of_length @order[:batch_id], 10
-      f.print alpha_of_length @order[:order_id], 15
+      f.print number_of_length item[:batch_id], 10
+      f.print alpha_of_length item[:order_id], 15
       f.print number_of_length item[:line_item_no], 5
       f.print alpha_of_length (item[:sku].length <= 10 ? item[:sku] : nil), 10
       f.print number_of_length item[:quantity], 9
@@ -91,8 +99,8 @@ module Lsi
       f.puts ''
 
       f.print 'D2'
-      f.print number_of_length @order[:batch_id], 10
-      f.print alpha_of_length @order[:order_id], 15
+      f.print number_of_length item[:batch_id], 10
+      f.print alpha_of_length item[:order_id], 15
       f.print number_of_length item[:line_item_no], 5
       f.print alpha_of_length (item[:sku].length <= 10 ? item[:sku] : nil), 10
       f.print alpha_of_length 'AR', 2
