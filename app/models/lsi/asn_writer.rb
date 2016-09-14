@@ -23,13 +23,17 @@ module Lsi
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT) #Rails.logger
+      @logger ||= Logger.new(STDOUT)
     end
 
     def perform
       file_name = AsnWriter.file_name
+      logger.debug "start Lsi::AsnWriter#perform"
       logger.debug "Write simulated shipping notification for order #{@order[:order_id]} to #{file_name}"
       REMOTE_FILE_PROVIDER.send_file asn_file, file_name, 'outgoing'
+      logger.debug "end Lsi::AsnWriter#perform"
+    rescue => e
+      log.error "Error writing ASN for order #{order[:order_id]} #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
     def asn_file

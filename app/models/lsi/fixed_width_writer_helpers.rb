@@ -20,7 +20,7 @@ module Lsi
     # if the value is longer than the specified
     # length
     def number_of_length(value, length, precision = 0)
-      result = (value * (10 ** precision)).floor.to_s
+      result = ((value || 0) * (10 ** precision)).floor.to_s
       if result.length > length
         raise ArgumentError.new "The value #{value} is longer than the specified length #{length}"
       end

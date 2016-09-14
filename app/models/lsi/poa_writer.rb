@@ -27,9 +27,13 @@ module Lsi
     end
 
     def perform
+      logger.debug "start Lsi::PoaWriter#perform"
       file_name = PoaWriter.file_name
       logger.debug "Write simulated acknowledgement for order #{@order[:order_id]} to #{file_name}"
       REMOTE_FILE_PROVIDER.send_file poa_file, file_name, 'outgoing'
+      logger.debug "end Lsi::PoaWriter#perform"
+    rescue => e
+      logger.error "Error writing POA file: #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
     def poa_file

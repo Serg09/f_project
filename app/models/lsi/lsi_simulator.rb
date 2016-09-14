@@ -7,18 +7,18 @@ module Lsi
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT) #Rails.logger
+      @logger ||= Logger.new(STDOUT) # Rails.logger
     end
 
     def perform
       logger.debug "start Lsi::LsiSimulator#perform"
-
       REMOTE_FILE_PROVIDER.get_and_delete_files('incoming') do |content, filename|
         logger.debug "simulating acknowledgement for #{filename}"
         process_file(content)
       end
-
       logger.debug "end Lsi::LsiSimulator#perform"
+    rescue => e
+      logger.error "Error simulating LSI ingestion. #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
     private
