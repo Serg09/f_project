@@ -6,7 +6,7 @@ class Lsi::OrderReader < Lsi::FixedWidthReader
   add_line_def('$$HDR') do |line|
     line.column :header          , 5
     line.column :client_id        , 6
-    line.column :batch_id         , 10
+    line.column :batch_id         , 10, :integer
     line.column :batch_date_time  , 14, :date_time
   end
   add_line_def('H1') do |line|
