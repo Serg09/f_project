@@ -106,6 +106,23 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#all_items_shipped?' do
+    let (:order) { FactoryGirl.create(:processing_order, item_count: 1) }
+    let (:item) { order.items.first }
+    context 'when all items have been shipped' do
+      before { item.acknowledge!; item.ship! }
+      it 'returns true' do
+        expect(order).to be_all_items_shipped
+      end
+    end
+
+    context 'when at least one item has not been shipped' do
+      it 'returns false' do
+        expect(order).not_to be_all_items_shipped
+      end
+    end
+  end
+
   describe '#shipments' do
     it 'is a list of shipments in fulfillment of the order' do
       order = Order.new attributes

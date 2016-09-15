@@ -69,6 +69,9 @@ class Order < ActiveRecord::Base
     event :reject do
       transitions from: [:processing, :exported], to: :rejected
     end
+    event :ship do
+      transitions from: [:exported, :processing], to: :shipped
+    end
   end
 
   def total
@@ -91,6 +94,10 @@ class Order < ActiveRecord::Base
 
   def <<(product_or_sku)
     add_item product_or_sku
+  end
+
+  def all_items_shipped?
+    items.map(&:shipped?).all?
   end
 
   def updatable?
