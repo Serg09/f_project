@@ -11,10 +11,6 @@ module Lsi
       reader.read.reduce(true){|result, r| process_record(r) && result}
     end
 
-    def logger
-      @logger ||= Logger.new(STDOUT) #Rails.logger
-    end
-
     private
 
     def process_record(record)
