@@ -24,9 +24,9 @@ module Lsi
     def process_file(content)
       batch = OrderTranslator.translate(content)
       logger.debug "enqueue PoaWriter for batch #{batch[:batch_id]}"
-      Resque.enqueue_in 2.minutes, Lsi::PoaWriter, batch
+      Resque.enqueue_in 1.minutes, Lsi::PoaWriter, batch
       logger.debug "enqueue AsnWriter for order #{batch[:batch_id]}"
-      Resque.enqueue_in 5.minutes, Lsi::AsnWriter, batch
+      Resque.enqueue_in 3.minutes, Lsi::AsnWriter, batch
     end
   end
 
