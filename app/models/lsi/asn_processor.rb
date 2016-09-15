@@ -1,5 +1,7 @@
 module Lsi
   class AsnProcessor
+    include LogHelper
+
     def initialize(content)
       @content = content
     end
@@ -45,6 +47,7 @@ module Lsi
                                            freight_responsibility: record[:freight_responsibility] == 'C' ? 'customer' : 'publisher',
                                            cancel_code: record[:cancel_code],
                                            cancel_reason: record[:cancel_reason]
+      logger.info "created shipment #{@shipment.id}"
     end
 
     def process_item(record)
@@ -57,10 +60,17 @@ module Lsi
                                                 shipped_quantity: record[:shipped_quantity],
                                                 cancel_code: record[:cancel_code],
                                                 cancel_reason: record[:cancel_reason]
+        logger.info "created shipment item #{@shipment_item.id}"
         if order_item.all_items_shipped?
           order_item.ship!
+          logger.info "marked item #{order_item.id} as shipped"
+          if @order.all_items_shipped?
+            @order.ship!
+            logger.info "marked order #{@order.id} as shipped"
+          end
         elsif order_item.some_items_shipped?
           order_item.ship_part!
+          logger.info "marked item #{order_item.id} as partially shipped"
         end
       else
         logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"

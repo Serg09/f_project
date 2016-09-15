@@ -1,5 +1,7 @@
 module Lsi
   class PoaProcessor
+    include LogHelper
+
     def initialize(content)
       @content = content
     end
@@ -35,6 +37,7 @@ module Lsi
     end
 
     def process_order(record, order)
+      logger.debug "acknowledge order #{order.id}"
       order.acknowledge!
     end
 
