@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :order, aliases: [:incipient_order] do
     transient do
       item_count 0
+      items []
     end
     association :shipping_address, factory: :address
     client
@@ -13,6 +14,9 @@ FactoryGirl.define do
     after(:create) do |order, evaluator|
       (1..(evaluator.item_count)).each do |i|
         order.items << FactoryGirl.create(:order_item, order: order)
+      end
+      evaluator.items.each do |item|
+        order.add_item item[:sku], item[:quantity]
       end
     end
 
