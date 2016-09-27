@@ -1,13 +1,14 @@
 Rails.application.routes.draw do
-  get 'order_items/new'
-
-  get 'order_items/edit'
-
+  mount ResqueWeb::Engine => '/resque_web'
   devise_for :users
 
   resources :clients
   resources :orders do
     resources :order_items, only: [:new, :create]
+    member do
+      patch :submit
+      patch :export
+    end
   end
   resources :order_items, only: [:edit, :update, :destroy]
   resources :products

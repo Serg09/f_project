@@ -24,22 +24,23 @@
         %th Customer
         %td= @order.customer_name
       %tr
-        %th Address
-        %td
-          =@order.address_1
-          %br
-          -if @order.address_2.present?
-            =@order.address_2
-            %br
-          #{h @order.city}, #{h @order.state}  #{h @order.postal_code}
+        %th Shipping address
+        %td= render 'shared/address', address: @order.shipping_address
       %tr
         %th Telephone
         %td= @order.telephone
       %tr
         %th Email
-        %td= link_to @order.customer_email, "mailto:#{@order.customer_email}"
+        %td
+          -if @order.customer_email.present?
+            =link_to @order.customer_email, "mailto:#{@order.customer_email}"
+          -else
+            &nbsp;
   .col-md-1
-    =link_to 'Back', orders_path(status: @order.status), class: 'btn btn-primary', title: 'Click here to return to the list of orders.'
+    .btn-group-vertical
+      =link_to 'Back', orders_path(status: @order.status), class: 'btn btn-primary', title: 'Click here to return to the list of orders.'
+      -if @order.submitted?
+        =link_to 'Export', export_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to export this order to the fulfillment provider.'
 .row
   .col-md-12
     %table.table.table-striped
@@ -61,9 +62,9 @@
           %td= item.sku
           %td= item.description
           %td= item.quantity
-          %td= number_to_currency(item.price)
+          %td= number_to_currency(item.unit_price)
           %td= number_to_currency(item.extended_price)
           %td= number_to_currency(item.freight_charge)
-          %td= number_to_currency(item.total)
+          %td= number_to_currency(item.total_price)
           %td= item.weight
           %td= item.status

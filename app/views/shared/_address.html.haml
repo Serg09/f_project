@@ -1,0 +1,6 @@
+=address.line_1
+%br
+-if address.line_2.present?
+  =address.line_2
+  %br
+#{h address.city}, #{h address.state}  #{h address.postal_code}

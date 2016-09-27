@@ -1,4 +1,6 @@
 class Lsi::BatchWriter
+  include Lsi::FixedWidthWriterHelpers
+
   SHIP_METHODS = {
     US:
     {
@@ -41,38 +43,14 @@ class Lsi::BatchWriter
     @batch = batch
   end
 
-  # Right-pads the value up to the specified
-  # length with blank spaces, or truncates the
-  # values to the specified length if the
-  # values is longer
-  def alpha_of_length(value, length)
-    result = value.upcase
-    return result if result.length == length
-    if result.length < length
-      "#{result}#{" " * (length - result.length)}"
-    else
-      result.slice(0, length)
-    end
-  end
-
-  # Left-pads the value up to the specified
-  # length with zeros. Raises an exception
-  # if the value is longer than the specified
-  # length
-  def number_of_length(value, length)
-    result = value.to_s
-    if result.length > length
-      raise ArgumentError.new "The value #{value} is longer than the specified length #{length}"
-    end
-
-    "#{"0" * (length - result.length)}#{result}"
-  end
-
   def write(io)
     raise 'Batch has no orders' unless @batch.orders.any?
 
-    write_batch_header(io)
-    @batch.orders.each{|o| write_order(io, o)}
+    write_batch_header io
+    record_count = @batch.orders.reduce(0) do |count, o|
+      count + write_order(io, o)
+    end
+    write_batch_footer io, record_count
   end
 
   private
@@ -97,11 +75,22 @@ class Lsi::BatchWriter
     io.puts ''
   end
 
+  def write_batch_footer(io, record_count)
+    io.print "$$EOF"
+    io.print number_of_length(LSI_CLIENT_ID, 6)
+    io.print number_of_length(@batch.id, 10)
+    io.print @batch.created_at.strftime('%Y%m%d')
+    io.print @batch.created_at.strftime('%H%M%S')
+    io.print number_of_length record_count, 7
+    io.puts ''
+  end
+
   def write_order(io, order)
     write_order_header(io, order)
     write_order_address(io, order)
     write_order_comments(io, order)
     order.items.each{|i| write_order_item(io, i)}
+    3 + order.items.count # return the number of lines written
   end
 
   def write_order_header(io, order)

@@ -45,10 +45,11 @@ class Order < ActiveRecord::Base
   scope :unbatched, ->{where(batch_id: nil)}
   scope :ready_for_export, ->{unbatched.where(status: :submitted)}
 
-  STATUSES = [:incipient, :submitted, :exported, :processing, :shipped, :rejected]
+  STATUSES = [:incipient, :submitted, :exporting, :exported, :processing, :shipped, :rejected]
   aasm(:status, whiny_transitions: false) do
     state :incipient, initial: true
     state :submitted
+    state :exporting
     state :exported
     state :processing
     state :shipped
@@ -57,7 +58,10 @@ class Order < ActiveRecord::Base
       transitions from: :incipient, to: :submitted, if: :ready_for_submission?
     end
     event :export do
-      transitions from: :submitted, to: :exported
+      transitions from: :submitted, to: :exporting
+    end
+    event :complete_export do
+      transitions from: :exporting, to: :exported
     end
     event :acknowledge do
       transitions from: :exported, to: :processing
@@ -65,13 +69,19 @@ class Order < ActiveRecord::Base
     event :reject do
       transitions from: [:processing, :exported], to: :rejected
     end
+    event :ship do
+      transitions from: [:exported, :processing], to: :shipped
+    end
   end
 
   def total
     items.reduce(0){|sum, i| sum + i.total_price}
   end
 
-  def add_item(sku, quantity = 1)
+  def add_item(product_or_sku, quantity = 1)
+    sku = product_or_sku.respond_to?(:sku) ? product_or_sku.sku : product_or_sku
+
+    # Force the lookup here, or allow the call to pass in anything product-like?
     product = Product.find_by(sku: sku)
     items.create! sku: product.sku,
                   description: product.description,
@@ -82,15 +92,17 @@ class Order < ActiveRecord::Base
     nil
   end
 
-  def <<(sku)
-    add_item sku
+  def <<(product_or_sku)
+    add_item product_or_sku
+  end
+
+  def all_items_shipped?
+    items.map(&:shipped?).all?
   end
 
   def updatable?
     incipient?
   end
-
-  private
 
   def ready_for_submission?
     items.length > 0

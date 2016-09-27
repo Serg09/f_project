@@ -22,3 +22,12 @@ Given /^(#{CLIENT}) has an order on (#{DATE})$/ do |client, order_date|
   FactoryGirl.create :incipient_order, client: client,
                                        order_date: order_date
 end
+
+Given /^(#{CLIENT}) submitted an order on (#{DATE})$/ do |client, order_date|
+  FactoryGirl.create :submitted_order, client: client,
+                                       order_date: order_date
+end
+
+Then /^(#{ORDER}) should be marked as (.*)$/ do |order, status|
+  expect(order.status).to eq status
+end

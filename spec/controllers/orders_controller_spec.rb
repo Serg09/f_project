@@ -4,6 +4,7 @@ RSpec.describe OrdersController, type: :controller do
   let (:user) { FactoryGirl.create(:user) }
   let (:client) { FactoryGirl.create(:client) }
   let (:order) { FactoryGirl.create(:order) }
+  let (:product) { FactoryGirl.create(:product) }
 
   let (:attributes) do
     {
@@ -70,44 +71,6 @@ RSpec.describe OrdersController, type: :controller do
       end
     end
 
-    context 'for a new order' do
-      let!(:order) { FactoryGirl.create(:incipient_order) }
-
-      describe 'GET #edit' do
-        it 'is successfull' do
-          get :edit, id: order
-          expect(response).to have_http_status(:success)
-        end
-      end
-
-      describe 'PATCH #update' do
-        it 'redirects to the order index page' do
-          patch :update, id: order, order: attributes, shipping_address: shipping_address_attributes
-          expect(response).to redirect_to orders_path(status: :incipient)
-        end
-
-        it 'updates the order' do
-          expect do
-            patch :update, id: order, order: attributes, shipping_address: shipping_address_attributes
-            order.reload
-          end.to change(order, :order_date).to Date.parse('2016-03-02')
-        end
-      end
-
-      describe 'DELETE #destroy' do
-        it 'redirects to the order index page' do
-          delete :destroy, id: order
-          expect(response).to redirect_to orders_path(status: :incipient)
-        end
-
-        it 'removes the order record' do
-          expect do
-            delete :destroy, id: order
-          end.to change(Order, :count).by(-1)
-        end
-      end
-    end
-
     shared_examples_for 'an immutable order' do
       describe 'GET #edit' do
         it 'redirects to the order show page' do
@@ -154,29 +117,152 @@ RSpec.describe OrdersController, type: :controller do
       end
     end
 
-    context 'for an exported order' do
-      it_behaves_like 'an immutable order' do
-        let!(:order) { FactoryGirl.create(:exported_order) }
+    shared_examples_for 'an unsubmittable order' do
+      it 'redirects to the order show page' do
+        patch :submit, id: order
+        expect(response).to redirect_to order_path(order)
       end
+
+      it 'does not change the status of the order' do
+        expect do
+          patch :submit, id: order
+          order.reload
+        end.not_to change(order, :status)
+      end
+
+      it 'renders an error message' do
+        patch :submit, id: order
+        expect(flash[:alert]).to eq 'The order could not be submitted.'
+      end
+    end
+
+    shared_examples_for 'an unexportable order' do
+      it 'redirects to the order show page' do
+        patch :export, id: order
+        expect(response).to redirect_to order_path(order)
+      end
+
+      it 'does not change the order status' do
+        expect do
+          patch :export, id: order
+        end.not_to change(order, :status)
+      end
+    end
+
+    context 'for a new order' do
+      let!(:order) { FactoryGirl.create(:incipient_order) }
+
+      describe 'GET #edit' do
+        it 'is successfull' do
+          get :edit, id: order
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      describe 'PATCH #update' do
+        it 'redirects to the order index page' do
+          patch :update, id: order, order: attributes, shipping_address: shipping_address_attributes
+          expect(response).to redirect_to orders_path(status: :incipient)
+        end
+
+        it 'updates the order' do
+          expect do
+            patch :update, id: order, order: attributes, shipping_address: shipping_address_attributes
+            order.reload
+          end.to change(order, :order_date).to Date.parse('2016-03-02')
+        end
+      end
+
+      describe 'DELETE #destroy' do
+        it 'redirects to the order index page' do
+          delete :destroy, id: order
+          expect(response).to redirect_to orders_path(status: :incipient)
+        end
+
+        it 'removes the order record' do
+          expect do
+            delete :destroy, id: order
+          end.to change(Order, :count).by(-1)
+        end
+      end
+
+      describe 'PATCH #submit' do
+        before(:each) do
+          order << product
+        end
+        it 'redirects to the index page showing submitted orders' do
+          patch :submit, id: order
+          expect(response).to redirect_to orders_path(status: :submitted)
+        end
+
+        it 'changes the order status to submitted' do
+          expect do
+            patch :submit, id: order
+            order.reload
+          end.to change(order, :status).to('submitted')
+        end
+      end
+
+      include_examples 'an unexportable order'
+    end
+
+    context 'for a submitted order' do
+      let!(:order) { FactoryGirl.create(:submitted_order) }
+
+      describe 'PATCH #export' do
+        it 'redirects to the exporting order index page' do
+          patch :export, id: order
+          expect(response).to redirect_to orders_path(status: :exporting)
+        end
+
+        it 'changes the order status to "exporting"' do
+          expect do
+            patch :export, id: order
+            order.reload
+          end.to change(order, :status).to('exporting')
+        end
+      end
+
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+    end
+
+    context 'for an exporting order' do
+      let!(:order) { FactoryGirl.create(:exported_order) }
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+      include_examples 'an unexportable order'
+    end
+
+    context 'for an exported order' do
+      let!(:order) { FactoryGirl.create(:exported_order) }
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+      include_examples 'an unexportable order'
     end
 
     context 'for a processing order' do
-      it_behaves_like 'an immutable order' do
-        let!(:order) { FactoryGirl.create(:processing_order) }
-      end
+      let!(:order) { FactoryGirl.create(:processing_order) }
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+      include_examples 'an unexportable order'
     end
 
     context 'for a shipped order' do
-      it_behaves_like 'an immutable order' do
-        let!(:order) { FactoryGirl.create(:shipped_order) }
-      end
+      let!(:order) { FactoryGirl.create(:shipped_order) }
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+      include_examples 'an unexportable order'
     end
 
     context 'for a rejected order' do
+      let!(:order) { FactoryGirl.create(:rejected_order) }
+
       # TODO Should create a new order or be able to modify a rejected order?
-      it_behaves_like 'an immutable order' do
-        let!(:order) { FactoryGirl.create(:rejected_order) }
-      end
+      include_examples 'an immutable order'
+      include_examples 'an unsubmittable order'
+
+      include_examples 'an unexportable order'
     end
   end
 
@@ -248,6 +334,38 @@ RSpec.describe OrdersController, type: :controller do
         expect do
           delete :destroy, id: order
         end.not_to change(Order, :count)
+      end
+    end
+
+    describe 'PATCH #submit' do
+      let!(:order) { FactoryGirl.create(:incipient_order) }
+
+      it "redirects to the sign in page" do
+        patch :submit, id: order
+        expect(response).to redirect_to new_user_session_path
+      end
+
+      it 'does not change the order status' do
+        expect do
+          patch :submit, id: order
+          order.reload
+        end.not_to change(order, :status)
+      end
+    end
+
+    describe 'PATCH #export' do
+      let!(:order) { FactoryGirl.create(:submitted_order) }
+
+      it "redirects to the sign in page" do
+        patch :export , id: order
+        expect(response).to redirect_to new_user_session_path
+      end
+
+      it 'does not change the order status' do
+        expect do
+          patch :export, id: order
+          order.reload
+        end.not_to change(order, :status)
       end
     end
   end

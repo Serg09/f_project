@@ -216,6 +216,12 @@ GEM
       redis (~> 3.0)
       resque (~> 1.25)
       rufus-scheduler (~> 3.2)
+    resque-web (0.0.9)
+      coffee-rails
+      jquery-rails
+      resque
+      sass-rails
+      twitter-bootstrap-rails
     rspec-collection_matchers (1.1.2)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.4.4)
@@ -327,6 +333,7 @@ DEPENDENCIES
   rails_12factor
   resque
   resque-scheduler
+  resque-web
   rspec-collection_matchers
   rspec-rails
   sass-rails (~> 5.0)

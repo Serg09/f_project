@@ -12,7 +12,8 @@ default: &default
 
 development:
   <<: *default
-  username: doug
+  username: app_user
+  password: 'please01'
   database: crowdscribed_fulfillment_development
 
 # Warning: The database defined as "test" will be erased and

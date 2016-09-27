@@ -37,9 +37,9 @@ class Lsi::FixedWidthReader
   end
 
   def get_column_defs(line)
-    line_def = @@line_defs.lazy.select do |line_def|
+    line_def = @@line_defs.lazy.detect do |line_def|
       line.starts_with?(line_def.start)
-    end.first
+    end
     line_def ? line_def.columns : nil
   end
 

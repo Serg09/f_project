@@ -1,5 +1,7 @@
 module Lsi
   class AsnProcessor
+    include LogHelper
+
     def initialize(content)
       @content = content
     end
@@ -15,7 +17,7 @@ module Lsi
       @order = Order.find(record[:order_id]) if record[:order_id]
       case record[:header]
       when '$$HDR'
-        Rails.logger.info "Processing advanced shipping notification for batch #{record[:batch_id]}"
+        logger.info "Processing advanced shipping notification for batch #{record[:batch_id]}"
         true
       when 'O'
         process_order(record)
@@ -27,7 +29,7 @@ module Lsi
         true
       end
     rescue => e
-      Rails.logger.error "Error processing record #{record.inspect} #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+      logger.error "Error processing record #{record.inspect} #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     end
 
     def process_order(record)
@@ -41,6 +43,7 @@ module Lsi
                                            freight_responsibility: record[:freight_responsibility] == 'C' ? 'customer' : 'publisher',
                                            cancel_code: record[:cancel_code],
                                            cancel_reason: record[:cancel_reason]
+      logger.info "created shipment #{@shipment.id}"
     end
 
     def process_item(record)
@@ -53,13 +56,20 @@ module Lsi
                                                 shipped_quantity: record[:shipped_quantity],
                                                 cancel_code: record[:cancel_code],
                                                 cancel_reason: record[:cancel_reason]
+        logger.info "created shipment item #{@shipment_item.id}"
         if order_item.all_items_shipped?
           order_item.ship!
+          logger.info "marked item #{order_item.id} as shipped"
+          if @order.all_items_shipped?
+            @order.ship!
+            logger.info "marked order #{@order.id} as shipped"
+          end
         elsif order_item.some_items_shipped?
           order_item.ship_part!
+          logger.info "marked item #{order_item.id} as partially shipped"
         end
       else
-        Rails.logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"
+        logger.warn "Unable to process shipment item: order item not found: #{record.inspect}"
       end
     end
 
