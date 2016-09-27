@@ -42,7 +42,7 @@ module Lsi
         record_count += 1
         order[:items].each do |i|
           write_item f, i
-          record_count += 1
+          record_count += 2
         end
       end
       write_batch_trailer f, record_count
