@@ -12,8 +12,8 @@ describe Api::V1::OrdersController do
 
       it 'returns the list of orders' do
         get :index
-        result = JSON.parse(response.body)
-        expect(result).to eq [order.as_json]
+        result = JSON.parse(response.body).map{|o| o['id']}
+        expect(result).to eq [order.id]
       end
     end
   end
