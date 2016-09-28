@@ -1,9 +1,11 @@
 require 'rails_helper'
 
 describe Api::V1::OrdersController do
+  let!(:order) { FactoryGirl.create :order }
+
   context 'when a valid auth token is present' do
-    let!(:order) { FactoryGirl.create :order }
     before { request.headers['Authorization'] = 'Token token=abc123' }
+
     describe 'get :index' do
       it 'is successful' do
         get :index
@@ -26,6 +28,11 @@ describe Api::V1::OrdersController do
       end
 
       it 'does not return any orders' do
+        get :index
+        expect(response.body).not_to match(Regexp.new(order.customer_name))
+      end
+
+      it 'returns an error message' do
         get :index
         result = JSON.parse(response.body, symbolize_names: true)
         expect(result).to eq({error: 'Bad credentials'})
