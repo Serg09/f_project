@@ -2,6 +2,12 @@ Rails.application.routes.draw do
   mount ResqueWeb::Engine => '/resque_web'
   devise_for :users
 
+  namespace :api do
+    namespace :v1 do
+      resources :orders, only: [:index, :create, :update], defaults: {format: :json}
+    end
+  end
+
   resources :clients
   resources :orders do
     resources :order_items, only: [:new, :create]
