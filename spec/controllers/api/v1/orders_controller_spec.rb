@@ -2,7 +2,8 @@ require 'rails_helper'
 
 describe Api::V1::OrdersController do
   let (:client) { FactoryGirl.create :client }
-  let!(:order) { FactoryGirl.create :order }
+  let!(:order) { FactoryGirl.create :order, client: client }
+  let!(:other_order) { FactoryGirl.create :order }
 
   context 'when a valid auth token is present' do
     let (:auth_token) { client.auth_token }
@@ -14,10 +15,16 @@ describe Api::V1::OrdersController do
         expect(response).to have_http_status :success
       end
 
-      it 'returns the list of orders' do
+      it 'returns the list of orders belonging to the client' do
         get :index
         result = JSON.parse(response.body).map{|o| o['id']}
-        expect(result).to eq [order.id]
+        expect(result).to include order.id
+      end
+
+      it 'excludes orders that do not belong to the client' do
+        get :index
+        result = JSON.parse(response.body).map{|o| o['id']}
+        expect(result).not_to include other_order.id
       end
     end
   end
