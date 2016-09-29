@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160823231941) do
+ActiveRecord::Schema.define(version: 20160929000600) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,9 +62,11 @@ ActiveRecord::Schema.define(version: 20160823231941) do
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
     t.string   "order_import_processor_class", limit: 250
+    t.string   "auth_token",                   limit: 40,  null: false
   end
 
   add_index "clients", ["abbreviation"], name: "index_clients_on_abbreviation", unique: true, using: :btree
+  add_index "clients", ["auth_token"], name: "index_clients_on_auth_token", unique: true, using: :btree
   add_index "clients", ["name"], name: "index_clients_on_name", unique: true, using: :btree
 
   create_table "documents", force: :cascade do |t|

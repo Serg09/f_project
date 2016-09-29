@@ -20,6 +20,8 @@ class Client < ActiveRecord::Base
   validates_length_of :order_import_processor_class, maximum: 250
   validates_uniqueness_of [:name, :abbreviation]
 
+  before_create :ensure_auth_token
+
   scope :order_importers, ->{where('order_import_processor_class is not null')}
 
   def import_orders(content)
@@ -28,6 +30,10 @@ class Client < ActiveRecord::Base
   end
 
   private
+
+  def ensure_auth_token
+    self.auth_token ||= SecureRandom.uuid.gsub('-', '')
+  end
 
   def order_importer_class
     order_import_processor_class.constantize

@@ -49,6 +49,13 @@ RSpec.describe Client, type: :model do
     end
   end
 
+  describe '#auth_token' do
+    it 'is set automatically' do
+      client = Client.create! attributes
+      expect(client.auth_token).not_to be_nil
+    end
+  end
+
   describe '#order_import_processor_class' do
     it 'cannot be longer than 250 characters' do
       client = Client.new attributes.merge(order_import_processor_class: 'X' * 251)
