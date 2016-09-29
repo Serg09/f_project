@@ -4,6 +4,8 @@ class Api::V1::BaseController < ApplicationController
   before_action :destroy_session
   before_action :authenticate!
 
+  attr_reader :current_client
+
   private
 
   def authenticate!
@@ -12,7 +14,7 @@ class Api::V1::BaseController < ApplicationController
 
   def authenticate_token
     authenticate_with_http_token do |token, options|
-      token == "abc123"
+      @current_client = Client.find_by(auth_token: token)
     end
   end
 

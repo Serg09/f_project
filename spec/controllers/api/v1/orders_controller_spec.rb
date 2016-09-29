@@ -1,10 +1,12 @@
 require 'rails_helper'
 
 describe Api::V1::OrdersController do
+  let (:client) { FactoryGirl.create :client }
   let!(:order) { FactoryGirl.create :order }
 
   context 'when a valid auth token is present' do
-    before { request.headers['Authorization'] = 'Token token=abc123' }
+    let (:auth_token) { client.auth_token }
+    before { request.headers['Authorization'] = "Token token=#{auth_token}" }
 
     describe 'get :index' do
       it 'is successful' do
