@@ -36,6 +36,7 @@ gem 'resque-web', require: 'resque_web'
 gem 'aasm'
 gem 'cancan'
 gem 'chronic'
+gem 'activesupport-json_encoder'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
