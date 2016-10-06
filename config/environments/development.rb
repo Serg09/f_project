@@ -45,3 +45,8 @@ REMOTE_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'lsi_client', 'p
 LSI_CLIENT_ID = 654321
 
 ORDER_IMPORT_FILE_PROVIDER = RemoteFileProvider::Ftp.new('localhost', 'cs_fulfillment', 'please01', root_directory: 'cs_fulfillment')
+
+Braintree::Configuration.environment = :sandbox
+Braintree::Configuration.merchant_id = 'g6y4bsh5qmx9rt7v'
+Braintree::Configuration.public_key  = 'st2qmrznz2k2fg3d'
+Braintree::Configuration.private_key = '1d3dab63a6d489754e42236c753f9047'

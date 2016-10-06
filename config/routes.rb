@@ -7,6 +7,11 @@ Rails.application.routes.draw do
       resources :products, only: [:index], defaults: {format: :json}
       get 'products/:sku', to: 'products#show', defaults: {format: :json}
       resources :orders, only: [:index, :create, :update], defaults: {format: :json}
+      resources :payments, only: [] do
+        collection do
+          get :token
+        end
+      end
     end
   end
 
