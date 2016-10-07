@@ -5,6 +5,11 @@
   }
 
   var HOST = 'http://localhost:3030';
+  var HTTP_CONFIG = {
+    headers: {
+      'Authorization': 'Token token=fde100e5505140c5a93cede29321cd9c'
+    }
+  };
 
   angular.module('crowdscribed', [])
     .directive('purchaseTile', ['$sce', function($sce) {
@@ -32,11 +37,7 @@
       this.getProduct = function(sku, callback) {
         // TODO Put in the proper domain name
         var url = HOST + '/api/v1/products/' + sku;
-        $http.get(url, {
-          headers: {
-            'Authorization': 'Token token=fde100e5505140c5a93cede29321cd9c'
-          }
-        }).then(function(response) {
+        $http.get(url, HTTP_CONFIG).then(function(response) {
           callback(response.data);
         }, function(error) {
           console.log("Unable to get the product.");
@@ -44,9 +45,8 @@
         });
       }
       this.getPaymentToken = function(callback) {
-        var url = HOST + '/api/v1/tokens';
-        $http.post(url, {
-        }).then(function(response) {
+        var url = HOST + '/api/v1/payments/token';
+        $http.get(url, HTTP_CONFIG).then(function(response) {
           callback(response.data.token);
         }, function(error) {
           console.log("Unable to get a payment token.");
@@ -65,17 +65,52 @@
         });
       });
     }])
-    .controller('purchaseController', ['$scope', 'cs', function($scope, cs) {
+    .controller('paymentController', ['$scope', 'cs', function($scope, cs) {
       cs.getPaymentToken(function(token) {
-        braintree.setup(token, 'custom',
-          id: 'payment-form',
-          onPaymentMethodReceived: function(details) {
-          },
-          hostedFields: {
-            number: {
-              selector: '#card-number'
-            }
+        braintree.client.create({authorization: token}, function(error, client) {
+          if (error) {
+            console.log("An error ocurred setting up the braintree client.");
+            console.log(error);
+            return;
           }
-      )});
-    }]);
+
+          braintree.hostedFields.create({
+            client: client,
+            styles: {
+              'input': {
+                'font-size': '12px',
+                'height': '24px'
+              }
+            },
+            fields: {
+              number: {
+                selector: '#card-number'
+              }
+            }
+          }, function(error, hostedFields) {
+            if (error) {
+              console.log("An error ocurred setting up the hosted fields.");
+              console.log(error);
+              return;
+            }
+
+            // add CC field events here
+
+            $('#payment-form').submit(function(event) {
+              event.preventDefault();
+              hostedFields.tokenize(function(error, payload) {
+                if (error) {
+                  console.log("An error ocurred tokenizing the payment method.");
+                  console.log(error);
+                  return;
+                }
+
+                console.log("nonce received, now we need to finish in the server side.");
+                console.log(payload);
+              }); // tokenize callback
+            }); // submit
+          }); // hostedFields.create
+        }); // braintree.client.create
+      }); // getPaymentToken
+    }]); // controller('paymentController')
 })();
