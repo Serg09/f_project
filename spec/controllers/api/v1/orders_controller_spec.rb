@@ -10,6 +10,7 @@ describe Api::V1::OrdersController do
       telephone: '2145551212',
       customer_email: 'john@doe.com',
       shipping_address_attributes: {
+        recipient: 'John Doe',
         line_1: '1234 Main St',
         line_2: 'Apt 227',
         city: 'Dallas',
@@ -55,16 +56,27 @@ describe Api::V1::OrdersController do
         end.to change(Order, :count).by(1)
       end
 
+      it 'creates an address record' do
+        expect do
+          post :create, order: attributes
+        end.to change(Address, :count).by(1)
+      end
+
       it 'returns the order' do
-        post :create, order: attributes
+        Timecop.freeze(DateTime.parse('2016-03-02 12:00:00')) do
+          post :create, order: attributes
+        end
         result = JSON.parse(response.body, symbolize_names: true)
-        expect(result). to eq({
+        expect(result).to include({
           customer_name: 'John Doe',
           telephone: '2145551212',
           order_date: '2016-03-02',
           status: 'incipient',
           client_id: client.id,
-          customer_email: 'john@.doe.com'
+          customer_email: 'john@doe.com',
+          batch_id: nil,
+          client_order_id: nil,
+          error: nil
         })
       end
     end
@@ -90,9 +102,21 @@ describe Api::V1::OrdersController do
     end
 
     describe 'post :create' do
-      it 'is returns status code "unauthorized"'
-      it 'does not create an order record'
-      it 'does not return an order'
+      it 'is returns status code "unauthorized"' do
+        post :create, order: attributes
+        expect(response).to have_http_status :unauthorized
+      end
+
+      it 'does not create an order record' do
+        expect do
+          post :create, order: attributes
+        end.not_to change(Order, :count)
+      end
+
+      it 'does not return an order' do
+        post :create, order: attributes
+        expect(response.body).not_to match /customer_name/
+      end
     end
   end
 end
