@@ -6,6 +6,10 @@ class Api::V1::BaseController < ApplicationController
 
   attr_reader :current_client
 
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render json: {message: 'not found'}, status: 404
+  end
+
   private
 
   def authenticate!
