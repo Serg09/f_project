@@ -12,7 +12,7 @@
 #  status              :string(30)       default("incipient"), not null
 #  error               :text
 #  client_id           :integer          not null
-#  client_order_id     :string(100)      not null
+#  client_order_id     :string(100)
 #  customer_email      :string(100)
 #  ship_method_id      :integer
 #  shipping_address_id :integer          not null
@@ -28,7 +28,6 @@ class Order < ActiveRecord::Base
   belongs_to :client
 
   validates_presence_of :client_id,
-                        :client_order_id,
                         :customer_name,
                         :order_date,
                         :telephone
@@ -39,6 +38,8 @@ class Order < ActiveRecord::Base
                        maximum: 100
   validates_length_of :telephone, maximum: 25
   validates_uniqueness_of :client_order_id
+
+  accepts_nested_attributes_for :shipping_address
 
   scope :by_order_date, ->{order('order_date desc')}
   scope :by_status, ->(status){where(status: status)}

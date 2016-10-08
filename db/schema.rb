@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160929000600) do
+ActiveRecord::Schema.define(version: 20161008163840) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 20160929000600) do
     t.string   "status",              limit: 30,  default: "incipient", null: false
     t.text     "error"
     t.integer  "client_id",                                             null: false
-    t.string   "client_order_id",     limit: 100,                       null: false
+    t.string   "client_order_id",     limit: 100
     t.string   "customer_email",      limit: 100
     t.integer  "ship_method_id"
     t.integer  "shipping_address_id",                                   null: false
