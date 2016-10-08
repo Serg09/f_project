@@ -84,7 +84,16 @@
             },
             fields: {
               number: {
-                selector: '#card-number'
+                selector: '#card-number',
+                placeholder: '4111 1111 1111 1111'
+              },
+              cvv: {
+                selector: '#cvv',
+                placeholder: '111'
+              },
+              expirationDate: {
+                selector: '#expiration-date',
+                placeholder: '12 / 22'
               }
             }
           }, function(error, hostedFields) {
