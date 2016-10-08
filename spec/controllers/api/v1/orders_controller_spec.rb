@@ -4,6 +4,21 @@ describe Api::V1::OrdersController do
   let (:client) { FactoryGirl.create :client }
   let!(:order) { FactoryGirl.create :order, client: client }
   let!(:other_order) { FactoryGirl.create :order }
+  let (:attributes) do
+    {
+      customer_name: 'John Doe',
+      telephone: '2145551212',
+      customer_email: 'john@doe.com',
+      shipping_address_attributes: {
+        line_1: '1234 Main St',
+        line_2: 'Apt 227',
+        city: 'Dallas',
+        state: 'TX',
+        postal_code: '75200',
+        country_code: 'US'
+      }
+    }
+  end
 
   context 'when a valid auth token is present' do
     let (:auth_token) { client.auth_token }
@@ -27,6 +42,32 @@ describe Api::V1::OrdersController do
         expect(result).not_to include other_order.id
       end
     end
+
+    describe 'post :create' do
+      it 'is successful' do
+        post :create, order: attributes
+        expect(response).to have_http_status :success
+      end
+
+      it 'creates an order record' do
+        expect do
+          post :create, order: attributes
+        end.to change(Order, :count).by(1)
+      end
+
+      it 'returns the order' do
+        post :create, order: attributes
+        result = JSON.parse(response.body, symbolize_names: true)
+        expect(result). to eq({
+          customer_name: 'John Doe',
+          telephone: '2145551212',
+          order_date: '2016-03-02',
+          status: 'incipient',
+          client_id: client.id,
+          customer_email: 'john@.doe.com'
+        })
+      end
+    end
   end
 
   context 'when no valid auth token is present' do
@@ -46,6 +87,12 @@ describe Api::V1::OrdersController do
         result = JSON.parse(response.body, symbolize_names: true)
         expect(result).to eq({error: 'Bad credentials'})
       end
+    end
+
+    describe 'post :create' do
+      it 'is returns status code "unauthorized"'
+      it 'does not create an order record'
+      it 'does not return an order'
     end
   end
 end
