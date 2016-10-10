@@ -166,6 +166,36 @@ describe Api::V1::OrderItemsController, type: :controller do
           let (:order) { FactoryGirl.create :submitted_order }
         end
       end
+
+      context 'and the order is exporting' do
+        it_behaves_like 'an immutable order' do
+          let (:order) { FactoryGirl.create :exporting_order }
+        end
+      end
+
+      context 'and the order is exported' do
+        it_behaves_like 'an immutable order' do
+          let (:order) { FactoryGirl.create :exported_order }
+        end
+      end
+
+      context 'and the order is processing' do
+        it_behaves_like 'an immutable order' do
+          let (:order) { FactoryGirl.create :processing_order }
+        end
+      end
+
+      context 'and the order is shipped' do
+        it_behaves_like 'an immutable order' do
+          let (:order) { FactoryGirl.create :shipped_order }
+        end
+      end
+
+      context 'and the order is rejected' do
+        it_behaves_like 'an immutable order' do
+          let (:order) { FactoryGirl.create :rejected_order }
+        end
+      end
     end
 
     context 'and the order does not belong to the client' do
