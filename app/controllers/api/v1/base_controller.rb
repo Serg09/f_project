@@ -7,11 +7,15 @@ class Api::V1::BaseController < ApplicationController
   attr_reader :current_client
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
-    render json: {message: 'not found'}, status: 404
+    render json: {message: 'not found'}, status: :not_found
   end
 
   rescue_from CanCan::AccessDenied do |exception|
-    render json: {message: 'not found'}, status: 404
+    render json: {message: 'not found'}, status: :not_found
+  end
+
+  rescue_from InvalidState do |exception|
+    render json: {message: exception.message}, status: :conflict
   end
 
   def current_ability

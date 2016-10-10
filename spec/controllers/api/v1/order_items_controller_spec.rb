@@ -32,47 +32,138 @@ describe Api::V1::OrderItemsController, type: :controller do
         end
       end
 
-      describe 'post :create' do
-        it 'is successful' do
-          post :create, order_id: order, item: attributes
-          expect(response).to have_http_status :success
-        end
-
-        it 'creates an order item record' do
-          expect do
+      context 'and the order is incipient' do
+        describe 'post :create' do
+          it 'is successful' do
             post :create, order_id: order, item: attributes
-          end.to change(order.items, :count).by(1)
+            expect(response).to have_http_status :success
+          end
+
+          it 'creates an order item record' do
+            expect do
+              post :create, order_id: order, item: attributes
+            end.to change(order.items, :count).by(1)
+          end
+
+          it 'returns the new item' do
+            post :create, order_id: order, item: attributes
+            result = JSON.parse(response.body, symbolize_names: true)
+            expect(result).to include({
+              sku: product.sku,
+              quantity: 3,
+              unit_price: 9.99,
+              extended_price: 29.97
+            })
+          end
         end
 
-        it 'returns the new item' do
-          post :create, order_id: order, item: attributes
-          result = JSON.parse(response.body, symbolize_names: true)
-          expect(result).to include({
-            sku: product.sku,
-            quantity: 3,
-            unit_price: 9.99,
-            extended_price: 29.97
-          })
+        describe 'patch :update' do
+          it 'returns http status success' do
+            patch :update, id: item, item: {quantity: 4}
+            expect(response).to have_http_status :success
+          end
+
+          it 'updates the order item' do
+            expect do
+              patch :update, id: item, item: {quantity: 4}
+              item.reload
+            end.to change(item, :quantity).to(4)
+          end
+
+          it 'returns the item' do
+            patch :update, id: item, item: {quantity: 4}
+            result = JSON.parse(response.body, symbolize_names: true)
+            expect(result).to include quantity: 4
+          end
+        end
+
+        describe 'delete :destroy' do
+          it 'is successful' do
+            delete :destroy, id: item
+            expect(response).to have_http_status :success
+          end
+
+          it 'deletes the order item record' do
+            expect do
+              delete :destroy, id: item
+            end.to change(order.items, :count).by(-1)
+          end
         end
       end
 
-      describe 'patch :update' do
-        it 'returns http status success' do
-          patch :update, id: item, item: {quantity: 4}
-          expect(response).to have_http_status :success
+      shared_examples_for 'an immutable order' do
+        describe 'post :create' do
+          it 'returns http status "conflict"' do
+            post :create, order_id: order, item: attributes
+            expect(response).to have_http_status :conflict
+          end
+
+          it 'does not create an order item record' do
+            expect do
+              post :create, order_id: order, item: attributes
+            end.not_to change(order.items, :count)
+          end
+
+          it 'does not return an item' do
+            post :create, order_id: order, item: attributes
+            expect(response.body).not_to match /sku/
+          end
+
+          it 'returns an error message' do
+            post :create, order_id: order, item: attributes
+            result = JSON.parse(response.body, symbolize_names: true)
+            expect(result).to include message: 'The order cannot be modified in its current state.'
+          end
         end
 
-        it 'updates the order item' do
-          expect do
+        describe 'patch :update' do
+          it 'returns http status "conflict"' do
             patch :update, id: item, item: {quantity: 4}
-            item.reload
-          end.to change(item, :quantity).to(4)
+            expect(response).to have_http_status :conflict
+          end
+
+          it 'does not update the order item' do
+            expect do
+              patch :update, id: item, item: {quantity: 4}
+              item.reload
+            end.not_to change(item, :quantity)
+          end
+
+          it 'does not return the item' do
+            patch :update, id: item, item: {quantity: 4}
+            expect(response.body).not_to match /sku/
+          end
+
+          it 'returns an error message' do
+            patch :update, id: item, item: {quantity: 4}
+            result = JSON.parse(response.body, symbolize_names: true)
+            expect(result).to include message: 'The order cannot be modified in its current state.'
+          end
         end
 
-        it 'returns the item' do
-          patch :update, id: item, item: {quantity: 4}
-          result = JSON.parse(response.body, symbolize_names: true)
-          expect(result).to include quantity: 4
+        describe 'delete :destroy' do
+          it 'returns http status "conflict"' do
+            delete :destroy, id: item
+            expect(response).to have_http_status :conflict
+          end
+
+          it 'does not delete the order item record' do
+            expect do
+              delete :destroy, id: item
+            end.not_to change(OrderItem, :count)
+          end
+
+          it 'returns an error message' do
+            delete :destroy, id: item
+            result = JSON.parse(response.body, symbolize_names: true)
+            expect(result).to include message: 'The order cannot be modified in its current state.'
+          end
+        end
+      end
+
+      context 'and the order is submitted' do
+        it_behaves_like 'an immutable order' do
+          let (:order) { FactoryGirl.create :submitted_order }
         end
       end
     end

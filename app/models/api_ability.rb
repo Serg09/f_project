@@ -4,6 +4,7 @@ class ApiAbility
   def initialize(client)
     client ||= Client.new
 
-    can :manage, OrderItem, {order: {client_id: client.id}}
+    can :manage, Order, client_id: client.id
+    can :manage, OrderItem, order: {client_id: client.id}
   end
 end
