@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       resources :orders, only: [:index, :create, :update], defaults: {format: :json} do
         resources :order_items, only: [:index, :create], path: 'items'
       end
+      resources :order_items, only: [:update], defaults: {format: :json}, path: 'items'
       resources :payments, only: [] do
         collection do
           get :token, defaults: {format: :json}

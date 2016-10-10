@@ -55,6 +55,26 @@ describe Api::V1::OrderItemsController, type: :controller do
           })
         end
       end
+
+      describe 'patch :update' do
+        it 'returns http status success' do
+          patch :update, id: item, item: {quantity: 4}
+          expect(response).to have_http_status :success
+        end
+
+        it 'updates the order item' do
+          expect do
+            patch :update, id: item, item: {quantity: 4}
+            item.reload
+          end.to change(item, :quantity).to(4)
+        end
+
+        it 'returns the item' do
+          patch :update, id: item, item: {quantity: 4}
+          result = JSON.parse(response.body, symbolize_names: true)
+          expect(result).to include quantity: 4
+        end
+      end
     end
 
     context 'and the order does not belong to the client' do
@@ -92,6 +112,25 @@ describe Api::V1::OrderItemsController, type: :controller do
           expect(response.body).not_to match /sku/
         end
       end
+
+      describe 'patch :update' do
+        it 'returns http status "not found"' do
+          patch :update, id: item, item: {quantity: 1}
+          expect(response).to have_http_status :not_found
+        end
+
+        it 'does not update the order item' do
+          expect do
+            patch :update, id: item, item: {quantity: 1}
+            item.reload
+          end.not_to change(item, :quantity)
+        end
+
+        it 'does not return the item' do
+          patch :update, id: item, item: {quantity: 1}
+          expect(response.body).not_to match /sku/
+        end
+      end
     end
   end
 
@@ -124,6 +163,25 @@ describe Api::V1::OrderItemsController, type: :controller do
         post :create, order_id: order, item: attributes
         expect(response.body).not_to match /sku/
       end
+    end
+
+    describe 'patch :update' do
+        it 'returns http status "unauthorized"' do
+          patch :update, id: item, item: {quantity: 1}
+          expect(response).to have_http_status :unauthorized
+        end
+
+        it 'does not update the order item' do
+          expect do
+            patch :update, id: item, item: {quantity: 1}
+            item.reload
+          end.not_to change(item, :quantity)
+        end
+
+        it 'does not return the item' do
+          patch :update, id: item, item: {quantity: 1}
+          expect(response.body).not_to match /sku/
+        end
     end
   end
 end

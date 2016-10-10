@@ -10,6 +10,14 @@ class Api::V1::BaseController < ApplicationController
     render json: {message: 'not found'}, status: 404
   end
 
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: {message: 'not found'}, status: 404
+  end
+
+  def current_ability
+    @current_ability ||= ApiAbility.new(current_client)
+  end
+
   private
 
   def authenticate!
