@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Api::V1::OrderItemsController, type: :controller do
   let (:client) { FactoryGirl.create(:client) }
   let (:order) { FactoryGirl.create(:order, client: client) }
-  let!(:item) { FactoryGirl.create(:order_item, order: order) }
+  let!(:item) { FactoryGirl.create(:order_item, order: order, quantity: 3) }
   let (:product) { FactoryGirl.create(:product, price: 9.99) }
   let (:attributes) do
     {
@@ -287,22 +287,40 @@ describe Api::V1::OrderItemsController, type: :controller do
     end
 
     describe 'patch :update' do
-        it 'returns http status "unauthorized"' do
-          patch :update, id: item, item: {quantity: 1}
-          expect(response).to have_http_status :unauthorized
-        end
+      it 'returns http status "unauthorized"' do
+        patch :update, id: item, item: {quantity: 1}
+        expect(response).to have_http_status :unauthorized
+      end
 
-        it 'does not update the order item' do
-          expect do
-            patch :update, id: item, item: {quantity: 1}
-            item.reload
-          end.not_to change(item, :quantity)
-        end
-
-        it 'does not return the item' do
+      it 'does not update the order item' do
+        expect do
           patch :update, id: item, item: {quantity: 1}
-          expect(response.body).not_to match /sku/
-        end
+          item.reload
+        end.not_to change(item, :quantity)
+      end
+
+      it 'does not return the item' do
+        patch :update, id: item, item: {quantity: 1}
+        expect(response.body).not_to match /sku/
+      end
+    end
+
+    describe 'delete :destroy' do
+      it 'returns status "unauthorized"' do
+        delete :destroy, id: item
+        expect(response).to have_http_status :unauthorized
+      end
+
+      it 'does not delete the order item' do
+        expect do
+          delete :destroy, id: item
+        end.not_to change(OrderItem, :count)
+      end
+
+      it 'does not return the order item' do
+        delete :destroy, id: item
+        expect(response.body).not_to match /sku/
+      end
     end
   end
 end
