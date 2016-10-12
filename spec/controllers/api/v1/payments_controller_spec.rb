@@ -28,14 +28,16 @@ describe Api::V1::PaymentsController do
   end
 
   context 'when an authorization token is absent' do
-    it 'returns status code "unauthorized"' do
-      get :token
-      expect(response).to have_http_status :unauthorized
-    end
+    describe 'get :token' do
+      it 'returns status code "unauthorized"' do
+        get :token
+        expect(response).to have_http_status :unauthorized
+      end
 
-    it 'does not return a token' do
-      get :token
-      expect(response.body).not_to match /[a-z0-9]{128,}={0,2}/i
+      it 'does not return a token' do
+        get :token
+        expect(response.body).not_to match /[a-z0-9]{128,}={0,2}/i
+      end
     end
   end
 end
