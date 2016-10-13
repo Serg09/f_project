@@ -23,6 +23,7 @@ class Order < ActiveRecord::Base
 
   has_many :items, class_name: 'OrderItem'
   has_many :shipments
+  has_many :payments
   belongs_to :shipping_address, class_name: 'Address'
   belongs_to :batch
   belongs_to :client
