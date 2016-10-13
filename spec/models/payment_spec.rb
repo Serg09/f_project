@@ -43,7 +43,12 @@ RSpec.describe Payment, type: :model do
   shared_examples_for 'an executable payment' do
     describe '#execute' do
       context 'on success' do
-        it 'changes the state to "approved"'
+        it 'changes the state to "approved"' do
+          expect do
+            payment.execute!
+          end.to change(payment, :status).to('approved')
+        end
+
         it 'sets the #external_id'
         it 'sets the #external_fee'
       end
