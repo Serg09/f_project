@@ -30,11 +30,14 @@ class Payment < ActiveRecord::Base
     state :refunded
 
     event :execute do
-      transitions from: :pending, to: :approved, if: :_execute
+      transitions from: [:failed, :pending], to: :approved, if: :_execute
+      transitions from: :pending, to: :failed, unless: :provider_error
     end
   end
 
   private
+
+  attr_accessor :provider_error
 
   def calculate_fee
     return nil unless amount
@@ -48,8 +51,8 @@ class Payment < ActiveRecord::Base
                                            submit_for_settlement: true
                                          }
     # TODO Save the response
+    self.external_id ||= result.id
     if result.success?
-      self.external_id ||= result.id
       self.external_fee = calculate_fee
       true
     else
@@ -57,7 +60,7 @@ class Payment < ActiveRecord::Base
     end
   rescue StandardError => e
     Rails.logger.error "Error executing payment #{inspect}: #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
-    raise e if Rails.env.test?
+    self.provider_error = e
     false
   end
 end

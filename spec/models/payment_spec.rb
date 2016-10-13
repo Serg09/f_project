@@ -43,14 +43,13 @@ RSpec.describe Payment, type: :model do
 
   shared_examples_for 'an executable payment' do
     describe '#execute' do
+      let (:provider_id) { Faker::Number.hexadecimal(12) }
+
       context 'on success' do
-
-        let (:external_id) { Faker::Number.hexadecimal(12) }
-
         before do
           allow(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('result', success?: true, id: external_id))
+            and_return(double('result', success?: true, id: provider_id))
         end
 
         it 'changes the state to "approved"' do
@@ -60,15 +59,67 @@ RSpec.describe Payment, type: :model do
         end
 
         it 'sets the #external_id' do
-          expect do
-            payment.execute! nonce
-          end.to change(payment, :external_id).to external_id
+          if payment.pending?
+            expect do
+              payment.execute! nonce
+            end.to change(payment, :external_id).to provider_id
+          end
         end
 
         it 'sets the #external_fee' do
+          if payment.pending?
+            expect do
+              payment.execute! nonce
+            end.to change(payment, :external_fee).to 3.20
+          end
+        end
+      end
+
+      context 'on failure' do
+        before do
+          allow(Braintree::Transaction).to \
+            receive(:sale).
+            and_return(double('result', success?: false, id: provider_id))
+        end
+
+        it 'changes the state to "failed"' do
+          unless payment.failed?
+            expect do
+              payment.execute!(nonce)
+            end.to change(payment, :state).to('failed')
+          end
+        end
+
+        it 'does not change the #external_fee' do
           expect do
-            payment.execute! nonce
-          end.to change(payment, :external_fee).to 3.20
+            payment.execute!(nonce)
+          end.not_to change(payment, :external_fee)
+        end
+      end
+
+      context 'on error' do
+        before do
+          allow(Braintree::Transaction).to \
+            receive(:sale).
+            and_raise('Induced exception')
+        end
+
+        it 'does not change the state' do
+          expect do
+            payment.execute!(nonce)
+          end.not_to change(payment, :state)
+        end
+
+        it 'does not set the #external_id' do
+          expect do
+            payment.execute!(nonce)
+          end.not_to change(payment, :external_id)
+        end
+
+        it 'does not set the #external_fee' do
+          expect do
+            payment.execute!(nonce)
+          end.not_to change(payment, :external_fee)
         end
       end
     end
@@ -76,9 +127,29 @@ RSpec.describe Payment, type: :model do
 
   shared_examples_for 'an unexecutable payment' do
     describe '#execute' do
-      it 'does not change the state'
-      it 'does not change the #external_id'
-      it 'does not change the #external_fee'
+      it 'does not change the state' do
+        expect do
+          payment.execute!(nonce)
+        end.not_to change(payment, :state)
+      end
+
+      it 'does not change the #external_id' do
+        expect do
+          payment.execute!(nonce)
+        end.not_to change(payment, :external_id)
+      end
+
+      it 'does not change the #external_fee' do
+        expect do
+          payment.execute!(nonce)
+        end.not_to change(payment, :external_fee)
+      end
+
+      it 'does not call the provider' do
+        expect(Braintree::Transaction).not_to \
+          receive(:sale)
+        payment.execute!(nonce)
+      end
     end
   end
 
@@ -109,19 +180,38 @@ RSpec.describe Payment, type: :model do
     it_behaves_like 'an unexecutable payment' do
       let (:payment) { FactoryGirl.create(:approved_payment) }
     end
-    it_behaves_like 'a refundable payment'
+    it_behaves_like 'a refundable payment' do
+      let (:payment) { FactoryGirl.create(:approved_payment) }
+    end
   end
 
   context 'when completed' do
-    it_behaves_like 'an unexecutable payment'
+    it_behaves_like 'an unexecutable payment' do
+      let (:payment) { FactoryGirl.create(:completed_payment) }
+    end
+
+    it_behaves_like 'a refundable payment' do
+      let (:payment) { FactoryGirl.create(:completed_payment) }
+    end
   end
 
   context 'when failed' do
-    it_behaves_like 'an unrefundable payment'
+    it_behaves_like 'an executable payment' do
+      let (:payment) { FactoryGirl.create(:failed_payment, amount: 100) }
+    end
+
+    it_behaves_like 'an unrefundable payment' do
+      let (:payment) { FactoryGirl.create(:failed_payment, amount: 100) }
+    end
   end
 
   context 'when refunded' do
-    it_behaves_like 'an unexecutable payment'
-    it_behaves_like 'an unrefundable payment'
+    it_behaves_like 'an unexecutable payment' do
+      let (:payment) { FactoryGirl.create(:refunded_payment) }
+    end
+
+    it_behaves_like 'an unrefundable payment' do
+      let (:payment) { FactoryGirl.create(:refunded_payment) }
+    end
   end
 end
