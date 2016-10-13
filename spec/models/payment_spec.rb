@@ -8,6 +8,7 @@ RSpec.describe Payment, type: :model do
       amount: 100
     }
   end
+  let (:nonce) { Faker::Number.hexadecimal(10) }
 
   it 'can be created from valid attributes' do
     payment = Payment.new attributes
@@ -43,14 +44,32 @@ RSpec.describe Payment, type: :model do
   shared_examples_for 'an executable payment' do
     describe '#execute' do
       context 'on success' do
-        it 'changes the state to "approved"' do
-          expect do
-            payment.execute!
-          end.to change(payment, :status).to('approved')
+
+        let (:external_id) { Faker::Number.hexadecimal(12) }
+
+        before do
+          allow(Braintree::Transaction).to \
+            receive(:sale).
+            and_return(double('result', success?: true, id: external_id))
         end
 
-        it 'sets the #external_id'
-        it 'sets the #external_fee'
+        it 'changes the state to "approved"' do
+          expect do
+            payment.execute! nonce
+          end.to change(payment, :state).to('approved')
+        end
+
+        it 'sets the #external_id' do
+          expect do
+            payment.execute! nonce
+          end.to change(payment, :external_id).to external_id
+        end
+
+        it 'sets the #external_fee' do
+          expect do
+            payment.execute! nonce
+          end.to change(payment, :external_fee).to 3.20
+        end
       end
     end
   end
@@ -79,7 +98,7 @@ RSpec.describe Payment, type: :model do
 
   context 'when pending' do
     it_behaves_like 'an executable payment' do
-      let (:payment) { FactoryGirl.create(:pending_payment) }
+      let (:payment) { FactoryGirl.create(:pending_payment, amount: 100) }
     end
     it_behaves_like 'an unrefundable payment' do
       let (:payment) { FactoryGirl.create(:pending_payment) }

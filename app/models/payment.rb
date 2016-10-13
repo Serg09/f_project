@@ -13,9 +13,51 @@
 #
 
 class Payment < ActiveRecord::Base
+  include AASM
+
   belongs_to :order
 
   validates_presence_of :order_id, :amount
   validates_numericality_of :amount, greater_than: 0, if: :amount
+
   validates_length_of :external_id, maximum: 100
+
+  aasm(:state, whiny_transitions: false) do
+    state :pending, initial: true
+    state :approved
+    state :completed
+    state :failed
+    state :refunded
+
+    event :execute do
+      transitions from: :pending, to: :approved, if: :_execute
+    end
+  end
+
+  private
+
+  def calculate_fee
+    return nil unless amount
+    (amount * 0.029) + 0.30
+  end
+
+  def _execute(nonce)
+    result = Braintree::Transaction.sale amount: amount,
+                                         payment_method_nonce: nonce,
+                                         options: {
+                                           submit_for_settlement: true
+                                         }
+    # TODO Save the response
+    if result.success?
+      self.external_id ||= result.id
+      self.external_fee = calculate_fee
+      true
+    else
+      false
+    end
+  rescue StandardError => e
+    Rails.logger.error "Error executing payment #{inspect}: #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    raise e if Rails.env.test?
+    false
+  end
 end
