@@ -8,6 +8,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  order_import_processor_class :string(250)
+#  auth_token                   :string(40)       not null
 #
 
 class Client < ActiveRecord::Base
