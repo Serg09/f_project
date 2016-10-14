@@ -225,8 +225,24 @@ RSpec.describe Payment, type: :model do
 
   shared_examples_for 'an unrefundable payment' do
     describe '#refund' do
-      it 'does not change the state'
-      it 'does not change the fee'
+      it 'does not change the state' do
+        expect do
+          payment.refund!
+        end.not_to change(payment, :state)
+      end
+
+      it 'does not change the fee' do
+        expect do
+          payment.refund!
+        end.not_to change(payment, :external_fee)
+      end
+
+      it 'does not call the provider' do
+        expect(Braintree::Transaction).not_to \
+          receive(:find)
+        expect(Braintree::Transaction).not_to \
+          receive(:refund)
+      end
     end
   end
 
