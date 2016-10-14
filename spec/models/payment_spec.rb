@@ -72,6 +72,12 @@ RSpec.describe Payment, type: :model do
             end.to change(payment, :external_fee).to 3.20
           end
         end
+
+        it 'creates a response record' do
+          expect do
+            payment.execute! nonce
+          end.to change(payment.responses, :count).by(1)
+        end
       end
 
       context 'on failure' do
@@ -93,6 +99,12 @@ RSpec.describe Payment, type: :model do
           expect do
             payment.execute!(nonce)
           end.not_to change(payment, :external_fee)
+        end
+
+        it 'creates a transaction record' do
+          expect do
+            payment.execute! nonce
+          end.to change(payment.responses, :count).by(1)
         end
       end
 
@@ -119,6 +131,12 @@ RSpec.describe Payment, type: :model do
           expect do
             payment.execute!(nonce)
           end.not_to change(payment, :external_fee)
+        end
+
+        it 'does not create a transaction record' do
+          expect do
+            payment.execute!(nonce)
+          end.not_to change(Transaction, :count)
         end
       end
     end
@@ -179,6 +197,12 @@ RSpec.describe Payment, type: :model do
             payment.refund!
           end.to change(payment, :external_fee).to 0.30
         end
+
+        it 'creates a transaction record' do
+          expect do
+            payment.refund!
+          end.to change(payment.responses, :count).by(1)
+        end
       end
 
       context 'on failure' do
@@ -199,6 +223,12 @@ RSpec.describe Payment, type: :model do
             payment.refund!
           end.not_to change(payment, :external_fee)
         end
+
+        it 'creates a response record' do
+          expect do
+            payment.refund!
+          end.to change(payment.responses, :count).by(1)
+        end
       end
 
       context 'on error' do
@@ -218,6 +248,12 @@ RSpec.describe Payment, type: :model do
           expect do
             payment.refund!
           end.not_to change(payment, :external_fee)
+        end
+
+        it 'does not create a response record' do
+          expect do
+            payment.refund!
+          end.not_to change(Transaction, :count)
         end
       end
     end
