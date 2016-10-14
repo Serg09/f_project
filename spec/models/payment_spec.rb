@@ -48,7 +48,9 @@ RSpec.describe Payment, type: :model do
         before do
           allow(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('result', success?: true, id: provider_id))
+            and_return(double('result', success?: true,
+                                        id: provider_id,
+                                        status: 'approved'))
         end
 
         it 'changes the state to "approved"' do
@@ -84,7 +86,9 @@ RSpec.describe Payment, type: :model do
         before do
           allow(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('result', success?: false, id: provider_id))
+            and_return(double('result', success?: false,
+                                        id: provider_id,
+                                        status: 'no_dice'))
         end
 
         it 'changes the state to "failed"' do
@@ -136,7 +140,7 @@ RSpec.describe Payment, type: :model do
         it 'does not create a transaction record' do
           expect do
             payment.execute!(nonce)
-          end.not_to change(Transaction, :count)
+          end.not_to change(Response, :count)
         end
       end
     end
@@ -183,7 +187,8 @@ RSpec.describe Payment, type: :model do
         before do
           expect(Braintree::Transaction).to \
             receive(:refund).
-            and_return(double('result', success?: true))
+            and_return(double('result', success?: true,
+                                        status: 'refunded'))
         end
 
         it 'changes the state to "refunded"' do
@@ -209,7 +214,8 @@ RSpec.describe Payment, type: :model do
         before do
           expect(Braintree::Transaction).to \
             receive(:refund).
-            and_return(double('result', success?: false))
+            and_return(double('result', success?: false,
+                                        status: 'no_dice'))
         end
 
         it 'does not change the state' do
@@ -253,7 +259,7 @@ RSpec.describe Payment, type: :model do
         it 'does not create a response record' do
           expect do
             payment.refund!
-          end.not_to change(Transaction, :count)
+          end.not_to change(Response, :count)
         end
       end
     end

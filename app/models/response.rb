@@ -11,5 +11,7 @@
 #
 
 class Response < ActiveRecord::Base
+  belongs_to :payment
+
   validates_presence_of :payment_id, :status, :content
 end

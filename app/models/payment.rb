@@ -16,6 +16,7 @@ class Payment < ActiveRecord::Base
   include AASM
 
   belongs_to :order
+  has_many :responses
 
   validates_presence_of :order_id, :amount
   validates_numericality_of :amount, greater_than: 0, if: :amount
@@ -54,7 +55,8 @@ class Payment < ActiveRecord::Base
                                          options: {
                                            submit_for_settlement: true
                                          }
-    # TODO Save the response
+    responses.create! status: result.status,
+                      content: result.to_yaml
     self.external_id ||= result.id
     if result.success?
       self.external_fee = calculate_fee
@@ -75,7 +77,8 @@ class Payment < ActiveRecord::Base
              elsif %w(authorized submitted_for_settlement).include?(payment.status)
                Braintree::Transaction.void(external_id)
              end
-
+    responses.create! status: result.status,
+                      content: result.to_yaml
     if result.success?
       self.external_fee = 0.30 # Braintree keeps the $0.30 on a refund
       self.state = 'refunded'
