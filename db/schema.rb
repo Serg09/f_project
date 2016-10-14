@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161012021016) do
+ActiveRecord::Schema.define(version: 20161014015726) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -78,18 +78,18 @@ ActiveRecord::Schema.define(version: 20161012021016) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                                        null: false
-    t.integer  "line_item_no",                                    null: false
-    t.string   "sku",                 limit: 30,                  null: false
-    t.string   "description",         limit: 250
-    t.integer  "quantity",                                        null: false
+    t.integer  "order_id",                                       null: false
+    t.integer  "line_item_no",                                   null: false
+    t.string   "sku",                 limit: 30,                 null: false
+    t.string   "description",         limit: 50
+    t.integer  "quantity",                                       null: false
     t.decimal  "unit_price"
     t.decimal  "discount_percentage"
     t.decimal  "freight_charge"
     t.decimal  "tax"
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.string   "status",              limit: 30,  default: "new", null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.string   "status",              limit: 30, default: "new", null: false
     t.integer  "accepted_quantity"
     t.integer  "shipped_quantity"
     t.decimal  "weight"
@@ -155,6 +155,16 @@ ActiveRecord::Schema.define(version: 20161012021016) do
   end
 
   add_index "products", ["sku"], name: "index_products_on_sku", unique: true, using: :btree
+
+  create_table "responses", force: :cascade do |t|
+    t.integer  "payment_id", null: false
+    t.string   "status",     null: false
+    t.text     "content",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "responses", ["payment_id"], name: "index_responses_on_payment_id", using: :btree
 
   create_table "shipment_items", force: :cascade do |t|
     t.integer  "shipment_id",      null: false
