@@ -6,5 +6,8 @@ module Braintree
 
   class Transaction
     def self.sale(options); end
+    def self.refund(id); end
+    def self.void(id); end
+    def self.find(id); end
   end
 end

@@ -33,6 +33,10 @@ class Payment < ActiveRecord::Base
       transitions from: [:failed, :pending], to: :approved, if: :_execute
       transitions from: :pending, to: :failed, unless: :provider_error
     end
+
+    event :refund do
+      transitions from: [:approved, :completed], to: :refunded, if: :_refund
+    end
   end
 
   private
@@ -60,6 +64,27 @@ class Payment < ActiveRecord::Base
     end
   rescue StandardError => e
     Rails.logger.error "Error executing payment #{inspect}: #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
+    self.provider_error = e
+    false
+  end
+
+  def _refund
+    payment = Braintree::Transaction.find(external_id)
+    result = if %w(settled settling).include?(payment.status)
+               Braintree::Transaction.refund(external_id)
+             elsif %w(authorized submitted_for_settlement).include?(payment.status)
+               Braintree::Transaction.void(external_id)
+             end
+
+    if result.success?
+      self.external_fee = 0.30 # Braintree keeps the $0.30 on a refund
+      self.state = 'refunded'
+      true
+    else
+      false
+    end
+  rescue StandardError => e
+    Rails.logger.error "Error refunding payment #{inspect}: #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     self.provider_error = e
     false
   end

@@ -8,6 +8,7 @@ RSpec.describe Payment, type: :model do
       amount: 100
     }
   end
+  let (:provider_id) { Faker::Number.hexadecimal(12) }
   let (:nonce) { Faker::Number.hexadecimal(10) }
 
   it 'can be created from valid attributes' do
@@ -43,8 +44,6 @@ RSpec.describe Payment, type: :model do
 
   shared_examples_for 'an executable payment' do
     describe '#execute' do
-      let (:provider_id) { Faker::Number.hexadecimal(12) }
-
       context 'on success' do
         before do
           allow(Braintree::Transaction).to \
@@ -154,9 +153,73 @@ RSpec.describe Payment, type: :model do
   end
 
   shared_examples_for 'a refundable payment' do
+    before do
+      expect(Braintree::Transaction).to \
+        receive(:find).
+        with(payment.external_id).
+        and_return(double('payment', status: 'settled'))
+    end
+
     describe '#refund' do
-      it 'changes the state to "refunded"'
-      it 'reduces the external fee'
+      context 'on success' do
+        before do
+          expect(Braintree::Transaction).to \
+            receive(:refund).
+            and_return(double('result', success?: true))
+        end
+
+        it 'changes the state to "refunded"' do
+          expect do
+            payment.refund!
+          end.to change(payment, :state).to 'refunded'
+        end
+
+        it 'reduces the external fee' do
+          expect do
+            payment.refund!
+          end.to change(payment, :external_fee).to 0.30
+        end
+      end
+
+      context 'on failure' do
+        before do
+          expect(Braintree::Transaction).to \
+            receive(:refund).
+            and_return(double('result', success?: false))
+        end
+
+        it 'does not change the state' do
+          expect do
+            payment.refund!
+          end.not_to change(payment, :state)
+        end
+
+        it 'does not change the external fee' do
+          expect do
+            payment.refund!
+          end.not_to change(payment, :external_fee)
+        end
+      end
+
+      context 'on error' do
+        before do
+          expect(Braintree::Transaction).to \
+            receive(:refund).
+            and_raise('Induced error')
+        end
+
+        it 'does not change the state' do
+          expect do
+            payment.refund!
+          end.not_to change(payment, :state)
+        end
+
+        it 'does not change the external fee' do
+          expect do
+            payment.refund!
+          end.not_to change(payment, :external_fee)
+        end
+      end
     end
   end
 
