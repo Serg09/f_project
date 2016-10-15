@@ -36,7 +36,7 @@ class Order < ActiveRecord::Base
                        :customer_email],
                        maximum: 100
   validates_length_of :telephone, maximum: 25
-  validates_uniqueness_of :client_order_id
+  validates_uniqueness_of :client_order_id, if: :client_order_id
 
   accepts_nested_attributes_for :shipping_address
 
