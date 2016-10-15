@@ -1,0 +1,20 @@
+<div class="cart-tile" ng-controller="cartController">
+  order items go here
+
+  <table>
+    <tr>
+      <th>SKU</th>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Qty.</th>
+      <th>Total</th>
+    </tr>
+    <tr ng-repeat="item in order.items">
+      <td ng-bind="sku">
+      <td ng-bind="description">
+      <td ng-bind="unit_price">
+      <td ng-bind="quantity">
+      <td ng-bind="extended_price">
+    </tr>
+  </table>
+</div>

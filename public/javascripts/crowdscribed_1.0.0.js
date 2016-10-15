@@ -30,6 +30,15 @@
         templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/payment_tile.html')
       }
     }])
+    .directive('cartTile', ['$sce', function($sce) {
+      // ---------
+      // Cart Tile
+      // ---------
+      return {
+        restrict: 'E',
+        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/cart_tile.html')
+      }
+    }])
     .factory('cs', ['$http', function($http) {
       // --------------------
       // Crowdscribed Service
@@ -121,5 +130,7 @@
           }); // hostedFields.create
         }); // braintree.client.create
       }); // getPaymentToken
+    }])
+    .controller('cartController', ['$scope', 'cs', function($scope, cs) {
     }]); // controller('paymentController')
 })();
