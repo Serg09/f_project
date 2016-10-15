@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160823231941) do
+ActiveRecord::Schema.define(version: 20161014015726) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,9 +62,11 @@ ActiveRecord::Schema.define(version: 20160823231941) do
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
     t.string   "order_import_processor_class", limit: 250
+    t.string   "auth_token",                   limit: 40,  null: false
   end
 
   add_index "clients", ["abbreviation"], name: "index_clients_on_abbreviation", unique: true, using: :btree
+  add_index "clients", ["auth_token"], name: "index_clients_on_auth_token", unique: true, using: :btree
   add_index "clients", ["name"], name: "index_clients_on_name", unique: true, using: :btree
 
   create_table "documents", force: :cascade do |t|
@@ -106,7 +108,7 @@ ActiveRecord::Schema.define(version: 20160823231941) do
     t.string   "status",              limit: 30,  default: "incipient", null: false
     t.text     "error"
     t.integer  "client_id",                                             null: false
-    t.string   "client_order_id",     limit: 100,                       null: false
+    t.string   "client_order_id",     limit: 100
     t.string   "customer_email",      limit: 100
     t.integer  "ship_method_id"
     t.integer  "shipping_address_id",                                   null: false
@@ -131,6 +133,19 @@ ActiveRecord::Schema.define(version: 20160823231941) do
   add_index "packages", ["shipment_item_id"], name: "index_packages_on_shipment_item_id", using: :btree
   add_index "packages", ["tracking_number"], name: "index_packages_on_tracking_number", using: :btree
 
+  create_table "payments", force: :cascade do |t|
+    t.integer  "order_id",                                         null: false
+    t.decimal  "amount",                   precision: 9, scale: 2, null: false
+    t.string   "state",        limit: 20,                          null: false
+    t.string   "external_id",  limit: 100
+    t.decimal  "external_fee",             precision: 9, scale: 2
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "payments", ["external_fee"], name: "index_payments_on_external_fee", unique: true, using: :btree
+  add_index "payments", ["order_id"], name: "index_payments_on_order_id", using: :btree
+
   create_table "products", force: :cascade do |t|
     t.string   "sku",         limit: 30,                          null: false
     t.string   "description", limit: 256,                         null: false
@@ -140,6 +155,16 @@ ActiveRecord::Schema.define(version: 20160823231941) do
   end
 
   add_index "products", ["sku"], name: "index_products_on_sku", unique: true, using: :btree
+
+  create_table "responses", force: :cascade do |t|
+    t.integer  "payment_id", null: false
+    t.string   "status",     null: false
+    t.text     "content",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "responses", ["payment_id"], name: "index_responses_on_payment_id", using: :btree
 
   create_table "shipment_items", force: :cascade do |t|
     t.integer  "shipment_id",      null: false

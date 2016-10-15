@@ -33,5 +33,12 @@ module Fulfillment
     config.active_record.raise_in_transactional_callbacks = true
     config.assets.initialize_on_precompile = false
     config.autoload_paths << Rails.root.join('lib')
+
+    config.middleware.insert_before 0, 'Rack::Cors' do
+      allow do
+        origins '*'
+        resource '*', methods: :any, headers: :any, credentials: true
+      end
+    end
   end
 end

@@ -19,15 +19,19 @@ RSpec.describe Order, type: :model do
     expect(order).to be_valid
   end
 
+  it 'accepts nested attributes for shipping address' do
+    shipping_address = FactoryGirl.attributes_for(:address)
+    order = Order.new attributes.merge(
+      shipping_address_attributes: shipping_address
+    )
+    expect(order.save).to be true
+    expect(order.shipping_address.line_1).to eq shipping_address[:line_1]
+  end
+
   describe '#client_id' do
     it 'is required' do
       order = Order.new attributes.except(:client_id)
       expect(order).to have_at_least(1).error_on :client_id
-    end
-
-    it 'cannot be more than 100 characters' do
-      order = Order.new attributes.merge(client_order_id: 'X' * 101)
-      expect(order).to have_at_least(1).error_on :client_order_id
     end
   end
 
@@ -39,15 +43,15 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#client_order_id' do
-    it 'is required' do
-      order = Order.new attributes.except(:client_order_id)
-      expect(order).to have_at_least(1).error_on :client_order_id
-    end
-
     it 'must be unique' do
       o1 = Order.create! attributes
       o2 = Order.new attributes
       expect(o2).to have(1).error_on :client_order_id
+    end
+
+    it 'cannot be more than 100 characters' do
+      order = Order.new attributes.merge(client_order_id: 'X' * 101)
+      expect(order).to have_at_least(1).error_on :client_order_id
     end
   end
 
