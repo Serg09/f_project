@@ -56,11 +56,6 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#customer_name' do
-    it 'is required' do
-      order = Order.new attributes.except(:customer_name)
-      expect(order).to have_at_least(1).error_on :customer_name
-    end
-
     it 'can be 50 characters' do
       order = Order.new attributes.merge(customer_name: 'x' * 50)
       expect(order).to be_valid
@@ -80,11 +75,6 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#telephone' do
-    it 'is required' do
-      order = Order.new attributes.except(:telephone)
-      expect(order).to have_at_least(1).error_on :telephone
-    end
-
     it 'can be 25 characters' do
       order = Order.new attributes.merge(telephone: 'x' * 25)
       expect(order).to be_valid
@@ -342,9 +332,27 @@ RSpec.describe Order, type: :model do
       end
     end
 
-    context 'but not ready for submission' do
+    context 'but does not have any items' do
       it_behaves_like 'an unsubmittable order' do
         let (:order) { FactoryGirl.create(factory_key) }
+      end
+    end
+
+    context 'but does not have a customer name' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create(factory_key, item_count: 1, customer_name: nil) }
+      end
+    end
+
+    context 'but does not have a shipping address' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create(factory_key, item_count: 1, shipping_address: nil) }
+      end
+    end
+
+    context 'but does not have a telephone number' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create(factory_key, item_count: 1, telephone: nil) }
       end
     end
   end
