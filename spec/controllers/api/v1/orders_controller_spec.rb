@@ -45,39 +45,77 @@ describe Api::V1::OrdersController do
     end
 
     describe 'post :create' do
-      it 'is successful' do
-        post :create, order: attributes
-        expect(response).to have_http_status :success
-      end
-
-      it 'creates an order record' do
-        expect do
+      context 'with full order details' do
+        it 'is successful' do
           post :create, order: attributes
-        end.to change(Order, :count).by(1)
-      end
-
-      it 'creates an address record' do
-        expect do
-          post :create, order: attributes
-        end.to change(Address, :count).by(1)
-      end
-
-      it 'returns the order' do
-        Timecop.freeze(DateTime.parse('2016-03-02 12:00:00')) do
-          post :create, order: attributes
+          expect(response).to have_http_status :success
         end
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result).to include({
-          customer_name: 'John Doe',
-          telephone: '2145551212',
-          order_date: '2016-03-02',
-          status: 'incipient',
-          client_id: client.id,
-          customer_email: 'john@doe.com',
-          batch_id: nil,
-          client_order_id: nil,
-          error: nil
-        })
+
+        it 'creates an order record' do
+          expect do
+            post :create, order: attributes
+          end.to change(Order, :count).by(1)
+        end
+
+        it 'creates an address record' do
+          expect do
+            post :create, order: attributes
+          end.to change(Address, :count).by(1)
+        end
+
+        it 'returns the order' do
+          Timecop.freeze(DateTime.parse('2016-03-02 12:00:00')) do
+            post :create, order: attributes
+          end
+          result = JSON.parse(response.body, symbolize_names: true)
+          expect(result).to include({
+            customer_name: 'John Doe',
+            telephone: '2145551212',
+            order_date: '2016-03-02',
+            status: 'incipient',
+            client_id: client.id,
+            customer_email: 'john@doe.com',
+            batch_id: nil,
+            client_order_id: nil,
+            error: nil
+          })
+        end
+      end
+
+      context 'with minimum order details' do
+        let (:attributes) { {} }
+
+        it 'is successful' do
+          post :create, order: attributes
+          expect(response).to have_http_status :success
+        end
+
+        it 'creates an order record' do
+          expect do
+            post :create, order: attributes
+          end.to change(Order, :count).by(1)
+        end
+
+        it 'does not create an address record' do
+          expect do
+            post :create, order: attributes
+          end.not_to change(Address, :count)
+        end
+
+        it 'returns the order' do
+          Timecop.freeze(DateTime.parse('2016-03-02 12:00:00')) do
+            post :create, order: attributes
+          end
+          result = JSON.parse(response.body, symbolize_names: true)
+          expect(result).to include({
+            order_date: '2016-03-02',
+            status: 'incipient',
+            client_id: client.id,
+            batch_id: nil,
+            client_order_id: nil,
+            error: nil
+          })
+        end
       end
     end
   end
