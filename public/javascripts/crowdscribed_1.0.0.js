@@ -7,11 +7,12 @@
   var HOST = 'http://localhost:3030';
   var HTTP_CONFIG = {
     headers: {
-      'Authorization': 'Token token=fde100e5505140c5a93cede29321cd9c'
+      'Authorization': 'Token token=fde100e5505140c5a93cede29321cd9c',
+      'Content-Type': 'application/json'
     }
   };
 
-  angular.module('crowdscribed', [])
+  angular.module('crowdscribed', ['ngCookies'])
     .directive('purchaseTile', ['$sce', function($sce) {
       // -------------
       // Purchase Tile
@@ -61,7 +62,25 @@
           console.log("Unable to get a payment token.");
           console.log(error);
         });
-      }
+      };
+      this.createOrder = function(callback) {
+        var url = HOST + '/api/v1/orders'
+        $http.post(url, {order: {}}, HTTP_CONFIG).then(function(response) {
+          callback(response.data);
+        }, function(error) {
+          console.log("Unable to create the order.");
+          console.log(error);
+        });
+      };
+      this.getOrder = function(orderId, callback) {
+        var url = HOST + '/api/v1/orders/' + orderId
+        $http.get(url, HTTP_CONFIG).then(function(response) {
+          callback(response.data);
+        }, function(error) {
+          console.log("Unable to get the order " + orderId + ".");
+          console.log(error);
+        });
+      };
       return this;
     }])
     .controller('purchaseTileController', ['$scope', 'cs', function($scope, cs) {
@@ -134,6 +153,23 @@
         }); // braintree.client.create
       }); // getPaymentToken
     }])
-    .controller('cartController', ['$scope', 'cs', function($scope, cs) {
+    .controller('cartController', ['$scope', '$cookies', '$location', 'cs', function($scope, $cookies, $location, cs) {
+      // Find the existing order or create a new order
+      var orderId = $cookies.get('order_id');
+
+      var handleOrder = function(order) {
+        $scope.order = order;
+        $cookies.put('order_id', order.id);
+
+        // TODO Add products specified on the query string
+        console.log('location.search');
+        console.log($location.search());
+      };
+
+      if ((typeof orderId) === "undefined") {
+        cs.createOrder(handleOrder);
+      } else {
+        cs.getOrder(orderId, handleOrder);
+      }
     }]); // controller('paymentController')
 })();
