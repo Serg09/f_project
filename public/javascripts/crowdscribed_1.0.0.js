@@ -116,6 +116,9 @@
 
             $('#payment-form').submit(function(event) {
               event.preventDefault();
+
+              // TODO submit the order
+
               hostedFields.tokenize(function(error, payload) {
                 if (error) {
                   console.log("An error ocurred tokenizing the payment method.");
