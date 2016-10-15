@@ -1,15 +1,29 @@
 class Api::V1::OrdersController < Api::V1::BaseController
+  before_action :load_order, only: [:show]
+
   def index
     render json: current_client.orders
   end
 
   def create
     order = Order.create(order_params)
-    order.save
-    render json: order
+    if order.save
+      render json: order
+    else
+      render json: {errors: order.errors.full_messages}, status: 400
+    end
+  end
+
+  def show
+    authorize! :show, @order
+    render json: @order
   end
 
   private
+
+  def load_order
+    @order = Order.find(params[:id])
+  end
 
   def order_params
     defaults = {

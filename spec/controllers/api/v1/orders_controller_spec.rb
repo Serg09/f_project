@@ -33,14 +33,40 @@ describe Api::V1::OrdersController do
 
       it 'returns the list of orders belonging to the client' do
         get :index
-        result = JSON.parse(response.body).map{|o| o['id']}
-        expect(result).to include order.id
+        expect(json_response.map{|o| o[:id]}).to include order.id
       end
 
       it 'excludes orders that do not belong to the client' do
         get :index
-        result = JSON.parse(response.body).map{|o| o['id']}
-        expect(result).not_to include other_order.id
+        expect(json_response).not_to include other_order.id
+      end
+    end
+
+    describe 'get :show' do
+      context 'for an order belonging to the client' do
+        it 'is successful' do
+          get :show, id: order
+          expect(response).to have_http_status :success
+        end
+
+        it 'returns the order' do
+          get :show, id: order
+          expect(json_response).to include id: order.id
+        end
+      end
+
+      context 'for an order not belonging to the client' do
+        let (:other_order) { FactoryGirl.create(:order) }
+
+        it 'returns http status "not found"' do
+          get :show, id: other_order
+          expect(response).to have_http_status :not_found
+        end
+
+        it 'does not return the order' do
+          get :show, id: other_order
+          expect(json_response).not_to include id: other_order.id
+        end
       end
     end
 
@@ -67,8 +93,7 @@ describe Api::V1::OrdersController do
           Timecop.freeze(DateTime.parse('2016-03-02 12:00:00')) do
             post :create, order: attributes
           end
-          result = JSON.parse(response.body, symbolize_names: true)
-          expect(result).to include({
+          expect(json_response).to include({
             customer_name: 'John Doe',
             telephone: '2145551212',
             order_date: '2016-03-02',
@@ -106,8 +131,7 @@ describe Api::V1::OrdersController do
           Timecop.freeze(DateTime.parse('2016-03-02 12:00:00')) do
             post :create, order: attributes
           end
-          result = JSON.parse(response.body, symbolize_names: true)
-          expect(result).to include({
+          expect(json_response).to include({
             order_date: '2016-03-02',
             status: 'incipient',
             client_id: client.id,
@@ -134,8 +158,7 @@ describe Api::V1::OrdersController do
 
       it 'returns an error message' do
         get :index
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result).to eq({error: 'Bad credentials'})
+        expect(json_response).to eq({error: 'Bad credentials'})
       end
     end
 
