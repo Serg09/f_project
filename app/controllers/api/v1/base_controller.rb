@@ -1,6 +1,6 @@
 class Api::V1::BaseController < ApplicationController
   protect_from_forgery with: :null_session,
-    if: Proc.new{|c| Rails.logger.info("format=" + request.format); c.request.format.json?}
+    if: Proc.new{|c| c.request.format.json?}
 
   before_action :destroy_session
   before_action :authenticate!
