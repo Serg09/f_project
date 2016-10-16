@@ -13,6 +13,10 @@
   };
 
   angular.module('crowdscribed', ['ngCookies'])
+    .config(['$locationProvider', function($locationProvider) {
+      $locationProvider.html5Mode({enabled: true,
+                                   requireBase: false});
+    }])
     .directive('purchaseTile', ['$sce', function($sce) {
       // -------------
       // Purchase Tile
@@ -81,6 +85,21 @@
           console.log(error);
         });
       };
+      this.addItem = function(orderId, sku, quantity, callback) {
+        var url = HOST + '/api/v1/orders/' + orderId + '/items';
+        data = {
+          item: {
+            sku: sku,
+            quantity: quantity
+          }
+        };
+        $http.post(url, data, HTTP_CONFIG).then(function(response) {
+          callback(response.data);
+        }, function(error) {
+          console.log("Unable to add the order item " + sku + " to the order.");
+          console.log(error);
+        });
+      }
       return this;
     }])
     .controller('purchaseTileController', ['$scope', 'cs', function($scope, cs) {
@@ -159,11 +178,20 @@
 
       var handleOrder = function(order) {
         $scope.order = order;
-        $cookies.put('order_id', order.id);
+        if (order.id)
+          $cookies.put('order_id', order.id);
 
-        // TODO Add products specified on the query string
-        console.log('location.search');
-        console.log($location.search());
+        $scope.orderTotal = _.reduce($scope.order.items, function(sum, item) {
+          return sum + item.extended_price;
+        }, 0);
+
+        var sku = $location.search()['sku'];
+        if (sku) {
+          var quantity = $location.search()['quantity'] || 1;
+          cs.addItem(order.id, sku, quantity, function(item) {
+            $scope.order.items.push(item);
+          });
+        }
       };
 
       if ((typeof orderId) === "undefined") {

@@ -1,6 +1,4 @@
 <div class="cart-tile" ng-controller="cartController">
-  order items go here
-
   <table>
     <tr>
       <th>SKU</th>
@@ -10,11 +8,15 @@
       <th>Total</th>
     </tr>
     <tr ng-repeat="item in order.items">
-      <td ng-bind="sku">
-      <td ng-bind="description">
-      <td ng-bind="unit_price">
-      <td ng-bind="quantity">
-      <td ng-bind="extended_price">
+      <td ng-bind="item.sku"></td>
+      <td ng-bind="item.description"></td>
+      <td ng-bind="item.unit_price"></td>
+      <td ng-bind="item.quantity"></td>
+      <td ng-bind="item.extended_price"></td>
+    </tr>
+    <tr>
+      <td colspan="4">Total</td>
+      <td ng-bind="orderTotal"></td>
     </tr>
   </table>
 </div>
