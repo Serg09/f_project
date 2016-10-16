@@ -16,7 +16,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
 
   def show
     authorize! :show, @order
-    render json: @order
+    render json: @order.as_json(include: {items: {methods: [:extended_price]}})
   end
 
   private
