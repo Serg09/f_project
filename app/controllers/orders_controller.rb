@@ -32,6 +32,7 @@ class OrdersController < ApplicationController
     unless can? :update, @order
       redirect_to order_path(@order), alert: 'This order cannot be edited.'
     end
+    @shipping_address = @order.shipping_address || @order.build_shipping_address
   end
 
   def update
