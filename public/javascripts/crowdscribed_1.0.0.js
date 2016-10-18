@@ -24,7 +24,7 @@
       return {
         restrict: 'E',
         templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/purchase_tile.html')
-      } // TODO Put in the proper domain name
+      }
     }])
     .directive('paymentTile', ['$sce', function($sce) {
       // ------------
