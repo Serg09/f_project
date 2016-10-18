@@ -1,22 +1,22 @@
 <div class="cart-tile" ng-controller="cartController">
   <table>
-    <tr>
-      <th>SKU</th>
-      <th>Description</th>
-      <th>Price</th>
-      <th>Qty.</th>
-      <th>Total</th>
+    <tr class="header-row">
+      <th class="text-column">SKU</th>
+      <th class="text-column">Description</th>
+      <th class="number-column">Price</th>
+      <th class="number-column">Qty.</th>
+      <th class="number-column">Total</th>
     </tr>
     <tr ng-repeat="item in order.items">
       <td ng-bind="item.sku"></td>
       <td ng-bind="item.description"></td>
-      <td ng-bind="item.unit_price"></td>
-      <td ng-bind="item.quantity"></td>
-      <td ng-bind="item.extended_price"></td>
+      <td ng-bind="item.unit_price" class="number-column"></td>
+      <td ng-bind="item.quantity" class="number-column"></td>
+      <td ng-bind="item.extended_price" class="number-column"></td>
     </tr>
-    <tr>
-      <td colspan="4">Total</td>
-      <td ng-bind="orderTotal"></td>
+    <tr class="summary-row">
+      <td colspan="4" class="number-column">Total</td>
+      <td ng-bind="orderTotal" class="number-column"></td>
     </tr>
   </table>
 </div>
