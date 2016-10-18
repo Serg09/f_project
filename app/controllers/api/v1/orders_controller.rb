@@ -1,5 +1,5 @@
 class Api::V1::OrdersController < Api::V1::BaseController
-  before_action :load_order, only: [:show]
+  before_action :load_order, only: [:show, :submit]
 
   def index
     render json: current_client.orders
@@ -17,6 +17,17 @@ class Api::V1::OrdersController < Api::V1::BaseController
   def show
     authorize! :show, @order
     render json: @order.as_json(include: {items: {methods: [:extended_price]}})
+  end
+
+  def submit
+    authorize! :update, @order
+    if !@order.incipient?
+      render json: [], status: :unprocessable_entity
+    elsif @order.submit!
+      render json: @order.as_json(include: {items: {methods: [:extended_price]}})
+    else
+      render json: {error: "Unable to submit the order."}
+    end
   end
 
   private

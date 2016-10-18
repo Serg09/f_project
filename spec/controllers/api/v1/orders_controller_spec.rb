@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Api::V1::OrdersController do
   let (:client) { FactoryGirl.create :client }
-  let!(:order) { FactoryGirl.create :order, client: client }
+  let!(:order) { FactoryGirl.create :order, client: client, item_count: 1 }
   let!(:other_order) { FactoryGirl.create :order }
   let (:attributes) do
     {
@@ -143,22 +143,133 @@ describe Api::V1::OrdersController do
       end
     end
 
+    shared_examples_for 'an unsubmittable order' do
+      it 'returns http status "unprocessable entity"' do
+        patch :submit, id: order
+        expect(response).to have_http_status :unprocessable_entity
+      end
+
+      it 'does not return the order' do
+        patch :submit, id: order
+        expect(json_response).not_to include(id: order.id)
+      end
+
+      it 'does not change the order status' do
+        expect do
+          patch :submit, id: order
+          order.reload
+        end.not_to change(order, :status)
+      end
+    end
+
+    shared_examples_for 'another client\'s order' do
+      let (:another_client) { FactoryGirl.create(:client) }
+      let (:auth_token) { another_client.auth_token }
+
+      context 'that does not belong to the client' do
+        describe 'patch :submit' do
+          it 'returns "not found"' do
+            patch :submit, id: order
+            expect(response).to have_http_status :not_found
+          end
+
+          it 'does not return the order' do
+            patch :submit, id: order
+            expect(json_response).not_to include(id: order.id)
+          end
+
+          it 'does not change the order status' do
+            expect do
+              patch :submit, id: order
+              order.reload
+            end.not_to change(order, :status)
+          end
+        end
+      end
+    end
+
     # TODO Share this with the non-api controller spec?
     context 'with an incipient order' do
       context 'that belongs to the client' do
         describe 'patch :submit' do
-          it 'is successful'
-          it 'returns the order'
-          it 'changes the order status to "submitted"'
+          it 'is successful' do
+            patch :submit, id: order
+            expect(response).to have_http_status :success
+          end
+
+          it 'returns the order' do
+            patch :submit, id: order
+            expect(json_response).to include(id: order.id)
+          end
+
+          it 'changes the order status to "submitted"' do
+            expect do
+              patch :submit, id: order
+              order.reload
+            end.to change(order, :status).to 'submitted'
+          end
         end
       end
 
-      context 'that does not belong to the client' do
-        describe 'patch :submit' do
-          it 'returns "not found"'
-          it 'does not return the order'
-          it 'does not change the order status'
-        end
+      it_behaves_like 'another client\'s order'
+    end
+
+    context 'with a submited order' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create :submitted_order, client: client, item_count: 1 }
+      end
+      it_behaves_like 'another client\'s order' do
+        let (:order) { FactoryGirl.create :submitted_order, client: client, item_count: 1 }
+      end
+    end
+
+    context 'with an exporting order' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create :exporting_order, client: client, item_count: 1 }
+      end
+
+      it_behaves_like 'another client\'s order' do
+        let (:order) { FactoryGirl.create :exporting_order, client: client, item_count: 1 }
+      end
+    end
+
+    context 'with an exported order' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create :exported_order, client: client, item_count: 1 }
+      end
+
+      it_behaves_like 'another client\'s order' do
+        let (:order) { FactoryGirl.create :exported_order, client: client, item_count: 1 }
+      end
+    end
+
+    context 'with an processing order' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create :processing_order, client: client, item_count: 1 }
+      end
+
+      it_behaves_like 'another client\'s order' do
+        let (:order) { FactoryGirl.create :processing_order, client: client, item_count: 1 }
+      end
+    end
+
+    context 'with an shipped order' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create :shipped_order, client: client, item_count: 1 }
+      end
+
+      it_behaves_like 'another client\'s order' do
+        let (:order) { FactoryGirl.create :shipped_order, client: client, item_count: 1 }
+      end
+    end
+
+    context 'with an rejected order' do
+      it_behaves_like 'an unsubmittable order' do
+        let (:order) { FactoryGirl.create :rejected_order, client: client, item_count: 1 }
+      end
+
+      it_behaves_like 'another client\'s order' do
+        let (:order) { FactoryGirl.create :rejected_order, client: client, item_count: 1 }
       end
     end
   end
