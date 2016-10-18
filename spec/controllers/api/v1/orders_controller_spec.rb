@@ -142,6 +142,25 @@ describe Api::V1::OrdersController do
         end
       end
     end
+
+    # TODO Share this with the non-api controller spec?
+    context 'with an incipient order' do
+      context 'that belongs to the client' do
+        describe 'patch :submit' do
+          it 'is successful'
+          it 'returns the order'
+          it 'changes the order status to "submitted"'
+        end
+      end
+
+      context 'that does not belong to the client' do
+        describe 'patch :submit' do
+          it 'returns "not found"'
+          it 'does not return the order'
+          it 'does not change the order status'
+        end
+      end
+    end
   end
 
   context 'when no valid auth token is present' do
