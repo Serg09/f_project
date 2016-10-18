@@ -44,6 +44,15 @@
         templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/cart_tile.html')
       }
     }])
+    .directive('addressTile', ['$sce', function($sce) {
+      // ------------
+      // Address Tile
+      // ------------
+      return {
+        restrict: 'E',
+        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/address_tile.html')
+      }
+    }])
     .factory('cs', ['$http', function($http) {
       // --------------------
       // Crowdscribed Service
