@@ -102,7 +102,7 @@
       };
       this.submitOrder = function(orderId, callback) {
         var url = HOST + '/api/v1/orders/' + orderId + '/submit';
-        $http.patch(url, {}, HTTP_CONFIG).then(function(response) {
+        $http.patch(url, {order: {}}, HTTP_CONFIG).then(function(response) {
           callback({succeeded: true});
         }, function(error) {
           console.log("Unable to submit the order.");
@@ -117,13 +117,7 @@
             nonce: nonce
           }
         };
-
-        console.log("POST payments#create");
-
         $http.post(url, data, HTTP_CONFIG).then(function(response) {
-
-          console.log("POST payments#create success callback");
-
           callback({succeeded: true});
         }, function(error) {
           console.log("Unable to create the payment.");
@@ -185,32 +179,19 @@
 
             $('#payment-form').submit(function(event) {
               event.preventDefault();
-
-              console.log("tokenize the payment");
-
               hostedFields.tokenize(function(error, payload) {
                 if (error) {
                   console.log("An error ocurred tokenizing the payment method.");
                   console.log(error);
                   return;
                 }
-
-                console.log("nonce received, create payment on the server.");
-
                 cs.createPayment($rootScope.order.id, payload.nonce, function(result) {
-
-                  console.log("createPayment callback");
-
                   if (result.succeeded) {
-
-                    console.log("payment created on the server.");
-
                     cs.submitOrder($rootScope.order.id, function(result) {
                       if (result.succeeded) {
-
-                        console.log("order submitted, show the confirmation");
-
                         $rootScope.confirmationNumber = $rootScope.order.id;
+
+                        console.log("set $rootScope.confirmationNumber to " + $rootScope.confirmationNumber);
                       } else {
                         alert("We were unable to submit your order.\n" + result.error);
                       }
@@ -229,9 +210,8 @@
       // Find the existing order or create a new order
       var orderId = $cookies.get('order_id');
 
-      var confirmationNumber = null;
-      var submissionComplete = function() {
-        return confirmationNumber != null;
+      this.submissionComplete = function() {
+        return $rootScope.confirmationNumber != null;
       };
 
       var handleOrder = function(order) {
