@@ -18,6 +18,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'helpers/json_helper'
+require 'helpers/payments_helper'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
@@ -44,6 +45,7 @@ RSpec.configure do |config|
   end
 
   config.include JsonHelper
+  config.include PaymentsHelper
 
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.

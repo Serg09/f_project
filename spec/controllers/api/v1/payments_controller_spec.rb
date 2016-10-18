@@ -9,6 +9,8 @@ describe Api::V1::PaymentsController do
     FactoryGirl.create(:order_item, order: order,
                                     sku: product.sku,
                                     unit_price: 100,
+                                    freight_charge: 0,
+                                    tax: 0,
                                     quantity: 1)
   end
   let (:attributes) do
@@ -45,11 +47,7 @@ describe Api::V1::PaymentsController do
         before do
           expect(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('response', success?: true,
-                                          transaction: double('transation',
-                                            status: 'approved',
-                                            id: '123'
-                                          )))
+            and_return(payment_provider_response('approved'))
         end
 
         it 'is successful' do
@@ -64,9 +62,6 @@ describe Api::V1::PaymentsController do
         end
 
         it 'returns payment information' do
-
-          order.items.each{|i| puts "#{i.quantity} #{i.unit_price}"}
-
           post :create, order_id: order, payment: attributes
           result = JSON.parse(response.body, symbolize_names: true)
           expect(result).to include state: 'approved',
@@ -78,9 +73,7 @@ describe Api::V1::PaymentsController do
         before do
           expect(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('response', success?: false,
-                                          status: 'denied',
-                                          id: '123'))
+            and_return(payment_provider_response('denied'))
         end
 
         it 'returns http status "unprocessable entity"' do
