@@ -3,11 +3,17 @@ require 'rails_helper'
 describe Api::V1::PaymentsController do
   let (:client) { FactoryGirl.create :client }
   let (:payment_token) { SecureRandom.base64(512) }
-  let (:order) { FactoryGirl.create(:order, client: client) }
+  let (:order) { FactoryGirl.create(:order, client: client, item_count: 0) }
+  let (:product) { FactoryGirl.create(:product, price: 100) }
+  let!(:order_item) do
+    FactoryGirl.create(:order_item, order: order,
+                                    sku: product.sku,
+                                    unit_price: 100,
+                                    quantity: 1)
+  end
   let (:attributes) do
     {
-      nonce: Faker::Number.hexadecimal(40),
-      amount: 100
+      nonce: Faker::Number.hexadecimal(40)
     }
   end
 
@@ -40,8 +46,10 @@ describe Api::V1::PaymentsController do
           expect(Braintree::Transaction).to \
             receive(:sale).
             and_return(double('response', success?: true,
-                                          status: 'approved',
-                                          id: '123'))
+                                          transaction: double('transation',
+                                            status: 'approved',
+                                            id: '123'
+                                          )))
         end
 
         it 'is successful' do
@@ -56,6 +64,9 @@ describe Api::V1::PaymentsController do
         end
 
         it 'returns payment information' do
+
+          order.items.each{|i| puts "#{i.quantity} #{i.unit_price}"}
+
           post :create, order_id: order, payment: attributes
           result = JSON.parse(response.body, symbolize_names: true)
           expect(result).to include state: 'approved',

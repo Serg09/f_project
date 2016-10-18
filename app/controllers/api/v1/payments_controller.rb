@@ -7,8 +7,8 @@ class Api::V1::PaymentsController < Api::V1::BaseController
 
   def create
     authorize! :update, @order
-    payment = @order.payments.new payment_params
-    payment.save
+    payment = @order.payments.new amount: @order.total
+    payment.save!
     payment.execute! params[:payment][:nonce]
     if payment.approved?
       render json: payment
@@ -21,9 +21,5 @@ class Api::V1::PaymentsController < Api::V1::BaseController
 
   def load_order
     @order = Order.find(params[:order_id])
-  end
-
-  def payment_params
-    params.require(:payment).permit(:amount)
   end
 end

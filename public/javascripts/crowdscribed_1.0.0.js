@@ -87,7 +87,7 @@
       };
       this.addItem = function(orderId, sku, quantity, callback) {
         var url = HOST + '/api/v1/orders/' + orderId + '/items';
-        data = {
+        var data = {
           item: {
             sku: sku,
             quantity: quantity
@@ -99,7 +99,38 @@
           console.log("Unable to add the order item " + sku + " to the order.");
           console.log(error);
         });
-      }
+      };
+      this.submitOrder = function(orderId, callback) {
+        var url = HOST + '/api/v1/orders/' + orderId + '/submit';
+        $http.patch(url, {}, HTTP_CONFIG).then(function(response) {
+          callback({succeeded: true});
+        }, function(error) {
+          console.log("Unable to submit the order.");
+          console.log(error);
+          callback({succeeded: false, error: error});
+        });
+      };
+      this.createPayment = function(orderId, nonce, callback) {
+        var url = HOST + '/api/v1/orders/' + orderId + '/payments';
+        var data = {
+          payment: {
+            nonce: nonce
+          }
+        };
+
+        console.log("POST payments#create");
+
+        $http.post(url, data, HTTP_CONFIG).then(function(response) {
+
+          console.log("POST payments#create success callback");
+
+          callback({succeeded: true});
+        }, function(error) {
+          console.log("Unable to create the payment.");
+          console.log(error);
+          callback({succeeded: false, error: error});
+        });
+      };
       return this;
     }])
     .controller('purchaseTileController', ['$scope', 'cs', function($scope, cs) {
@@ -112,7 +143,7 @@
         });
       });
     }])
-    .controller('paymentController', ['$scope', 'cs', function($scope, cs) {
+    .controller('paymentController', ['$rootScope', 'cs', function($rootScope, cs) {
       cs.getPaymentToken(function(token) {
         braintree.client.create({authorization: token}, function(error, client) {
           if (error) {
@@ -155,7 +186,7 @@
             $('#payment-form').submit(function(event) {
               event.preventDefault();
 
-              // TODO submit the order
+              console.log("tokenize the payment");
 
               hostedFields.tokenize(function(error, payload) {
                 if (error) {
@@ -164,24 +195,51 @@
                   return;
                 }
 
-                console.log("nonce received, now we need to finish in the server side.");
-                console.log(payload);
+                console.log("nonce received, create payment on the server.");
+
+                cs.createPayment($rootScope.order.id, payload.nonce, function(result) {
+
+                  console.log("createPayment callback");
+
+                  if (result.succeeded) {
+
+                    console.log("payment created on the server.");
+
+                    cs.submitOrder($rootScope.order.id, function(result) {
+                      if (result.succeeded) {
+
+                        console.log("order submitted, show the confirmation");
+
+                        $rootScope.confirmationNumber = $rootScope.order.id;
+                      } else {
+                        alert("We were unable to submit your order.\n" + result.error);
+                      }
+                    });
+                  } else {
+                    alert("Unable to submit the order.\n" + result.error);
+                  }
+                });
               }); // tokenize callback
             }); // submit
           }); // hostedFields.create
         }); // braintree.client.create
       }); // getPaymentToken
     }])
-    .controller('cartController', ['$scope', '$cookies', '$location', 'cs', function($scope, $cookies, $location, cs) {
+    .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
       // Find the existing order or create a new order
       var orderId = $cookies.get('order_id');
 
+      var confirmationNumber = null;
+      var submissionComplete = function() {
+        return confirmationNumber != null;
+      };
+
       var handleOrder = function(order) {
-        $scope.order = order;
+        $rootScope.order = order;
         if (order.id)
           $cookies.put('order_id', order.id);
 
-        $scope.orderTotal = _.reduce($scope.order.items, function(sum, item) {
+        $rootScope.orderTotal = _.reduce($rootScope.order.items, function(sum, item) {
           return sum + item.extended_price;
         }, 0);
 
@@ -189,7 +247,7 @@
         if (sku) {
           var quantity = $location.search()['quantity'] || 1;
           cs.addItem(order.id, sku, quantity, function(item) {
-            $scope.order.items.push(item);
+            $rootScope.order.items.push(item);
           });
         }
       };
