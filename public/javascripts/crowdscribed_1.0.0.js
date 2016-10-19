@@ -94,6 +94,15 @@
           console.log(error);
         });
       };
+      this.updateOrder = function(order, callback) {
+        var url = HOST + '/api/v1/orders/' + order.id;
+        $http.patch(url, order, HTTP_CONFIG).then(function(response) {
+          callback(response.data);
+        }, function(error) {
+          console.log("Unable to update the order.");
+          console.log(error);
+        });
+      };
       this.addItem = function(orderId, sku, quantity, callback) {
         var url = HOST + '/api/v1/orders/' + orderId + '/items';
         var data = {
@@ -147,8 +156,47 @@
       });
     }])
     .controller('paymentController', ['$rootScope', 'cs', function($rootScope, cs) {
-      cs.getPaymentToken(function(token) {
-        braintree.client.create({authorization: token}, function(error, client) {
+      var handleSubmitOrderResult = function(result) {
+        if (result.succeeded) {
+          $rootScope.confirmationNumber = $rootScope.order.id;
+
+          console.log("set $rootScope.confirmationNumber to " + $rootScope.confirmationNumber);
+        } else {
+          alert("We were unable to submit your order.\n" + result.error);
+          console.log(result.error)
+        }
+      };
+      var handleCreatePaymentResult = function(result) {
+        if (result.succeeded) {
+          cs.submitOrder($rootScope.order.id, handleSubmitOrderResult);
+        } else {
+          alert("Unable to submit the order.\n" + result.error);
+          console.log(result.error)
+        }
+      };
+      var handleUpdateOrderResult = function(order) {
+        cs.createPayment(
+            $rootScope.order.id,
+            payload.nonce,
+            handleCreatePaymentResult
+        );
+      };
+      var handleTokenizeResult = function(error, payload) {
+        if (error) {
+          console.log("An error ocurred tokenizing the payment method.");
+          console.log(error);
+          return;
+        }
+
+        cs.updateOrder($rootScope.order, handleUpdateOrderResult);
+      };
+      var registerFormSubmissionHandler = function() {
+        $('#payment-form').submit(function(event) {
+          event.preventDefault();
+          hostedFields.tokenize(handleTokenizeResult);
+        });
+      };
+      var handleClientCreate = function(error, client) {
           if (error) {
             console.log("An error ocurred setting up the braintree client.");
             console.log(error);
@@ -186,34 +234,13 @@
 
             // add CC field events here
 
-            $('#payment-form').submit(function(event) {
-              event.preventDefault();
-              hostedFields.tokenize(function(error, payload) {
-                if (error) {
-                  console.log("An error ocurred tokenizing the payment method.");
-                  console.log(error);
-                  return;
-                }
-                cs.createPayment($rootScope.order.id, payload.nonce, function(result) {
-                  if (result.succeeded) {
-                    cs.submitOrder($rootScope.order.id, function(result) {
-                      if (result.succeeded) {
-                        $rootScope.confirmationNumber = $rootScope.order.id;
-
-                        console.log("set $rootScope.confirmationNumber to " + $rootScope.confirmationNumber);
-                      } else {
-                        alert("We were unable to submit your order.\n" + result.error);
-                      }
-                    });
-                  } else {
-                    alert("Unable to submit the order.\n" + result.error);
-                  }
-                });
-              }); // tokenize callback
-            }); // submit
-          }); // hostedFields.create
-        }); // braintree.client.create
-      }); // getPaymentToken
+            registerFormSubmissionHandler();
+          });
+      };
+      var handlePaymentToken = function(token) {
+        braintree.client.create({authorization: token}, handleClientCreate); // braintree.client.create
+      };
+      cs.getPaymentToken(handlePaymentToken, handlePaymentToken);
     }])
     .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
       // Find the existing order or create a new order
@@ -227,6 +254,12 @@
         $rootScope.order = order;
         if (order.id)
           $cookies.put('order_id', order.id);
+        if (!$rootScope.order.shipping_address) {
+          $rootScope.order.shipping_address = {};
+        }
+
+        console.log("using order:");
+        console.log($rootScope.order);
 
         $rootScope.orderTotal = _.reduce($rootScope.order.items, function(sum, item) {
           return sum + item.extended_price;
