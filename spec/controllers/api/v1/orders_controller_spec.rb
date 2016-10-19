@@ -70,6 +70,20 @@ describe Api::V1::OrdersController do
       end
     end
 
+    describe 'patch :update' do
+      context 'for an order that belongs to the client' do
+        it 'is successful'
+        it 'updates the order'
+        it 'returns the updated order'
+      end
+
+      context 'for an order that does not belong to the client' do
+        it 'returns "not found"'
+        it 'does not update the order'
+        it 'does not return the order'
+      end
+    end
+
     describe 'post :create' do
       context 'with full order details' do
         it 'is successful' do
