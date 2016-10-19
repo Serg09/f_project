@@ -16,7 +16,10 @@ class Api::V1::OrdersController < Api::V1::BaseController
 
   def show
     authorize! :show, @order
-    render json: @order.as_json(include: {items: {methods: [:extended_price]}})
+    render json: @order.as_json(include: [
+      :shipping_address,
+      items: {methods: [:extended_price]}
+    ])
   end
 
   def submit
