@@ -42,8 +42,8 @@ describe Api::V1::OrdersController do
       end
     end
 
-    describe 'get :show' do
-      context 'for an order belonging to the client' do
+    context 'for an order belonging to the client' do
+      describe 'get :show' do
         it 'is successful' do
           get :show, id: order
           expect(response).to have_http_status :success
@@ -55,32 +55,60 @@ describe Api::V1::OrdersController do
         end
       end
 
+      describe 'patch :update' do
+        it 'is successful' do
+          patch :update, id: order, order: attributes
+          expect(response).to have_http_status :success
+        end
+
+        it 'updates the order' do
+          expect do
+            patch :update, id: order, order: attributes
+            order.reload
+          end.to change(order, :customer_name).to 'John Doe'
+        end
+
+        it 'returns the updated order' do
+          patch :update, id: order, order: attributes
+          expect(json_response).to include id: order.id,
+                                           customer_name: 'John Doe'
+        end
+      end
+
       context 'for an order not belonging to the client' do
-        let (:other_order) { FactoryGirl.create(:order) }
+        let (:other_client) { FactoryGirl.create(:client) }
+        let (:auth_token) { other_client.auth_token }
 
-        it 'returns http status "not found"' do
-          get :show, id: other_order
-          expect(response).to have_http_status :not_found
+        describe 'get :show' do
+          it 'returns http status "not found"' do
+            get :show, id: order
+            expect(response).to have_http_status :not_found
+          end
+
+          it 'does not return the order' do
+            get :show, id: order
+            expect(json_response).not_to include id: other_order.id
+          end
         end
 
-        it 'does not return the order' do
-          get :show, id: other_order
-          expect(json_response).not_to include id: other_order.id
+        describe 'patch :update' do
+          it 'returns "not found"' do
+            patch :update, id: order, order: attributes
+            expect(response).to have_http_status :not_found
+          end
+
+          it 'does not update the order' do
+            expect do
+              patch :update, id: order, order: attributes
+              order.reload
+            end.not_to change(order, :customer_name)
+          end
+
+          it 'does not return the order' do
+            patch :update, id: order, order: attributes
+            expect(json_response).not_to include id: order.id
+          end
         end
-      end
-    end
-
-    describe 'patch :update' do
-      context 'for an order that belongs to the client' do
-        it 'is successful'
-        it 'updates the order'
-        it 'returns the updated order'
-      end
-
-      context 'for an order that does not belong to the client' do
-        it 'returns "not found"'
-        it 'does not update the order'
-        it 'does not return the order'
       end
     end
 

@@ -1,5 +1,5 @@
 class Api::V1::OrdersController < Api::V1::BaseController
-  before_action :load_order, only: [:show, :submit]
+  before_action :load_order, only: [:show, :submit, :update]
 
   def index
     render json: current_client.orders
@@ -20,6 +20,13 @@ class Api::V1::OrdersController < Api::V1::BaseController
       :shipping_address,
       items: {methods: [:extended_price]}
     ])
+  end
+
+  def update
+    authorize! :update, @order
+    @order.update_attributes order_params
+    @order.save
+    render json: @order
   end
 
   def submit
