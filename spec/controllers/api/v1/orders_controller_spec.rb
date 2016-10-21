@@ -8,16 +8,18 @@ describe Api::V1::OrdersController do
     {
       customer_name: 'John Doe',
       telephone: '2145551212',
-      customer_email: 'john@doe.com',
-      shipping_address_attributes: {
-        recipient: 'John Doe',
-        line_1: '1234 Main St',
-        line_2: 'Apt 227',
-        city: 'Dallas',
-        state: 'TX',
-        postal_code: '75200',
-        country_code: 'US'
-      }
+      customer_email: 'john@doe.com'
+    }
+  end
+  let (:shipping_address_attributes) do
+    {
+      recipient: 'John Doe',
+      line_1: '1234 Main St',
+      line_2: 'Apt 227',
+      city: 'Dallas',
+      state: 'TX',
+      postal_code: '75200',
+      country_code: 'US'
     }
   end
 
@@ -66,6 +68,15 @@ describe Api::V1::OrdersController do
             patch :update, id: order, order: attributes
             order.reload
           end.to change(order, :customer_name).to 'John Doe'
+        end
+
+        it 'updates the shipping address' do
+          expect do
+            patch :update, id: order,
+                           order: attributes,
+                           shipping_address: shipping_address_attributes
+            order.shipping_address.reload
+          end.to change(order.shipping_address, :recipient).to 'John Doe'
         end
 
         it 'returns the updated order' do
@@ -127,7 +138,8 @@ describe Api::V1::OrdersController do
 
         it 'creates an address record' do
           expect do
-            post :create, order: attributes
+            post :create, order: attributes,
+                          shipping_address: shipping_address_attributes
           end.to change(Address, :count).by(1)
         end
 

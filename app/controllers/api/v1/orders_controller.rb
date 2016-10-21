@@ -7,6 +7,11 @@ class Api::V1::OrdersController < Api::V1::BaseController
 
   def create
     order = Order.create(order_params)
+    if params[:shipping_address]
+      shipping_address = Address.new shipping_address_params
+      shipping_address.save
+      order.shipping_address = shipping_address
+    end
     if order.save
       render json: order
     else
@@ -25,7 +30,18 @@ class Api::V1::OrdersController < Api::V1::BaseController
   def update
     authorize! :update, @order
     @order.update_attributes order_params
-    @order.save
+    if params[:shipping_address]
+      if @order.shipping_address_id
+        @order.shipping_address.update_attributes shipping_address_params
+        @order.shipping_address.save!
+      else
+        shipping_address = Address.new shipping_address_params
+        shipping_address.save!
+
+        @order.shipping_address = shipping_address
+      end
+    end
+    @order.save!
     render json: @order
   end
 
@@ -55,18 +71,19 @@ class Api::V1::OrdersController < Api::V1::BaseController
       params.require(:order).permit(:customer_name,
                                     :telephone,
                                     :customer_email,
-                                    :ship_method_id,
-                                    shipping_address_attributes: [
-                                      :recipient,
-                                      :line_1,
-                                      :line_2,
-                                      :city,
-                                      :state,
-                                      :postal_code,
-                                      :country_code
-                                    ]).merge(defaults)
+                                    :ship_method_id).merge(defaults)
     else
       defaults
     end
+  end
+
+  def shipping_address_params
+    params.require(:shipping_address).permit(:recipient,
+                                             :line_1,
+                                             :line_2,
+                                             :city,
+                                             :state,
+                                             :postal_code,
+                                             :country_code)
   end
 end

@@ -96,7 +96,12 @@
       };
       this.updateOrder = function(order, callback) {
         var url = HOST + '/api/v1/orders/' + order.id;
-        $http.patch(url, order, HTTP_CONFIG).then(function(response) {
+        data = {
+          order: order,
+          shipping_address: order.shipping_address
+        }
+        order.shipping_address = null;
+        $http.patch(url, data, HTTP_CONFIG).then(function(response) {
           callback(response.data);
         }, function(error) {
           console.log("Unable to update the order.");
@@ -159,8 +164,6 @@
       var handleSubmitOrderResult = function(result) {
         if (result.succeeded) {
           $rootScope.confirmationNumber = $rootScope.order.id;
-
-          console.log("set $rootScope.confirmationNumber to " + $rootScope.confirmationNumber);
         } else {
           alert("We were unable to submit your order.\n" + result.error);
           console.log(result.error)
@@ -174,10 +177,10 @@
           console.log(result.error)
         }
       };
-      var handleUpdateOrderResult = function(order) {
+      var handleUpdateOrderResult = function(nonce, order) {
         cs.createPayment(
             $rootScope.order.id,
-            payload.nonce,
+            nonce,
             handleCreatePaymentResult
         );
       };
@@ -187,10 +190,11 @@
           console.log(error);
           return;
         }
-
-        cs.updateOrder($rootScope.order, handleUpdateOrderResult);
+        cs.updateOrder($rootScope.order, function(order) {
+          handleUpdateOrderResult(payload.nonce, order)
+        });
       };
-      var registerFormSubmissionHandler = function() {
+      var registerFormSubmissionHandler = function(hostedFields) {
         $('#payment-form').submit(function(event) {
           event.preventDefault();
           hostedFields.tokenize(handleTokenizeResult);
@@ -234,13 +238,13 @@
 
             // add CC field events here
 
-            registerFormSubmissionHandler();
+            registerFormSubmissionHandler(hostedFields);
           });
       };
       var handlePaymentToken = function(token) {
         braintree.client.create({authorization: token}, handleClientCreate); // braintree.client.create
       };
-      cs.getPaymentToken(handlePaymentToken, handlePaymentToken);
+      cs.getPaymentToken(handlePaymentToken);
     }])
     .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
       // Find the existing order or create a new order
@@ -257,10 +261,9 @@
         if (!$rootScope.order.shipping_address) {
           $rootScope.order.shipping_address = {};
         }
-
-        console.log("using order:");
-        console.log($rootScope.order);
-
+        if (!$rootScope.order.items) {
+          $rootScope.order.items = [];
+        }
         $rootScope.orderTotal = _.reduce($rootScope.order.items, function(sum, item) {
           return sum + item.extended_price;
         }, 0);

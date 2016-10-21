@@ -7,6 +7,11 @@ class Api::V1::BaseController < ApplicationController
 
   attr_reader :current_client
 
+  rescue_from StandardError do |exception|
+    Rails.logger.warn "rescue_from #{exception.inspect}"
+    render json: {message: exception.message}, status: :internal_service_error
+  end
+
   rescue_from ActiveRecord::RecordNotFound do |exception|
     render json: {message: 'not found'}, status: :not_found
   end
