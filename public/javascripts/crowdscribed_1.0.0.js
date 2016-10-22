@@ -100,6 +100,9 @@
           order: order,
           shipping_address: order.shipping_address
         }
+        if(!order.customer_name && order.shipping_address.recipient) {
+          order.customer_name = order.shipping_address.recipient
+        }
         order.shipping_address = null;
         $http.patch(url, data, HTTP_CONFIG).then(function(response) {
           callback(response.data);
