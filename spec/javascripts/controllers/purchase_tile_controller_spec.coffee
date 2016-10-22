@@ -1,26 +1,24 @@
 describe 'purchaseTileController', ->
   beforeEach module('crowdscribed')
 
-  beforeEach ->
-    module (_$provide_) ->
-      _$provide_.value 'cs',
-        getProduct: (sku) ->
-          console.log "get product " + sku
-          price: 19.99
-
-  rootScope = null
-  scope = {}
+  $rootScope = null
+  $scope = null
   controller = null
-  beforeEach(inject((_$rootScope_) ->
-      console.log _$rootScope_
-  ))
+  $httpBackend = null
+  beforeEach ->
+    inject (_$rootScope_, _$controller_, _$httpBackend_) ->
+      $httpBackend = _$httpBackend_
+      $rootScope = _$rootScope_
+      $scope = $rootScope.$new()
+      controller = _$controller_ 'purchaseTileController',
+        $scope: $scope
+
 
   describe 'sku', ->
     it 'looks up the product and sets the price', ->
-      console.log 'scope - inside spec'
-      console.log scope
-      expect(true).toEqual false
-
-      #scope.sku = '123456'
-      ##scope.$digest
-      #expect(scope.price).toEqual 19.99
+      $httpBackend.whenGET('http://localhost:3030/api/v1/products/123456').respond (method, url, data, headers, params)->
+        return [200]
+       
+      $scope.sku = '123456'
+      $scope.$digest()
+      expect($scope.price).toEqual 19.99

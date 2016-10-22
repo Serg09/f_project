@@ -12,7 +12,7 @@
     }
   };
 
-  angular.module('crowdscribed', ['ngCookies'])
+  var m = angular.module('crowdscribed', ['ngCookies'])
     .config(['$locationProvider', function($locationProvider) {
       $locationProvider.html5Mode({enabled: true,
                                    requireBase: false});
@@ -60,7 +60,14 @@
       this.getProduct = function(sku, callback) {
         // TODO Put in the proper domain name
         var url = HOST + '/api/v1/products/' + sku;
+
+        console.log("call the service");
+
         $http.get(url, HTTP_CONFIG).then(function(response) {
+
+          console.log("response");
+          console.log(response);
+
           callback(response.data);
         }, function(error) {
           console.log("Unable to get the product.");
@@ -162,6 +169,7 @@
           $scope.price = product.price;
         });
       });
+      $scope.price = 0;
     }])
     .controller('paymentController', ['$rootScope', 'cs', function($rootScope, cs) {
       var handleSubmitOrderResult = function(result) {
