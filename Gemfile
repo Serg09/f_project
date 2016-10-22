@@ -39,6 +39,7 @@ gem 'chronic'
 gem 'activesupport-json_encoder'
 gem 'rack-cors'
 gem 'braintree', '~> 2.64.0'
+gem 'angularjs-rails'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -57,6 +58,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'foreman'
+  gem 'jasmine'
 end
 
 group :development do
