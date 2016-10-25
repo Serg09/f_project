@@ -53,8 +53,38 @@ describe 'cartController', ->
       expect($rootScope.order.id).toEqual(321)
 
   describe 'when a SKU is present on the query string', ->
+    beforeEach ->
+      spyOn($cookies, 'get').and.returnValue '101'
+      spyOn($location, 'search').and.returnValue
+        sku: '123456'
     describe 'and not present in the order', ->
-      it 'adds the specified item to the order'
+      beforeEach ->
+        $httpBackend.whenGET('http://localhost:3030/api/v1/orders/101').respond ->
+          [200,
+            id: 101
+          ]
+        $httpBackend.whenPOST('http://localhost:3030/api/v1/orders/101/items').respond ->
+          [200,
+            sku: '123456'
+            description: 'Deluxe Widget'
+            unit_price: 19.99
+            quantity: 1
+            extended_price: 19.99
+          ]
+        controller = $controller 'cartController',
+          $scope: $scope
+          $cookies: $cookies
+          $location: $location
+      it 'adds the specified item to the order', ->
+        $httpBackend.flush()
+        expect($rootScope.order.items.length).toEqual 1
+        item = $rootScope.order.items[0]
+        expect(item.sku).toEqual '123456'
+        expect(item.description).toEqual 'Deluxe Widget'
+        expect(item.unit_price).toEqual 19.99
+        expect(item.quantity).toEqual 1
+        expect(item.extended_price).toEqual 19.99
+
     describe 'and present in the order', ->
       it 'does not add anything to the order'
   describe 'always', ->
