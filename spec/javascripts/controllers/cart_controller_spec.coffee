@@ -35,9 +35,23 @@ describe 'cartController', ->
     it 'sets the rootScope.order to the specified order', ->
       $httpBackend.flush()
       expect($rootScope.order).toBeDefined()
+      expect($rootScope.order.id).toEqual(123)
 
   describe 'when an order ID is not present in the cookies', ->
-    it 'creates a new order and sets rootScope.order'
+    beforeEach ->
+      controller = $controller 'cartController',
+        $scope: $scope
+        $cookies: $cookies
+        $location: $location
+
+      $httpBackend.whenPOST('http://localhost:3030/api/v1/orders').respond ->
+        return [201, {id: 321}]
+
+    it 'creates a new order and sets rootScope.order', ->
+      $httpBackend.flush()
+      expect($rootScope.order).toBeDefined()
+      expect($rootScope.order.id).toEqual(321)
+
   describe 'when a SKU is present on the query string', ->
     describe 'and not present in the order', ->
       it 'adds the specified item to the order'
