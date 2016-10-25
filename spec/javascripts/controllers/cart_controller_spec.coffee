@@ -7,18 +7,35 @@ describe 'cartController', ->
   $httpBackend = null
   $cookies = null
   $location = null
+  $controller = null
   beforeEach ->
-    inject (_$rootScope_, _$cookies, _$location_, _$controller_, _$httpBackend_) ->
+    inject (_$rootScope_, _$controller_, _$httpBackend_) ->
       $httpBackend = _$httpBackend_
       $rootScope = _$rootScope_
       $scope = $rootScope.$new()
-      $cookies = _$cookies_
-      $location = _$location_
-      controller = _$controller_ 'purchaseTileController',
-        $scope: $scope
+      $controller = _$controller_
+      $cookies =
+        get: ->
+        put: ->
+      $location =
+        search: ->
+          {}
 
   describe 'when an order ID is present in the cookies', ->
-    it 'sets the rootScope.order to the specified order'
+    beforeEach ->
+      spyOn($cookies, 'get').and.returnValue('123')
+      controller = $controller 'cartController',
+        $scope: $scope
+        $cookies: $cookies
+        $location: $location
+
+      $httpBackend.whenGET('http://localhost:3030/api/v1/orders/123').respond ->
+        return [200, {id: 123}]
+
+    it 'sets the rootScope.order to the specified order', ->
+      $httpBackend.flush()
+      expect($rootScope.order).toBeDefined()
+
   describe 'when an order ID is not present in the cookies', ->
     it 'creates a new order and sets rootScope.order'
   describe 'when a SKU is present on the query string', ->
