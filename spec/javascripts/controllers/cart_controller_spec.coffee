@@ -78,14 +78,41 @@ describe 'cartController', ->
       it 'adds the specified item to the order', ->
         $httpBackend.flush()
         expect($rootScope.order.items.length).toEqual 1
+        if $rootScope.order.items.length == 1
+          item = $rootScope.order.items[0]
+          expect(item.sku).toEqual '123456'
+          expect(item.description).toEqual 'Deluxe Widget'
+          expect(item.unit_price).toEqual 19.99
+          expect(item.quantity).toEqual 1
+          expect(item.extended_price).toEqual 19.99
+
+    describe 'and present in the order', ->
+      beforeEach ->
+        $httpBackend.whenGET('http://localhost:3030/api/v1/orders/101').respond ->
+          [200,
+            id: 101
+            items: [
+              sku: '123456'
+              description: 'Deluxe Widget'
+              unit_price: 14.99
+              quantity: 2
+              extended_price: 29.98
+            ]
+          ]
+        controller = $controller 'cartController',
+          $scope: $scope
+          $cookies: $cookies
+          $location: $location
+
+      it 'does not add anything to the order', ->
+        $httpBackend.flush()
+        expect($rootScope.order.items.length).toEqual 1
         item = $rootScope.order.items[0]
         expect(item.sku).toEqual '123456'
         expect(item.description).toEqual 'Deluxe Widget'
-        expect(item.unit_price).toEqual 19.99
-        expect(item.quantity).toEqual 1
-        expect(item.extended_price).toEqual 19.99
+        expect(item.unit_price).toEqual 14.99
+        expect(item.quantity).toEqual 2
+        expect(item.extended_price).toEqual 29.98
 
-    describe 'and present in the order', ->
-      it 'does not add anything to the order'
   describe 'always', ->
     it 'sets the rootScope.orderTotal value'

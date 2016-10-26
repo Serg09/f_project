@@ -258,6 +258,13 @@
         return $rootScope.confirmationNumber != null;
       };
 
+      var itemIsInOrder = function(sku) {
+        var found = _.find($rootScope.order.items, function(item) {
+          return item.sku == sku;
+        });
+        return found != null;
+      };
+
       var handleOrder = function(order) {
         $rootScope.order = order;
         if (order.id)
@@ -273,7 +280,7 @@
         }, 0);
 
         var sku = $location.search()['sku'];
-        if (sku) {
+        if (sku && !itemIsInOrder(sku)) {
           var quantity = $location.search()['quantity'] || 1;
           cs.addItem(order.id, sku, quantity, function(item) {
             $rootScope.order.items.push(item);
