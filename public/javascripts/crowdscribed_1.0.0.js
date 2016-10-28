@@ -249,14 +249,10 @@
         braintree.client.create({authorization: token}, handleClientCreate); // braintree.client.create
       };
       cs.getPaymentToken(handlePaymentToken);
-    }])
+    }]) // paymentController
     .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
       // Find the existing order or create a new order
       var orderId = $cookies.get('order_id');
-
-      this.submissionComplete = function() {
-        return $rootScope.confirmationNumber != null;
-      };
 
       var itemIsInOrder = function(sku) {
         var found = _.find($rootScope.order.items, function(item) {
@@ -275,9 +271,11 @@
         if (!$rootScope.order.items) {
           $rootScope.order.items = [];
         }
-        $rootScope.orderTotal = _.reduce($rootScope.order.items, function(sum, item) {
-          return sum + item.extended_price;
-        }, 0);
+        $rootScope.orderTotal = _.reduce(
+            $rootScope.order.items,
+            function(sum, item) {
+              return sum + item.extended_price;
+            }, 0);
 
         var sku = $location.search()['sku'];
         if (sku && !itemIsInOrder(sku)) {
@@ -293,5 +291,5 @@
       } else {
         cs.getOrder(orderId, handleOrder);
       }
-    }]); // controller('paymentController')
+    }]); // controller('cartController')
 })();
