@@ -30,12 +30,21 @@ describe 'cartController', ->
         $location: $location
 
       $httpBackend.whenGET('http://localhost:3030/api/v1/orders/123').respond ->
-        return [200, {id: 123}]
+        return [200,
+          id: 123,
+          items: [
+            {extended_price: 19.99},
+            {extended_price: 14.99}
+          ]
+        ]
 
     it 'sets the rootScope.order to the specified order', ->
       $httpBackend.flush()
       expect($rootScope.order).toBeDefined()
       expect($rootScope.order.id).toEqual(123)
+    it 'sets the rootScope.orderTotal value to the order total', ->
+      $httpBackend.flush()
+      expect($rootScope.orderTotal).toEqual 34.98
 
   describe 'when an order ID is not present in the cookies', ->
     beforeEach ->
@@ -51,6 +60,9 @@ describe 'cartController', ->
       $httpBackend.flush()
       expect($rootScope.order).toBeDefined()
       expect($rootScope.order.id).toEqual(321)
+    it 'sets the rootScope.orderTotal value to zero', ->
+      $httpBackend.flush()
+      expect($rootScope.orderTotal).toEqual 0
 
   describe 'when a SKU is present on the query string', ->
     beforeEach ->
@@ -113,6 +125,3 @@ describe 'cartController', ->
         expect(item.unit_price).toEqual 14.99
         expect(item.quantity).toEqual 2
         expect(item.extended_price).toEqual 29.98
-
-  describe 'always', ->
-    it 'sets the rootScope.orderTotal value'
