@@ -164,7 +164,16 @@
       });
       $scope.price = 0;
     }])
-    .controller('paymentController', ['$rootScope', 'cs', function($rootScope, cs) {
+    .controller('paymentController', ['$rootScope', '$scope', 'cs', function($rootScope, $scope, cs) {
+
+      $scope.submitPayment = function() {
+        if (typeof $scope.hostedFields === 'undefined') {
+          console.log("hostedFields has not been received from the payment provider.");
+        } else {
+          $scope.hostedFields.tokenize(handleTokenizeResult);
+        }
+      };
+
       var handleSubmitOrderResult = function(result) {
         if (result.succeeded) {
           $rootScope.confirmationNumber = $rootScope.order.id;
@@ -196,12 +205,6 @@
         }
         cs.updateOrder($rootScope.order, function(order) {
           handleUpdateOrderResult(payload.nonce, order)
-        });
-      };
-      var registerFormSubmissionHandler = function(hostedFields) {
-        $('#payment-form').submit(function(event) {
-          event.preventDefault();
-          hostedFields.tokenize(handleTokenizeResult);
         });
       };
       var handleClientCreate = function(error, client) {
@@ -242,7 +245,7 @@
 
             // add CC field events here
 
-            registerFormSubmissionHandler(hostedFields);
+            $scope.hostedFields = hostedFields;
           });
       };
       var handlePaymentToken = function(token) {

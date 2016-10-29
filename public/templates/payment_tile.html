@@ -1,5 +1,5 @@
-<div class="payment-tile" ng-controller="paymentController">
-  <form id="payment-form">
+<div class="payment-tile" ng-controller="paymentController as ctlr">
+  <form id="payment-form" ng-submit="submitPayment()">
     <div class="form-group">
       <label for="card-number">Card Number</label>
       <div id="card-number"></div>
