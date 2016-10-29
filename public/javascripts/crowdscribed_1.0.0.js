@@ -166,10 +166,13 @@
     }])
     .controller('paymentController', ['$rootScope', '$scope', 'cs', function($rootScope, $scope, cs) {
 
+      $rootScope.submissionInProgress = false;
+
       $scope.submitPayment = function() {
         if (typeof $scope.hostedFields === 'undefined') {
           console.log("hostedFields has not been received from the payment provider.");
         } else {
+          $rootScope.submissionInProgress = true;
           $scope.hostedFields.tokenize(handleTokenizeResult);
         }
       };

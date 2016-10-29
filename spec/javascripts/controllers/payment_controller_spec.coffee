@@ -6,6 +6,7 @@ describe 'paymentController', ->
   $controller = null
   hostedFields = null
   $scope = null
+  cs = jasmine.createSpyObj 'cs', ['updateOrder']
   beforeEach ->
     inject (_$rootScope_, _$controller_, _$httpBackend_) ->
       $httpBackend = _$httpBackend_
@@ -46,16 +47,27 @@ describe 'paymentController', ->
         [200, 'abc123']
       controller = $controller 'paymentController',
         $scope: $scope
+
+    it 'indicates the submission is being processed', ->
       $httpBackend.flush()
       $scope.submitPayment()
-
-    it 'displays a progress widget'
+      expect($rootScope.submissionInProgress).toBe true
 
     it 'tokenizes the payment', ->
+      $httpBackend.flush()
+      $scope.submitPayment()
       expect(hostedFields.tokenize).toHaveBeenCalled()
 
     describe 'on successful tokenization', ->
-      it 'updates the order'
+      beforeEach ->
+        hostedFields.tokenize = (callback) ->
+          callback null,
+            nonce: '987654'
+
+      it 'updates the order', ->
+        $httpBackend.flush()
+        $scope.submitPayment()
+        expect(cs.updateOrder).toHaveBeenCalled()
 
       describe 'on successful order update', ->
         it 'creates the payment'
