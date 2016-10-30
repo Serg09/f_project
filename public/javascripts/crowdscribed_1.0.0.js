@@ -123,6 +123,11 @@
         return result;
       };
 
+      this.create = function(workflow, callback) {
+        var steps = getOrCreateWorkflow(workflow);
+        callback(steps);
+      };
+
       this.addStep = function(workflow, fn) {
         var steps = getOrCreateWorkflow(workflow);
         steps.push(fn);
@@ -169,34 +174,36 @@
 
       $rootScope.submissionInProgress = false;
 
-      // update order
-      workflow.addStep('submission', function() {
-        return cs.updateOrder($rootScope.order);
-      });
-      // tokenize payment method
-      workflow.addStep('submission', function() {
-        var d = $q.defer();
-        if (typeof $scope.hostedFields === 'undefined') {
-          d.reject("hostedFields has no value");
-        } else {
-          $scope.hostedFields.tokenize(function(error, payload) {
-            if (error) {
-              d.reject(error);
-            } else {
-              $scope.nonce = payload.nonce;
-              d.resolve();
-            }
-          });
-        }
-        return d.promise;
-      });
-      // create payment
-      workflow.addStep('submission', function() {
-        return cs.createPayment($rootScope.order.id, $scope.nonce);
-      });
-      // submit order
-      workflow.addStep('submission', function() {
-        return cs.submitOrder($rootScope.order.id);
+      workflow.create('submission', function(wf) {
+        // update order
+        wf.push(function() {
+          return cs.updateOrder($rootScope.order);
+        });
+        // tokenize payment method
+        wf.push(function() {
+          var d = $q.defer();
+          if (typeof $scope.hostedFields === 'undefined') {
+            d.reject("hostedFields has no value");
+          } else {
+            $scope.hostedFields.tokenize(function(error, payload) {
+              if (error) {
+                d.reject(error);
+              } else {
+                $scope.nonce = payload.nonce;
+                d.resolve();
+              }
+            });
+          }
+          return d.promise;
+        });
+        // create payment
+        wf.push(function() {
+          return cs.createPayment($rootScope.order.id, $scope.nonce);
+        });
+        // submit order
+        wf.push(function() {
+          return cs.submitOrder($rootScope.order.id);
+        });
       });
 
       $scope.submitPayment = function() {
