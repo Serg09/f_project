@@ -127,6 +127,11 @@
       $rootScope.submissionInProgress = false;
 
       var steps = [{
+        // update order
+        execute: function() {
+          return cs.updateOrder($rootScope.order);
+        }
+      }, {
         // tokenize payment
         execute: function() {
           var d = $q.defer();
@@ -143,11 +148,6 @@
             });
           }
           return d.promise;
-        }
-      }, {
-        // update order
-        execute: function() {
-          return cs.updateOrder($rootScope.order);
         }
       }, {
         // create payment
