@@ -111,6 +111,49 @@
       };
       return this;
     }])
+    .factory('workflow', ['$q', function($q) {
+      var workflows = {};
+
+      var getOrCreateWorkflow = function(workflow) {
+        var result = workflows[workflow];
+        if (typeof result === 'undefined') {
+          result = [];
+          workflows[workflow] = result;
+        }
+        return result;
+      };
+
+      this.addStep = function(workflow, fn) {
+        var steps = getOrCreateWorkflow(workflow);
+        steps.push(fn);
+      };
+
+      var processStep = function(deferred, steps, index) {
+        if (index < steps.length) {
+          steps[index]().then(function(result) {
+            deferred.notify(index);
+            processStep(deferred, steps, index + 1);
+          }, function(error) {
+            deferred.reject(error);
+          });
+        } else {
+          deferred.resolve();
+        }
+      };
+
+      this.execute = function(workflow) {
+        var d = $q.defer();
+        steps = workflows[workflow];
+        if (typeof steps === 'undefined') {
+          d.reject("Workflow '" + workflow + "' is undefined.");
+        } else {
+          processStep(d, steps, 0);
+        }
+        return d.promise;
+      };
+
+      return this;
+    }])
     .controller('purchaseTileController', ['$scope', 'cs', function($scope, cs) {
       // ------------------------
       // Purchase Tile Controller
@@ -122,67 +165,43 @@
       });
       $scope.price = 0;
     }])
-    .controller('paymentController', ['$rootScope', '$scope', '$q', 'cs', function($rootScope, $scope, $q, cs) {
+    .controller('paymentController', ['$rootScope', '$scope', '$q', 'cs', 'workflow', function($rootScope, $scope, $q, cs, workflow) {
 
       $rootScope.submissionInProgress = false;
 
-      var steps = [{
-        // update order
-        execute: function() {
-          return cs.updateOrder($rootScope.order);
-        }
-      }, {
-        // tokenize payment
-        execute: function() {
-          var d = $q.defer();
-          if (typeof $scope.hostedFields === 'undefined') {
-            d.reject("hostedFields has no value");
-          } else {
-            $scope.hostedFields.tokenize(function(error, payload) {
-              if (error) {
-                d.reject(error);
-              } else {
-                $scope.nonce = payload.nonce;
-                d.resolve();
-              }
-            });
-          }
-          return d.promise;
-        }
-      }, {
-        // create payment
-        execute: function() {
-          return cs.createPayment($rootScope.order.id, $scope.nonce);
-        }
-      }, {
-        // submit order
-        execute: function() {
-          return cs.submitOrder($rootScope.order.id);
-        }
-      }];
-
-      var processStep = function(deferred, index) {
-        if (index < steps.length) {
-          steps[index].execute().then(function(result) {
-            deferred.notify(index);
-            processStep(deferred, index + 1);
-          }, function(error) {
-            deferred.reject(error);
-          });
-        } else {
-          deferred.resolve();
-        }
-      };
-
-      var processSteps = function() {
+      // update order
+      workflow.addStep('submission', function() {
+        return cs.updateOrder($rootScope.order);
+      });
+      // tokenize payment method
+      workflow.addStep('submission', function() {
         var d = $q.defer();
-        processStep(d, 0);
+        if (typeof $scope.hostedFields === 'undefined') {
+          d.reject("hostedFields has no value");
+        } else {
+          $scope.hostedFields.tokenize(function(error, payload) {
+            if (error) {
+              d.reject(error);
+            } else {
+              $scope.nonce = payload.nonce;
+              d.resolve();
+            }
+          });
+        }
         return d.promise;
-      };
+      });
+      // create payment
+      workflow.addStep('submission', function() {
+        return cs.createPayment($rootScope.order.id, $scope.nonce);
+      });
+      // submit order
+      workflow.addStep('submission', function() {
+        return cs.submitOrder($rootScope.order.id);
+      });
 
       $scope.submitPayment = function() {
         $rootScope.submissionInProgress = true;
-        processSteps().then(function() {
+        workflow.execute('submission').then(function() {
           $rootScope.submissionInProgress = false;
         }, function(error) {
           console.log("Unable to complete the submission.");
