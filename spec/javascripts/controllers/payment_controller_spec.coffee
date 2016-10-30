@@ -6,13 +6,18 @@ describe 'paymentController', ->
   $controller = null
   hostedFields = null
   $scope = null
-  cs = jasmine.createSpyObj 'cs', ['updateOrder']
+  ORDER_ID = 101
+  PAYMENT_TOKEN = 'abc123'
   beforeEach ->
-    inject (_$rootScope_, _$controller_, _$httpBackend_) ->
+    inject (_$rootScope_, _$controller_, _$httpBackend_, _$q_) ->
       $httpBackend = _$httpBackend_
       $rootScope = _$rootScope_
       $scope = $rootScope.$new()
       $controller = _$controller_
+    $rootScope.order =
+      id: ORDER_ID
+      shipping_address:
+        recipient: 'John Doe'
     hostedFields = jasmine.createSpyObj('hostedFields', ['tokenize'])
     window.braintree =
       client:
@@ -24,7 +29,7 @@ describe 'paymentController', ->
 
   it 'creates a payment token', ->
     $httpBackend.expectGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
-      [200, 'abc123']
+      [200, {token: PAYMENT_TOKEN}]
     $controller 'paymentController',
       $scope: $scope
     $httpBackend.flush()
@@ -41,58 +46,50 @@ describe 'paymentController', ->
 
 
   describe 'on submit', ->
-    controller = null
-    beforeEach ->
-      $httpBackend.whenGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
-        [200, 'abc123']
-      controller = $controller 'paymentController',
-        $scope: $scope
-
-    it 'indicates the submission is being processed', ->
-      $httpBackend.flush()
-      $scope.submitPayment()
-      expect($rootScope.submissionInProgress).toBe true
-
-    it 'tokenizes the payment', ->
-      $httpBackend.flush()
-      $scope.submitPayment()
-      expect(hostedFields.tokenize).toHaveBeenCalled()
-
-    describe 'on successful tokenization', ->
+    describe 'on success', ->
+      controller = null
       beforeEach ->
-        hostedFields.tokenize = (callback) ->
-          callback null,
-            nonce: '987654'
-
-      it 'updates the order', ->
+        $httpBackend.whenGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
+          [200, 'abc123']
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID).respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        controller = $controller 'paymentController',
+          $scope: $scope
         $httpBackend.flush()
         $scope.submitPayment()
-        expect(cs.updateOrder).toHaveBeenCalled()
 
-      describe 'on successful order update', ->
-        it 'creates the payment'
+      it 'indicates the submission is being processed', ->
+        expect($rootScope.submission.isInProgress()).toBe true
 
-        describe 'on successful payment creation', ->
-          it 'submits the order'
+      it 'tokenizes the payment', ->
+        expect(hostedFields.tokenize).toHaveBeenCalled()
 
-          describe 'on successful order submission', ->
-            it 'hides the progress widget'
-            it 'renders a confirmation number'
+      it 'updates the order'
 
-          describe 'on failure to submit the order', ->
-            it 'does not render a confirmation number'
-            it 'renders an error message'
-            it 'hides the progress widget'
+      it 'creates the payment'
 
-        describe 'on failure to create a payment', ->
-          it 'does not submit the order'
-          it 'renders an error message'
+      it 'submits the order'
 
-      describe 'on failure to update the order', ->
-        it 'does not create the payment'
-        it 'renders an error message'
+      it 'hides the progress widget'
+      it 'renders a confirmation number'
+
+    describe 'on failure to submit the order', ->
+      it 'renders an error message'
+      it 'indicates submission failure'
+
+    describe 'on failure to create a payment', ->
+      it 'renders an error message'
+      it 'indicates submission failure'
+
+    describe 'on failure to update the order', ->
+      it 'renders an error message'
+      it 'indicates submission failure'
 
     describe 'on unsuccessful tokenization', ->
-      it 'does not update the order'
       it 'renders an error message'
+      it 'indicates submission failure'
 
