@@ -161,28 +161,35 @@
         }
       }];
 
-      var handleStepFailure = function(error) {
-        console.log("Error processing the submission.");
-        console.log(error);
-      };
-
-      var handleProcessCompletion = function() {
-        $rootScope.submissionInProgress = false;
-      };
-
-      var processStep = function(index) {
-        if (index >= steps.length) {
-          handleProcessCompletion();
-        } else {
+      var processStep = function(deferred, index) {
+        if (index < steps.length) {
           steps[index].execute().then(function(result) {
-            processStep(index + 1);
-          }, handleStepFailure);
+            deferred.notify(index);
+            processStep(deferred, index + 1);
+          }, function(error) {
+            deferred.reject(error);
+          });
+        } else {
+          deferred.resolve();
         }
+      };
+
+      var processSteps = function() {
+        var d = $q.defer();
+        processStep(d, 0);
+        return d.promise;
       };
 
       $scope.submitPayment = function() {
         $rootScope.submissionInProgress = true;
-        processStep(0);
+        processSteps().then(function() {
+          $rootScope.submissionInProgress = false;
+        }, function(error) {
+          console.log("Unable to complete the submission.");
+          console.log(error);
+        }, function(index) {
+          console.log("processed step " + index);
+        });
       };
 
       cs.getPaymentToken().then(function(response) {
