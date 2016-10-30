@@ -57,44 +57,24 @@
       // --------------------
       // Crowdscribed Service
       // --------------------
-      this.getProduct = function(sku, callback) {
+      this.getProduct = function(sku) {
         // TODO Put in the proper domain name
         var url = HOST + '/api/v1/products/' + sku;
-        $http.get(url, HTTP_CONFIG).then(function(response) {
-          callback(response.data);
-        }, function(error) {
-          console.log("Unable to get the product.");
-          console.log(error);
-        });
+        return $http.get(url, HTTP_CONFIG);
       }
-      this.getPaymentToken = function(callback) {
+      this.getPaymentToken = function() {
         var url = HOST + '/api/v1/payments/token';
-        $http.get(url, HTTP_CONFIG).then(function(response) {
-          callback(response.data.token);
-        }, function(error) {
-          console.log("Unable to get a payment token.");
-          console.log(error);
-        });
+        return $http.get(url, HTTP_CONFIG);
       };
-      this.createOrder = function(callback) {
+      this.createOrder = function() {
         var url = HOST + '/api/v1/orders'
-        $http.post(url, {order: {}}, HTTP_CONFIG).then(function(response) {
-          callback(response.data);
-        }, function(error) {
-          console.log("Unable to create the order.");
-          console.log(error);
-        });
+        return $http.post(url, {order: {}}, HTTP_CONFIG);
       };
-      this.getOrder = function(orderId, callback) {
+      this.getOrder = function(orderId) {
         var url = HOST + '/api/v1/orders/' + orderId
-        $http.get(url, HTTP_CONFIG).then(function(response) {
-          callback(response.data);
-        }, function(error) {
-          console.log("Unable to get the order " + orderId + ".");
-          console.log(error);
-        });
+        return $http.get(url, HTTP_CONFIG);
       };
-      this.updateOrder = function(order, callback) {
+      this.updateOrder = function(order) {
         var url = HOST + '/api/v1/orders/' + order.id;
         data = {
           order: order,
@@ -104,14 +84,9 @@
           order.customer_name = order.shipping_address.recipient
         }
         order.shipping_address = null;
-        $http.patch(url, data, HTTP_CONFIG).then(function(response) {
-          callback(response.data);
-        }, function(error) {
-          console.log("Unable to update the order.");
-          console.log(error);
-        });
+        return $http.patch(url, data, HTTP_CONFIG);
       };
-      this.addItem = function(orderId, sku, quantity, callback) {
+      this.addItem = function(orderId, sku, quantity) {
         var url = HOST + '/api/v1/orders/' + orderId + '/items';
         var data = {
           item: {
@@ -119,37 +94,20 @@
             quantity: quantity
           }
         };
-        $http.post(url, data, HTTP_CONFIG).then(function(response) {
-          callback(response.data);
-        }, function(error) {
-          console.log("Unable to add the order item " + sku + " to the order.");
-          console.log(error);
-        });
+        return $http.post(url, data, HTTP_CONFIG);
       };
-      this.submitOrder = function(orderId, callback) {
+      this.submitOrder = function(orderId) {
         var url = HOST + '/api/v1/orders/' + orderId + '/submit';
-        $http.patch(url, {order: {}}, HTTP_CONFIG).then(function(response) {
-          callback({succeeded: true});
-        }, function(error) {
-          console.log("Unable to submit the order.");
-          console.log(error);
-          callback({succeeded: false, error: error});
-        });
+        return $http.patch(url, {order: {}}, HTTP_CONFIG);
       };
-      this.createPayment = function(orderId, nonce, callback) {
+      this.createPayment = function(orderId, nonce) {
         var url = HOST + '/api/v1/orders/' + orderId + '/payments';
         var data = {
           payment: {
             nonce: nonce
           }
         };
-        $http.post(url, data, HTTP_CONFIG).then(function(response) {
-          callback({succeeded: true});
-        }, function(error) {
-          console.log("Unable to create the payment.");
-          console.log(error);
-          callback({succeeded: false, error: error});
-        });
+        return $http.post(url, data, HTTP_CONFIG);
       };
       return this;
     }])
@@ -158,59 +116,77 @@
       // Purchase Tile Controller
       // ------------------------
       $scope.$watch('sku', function(newValue, oldValue) {
-        cs.getProduct(newValue, function(product) {
-          $scope.price = product.price;
+        cs.getProduct(newValue).then(function(response) {
+          $scope.price = response.data.price;
         });
       });
       $scope.price = 0;
     }])
-    .controller('paymentController', ['$rootScope', '$scope', 'cs', function($rootScope, $scope, cs) {
+    .controller('paymentController', ['$rootScope', '$scope', '$q', 'cs', function($rootScope, $scope, $q, cs) {
 
       $rootScope.submissionInProgress = false;
 
-      $scope.submitPayment = function() {
-        if (typeof $scope.hostedFields === 'undefined') {
-          console.log("hostedFields has not been received from the payment provider.");
+      var steps = [{
+        // tokenize payment
+        execute: function() {
+          var d = $q.defer();
+          if (typeof $scope.hostedFields === 'undefined') {
+            d.reject("hostedFields has no value");
+          } else {
+            $scope.hostedFields.tokenize(function(error, payload) {
+              if (error) {
+                d.reject(error);
+              } else {
+                $scope.nonce = payload.nonce;
+                d.resolve();
+              }
+            });
+          }
+          return d.promise;
+        }
+      }, {
+        // update order
+        execute: function() {
+          return cs.updateOrder($rootScope.order);
+        }
+      }, {
+        // create payment
+        execute: function() {
+          return cs.createPayment($rootScope.order.id, $scope.nonce);
+        }
+      }, {
+        // submit order
+        execute: function() {
+          return cs.submitOrder($rootScope.order.id);
+        }
+      }];
+
+      var handleStepFailure = function(error) {
+        console.log("Error processing the submission.");
+        console.log(error);
+      };
+
+      var handleProcessCompletion = function() {
+        $rootScope.submissionInProgress = false;
+      };
+
+      var processStep = function(index) {
+        if (index >= steps.length) {
+          handleProcessCompletion();
         } else {
-          $rootScope.submissionInProgress = true;
-          $scope.hostedFields.tokenize(handleTokenizeResult);
+          steps[index].execute().then(function(result) {
+            processStep(index + 1);
+          }, handleStepFailure);
         }
       };
 
-      var handleSubmitOrderResult = function(result) {
-        if (result.succeeded) {
-          $rootScope.confirmationNumber = $rootScope.order.id;
-        } else {
-          alert("We were unable to submit your order.\n" + result.error);
-          console.log(result.error)
-        }
+      $scope.submitPayment = function() {
+        $rootScope.submissionInProgress = true;
+        processStep(0);
       };
-      var handleCreatePaymentResult = function(result) {
-        if (result.succeeded) {
-          cs.submitOrder($rootScope.order.id, handleSubmitOrderResult);
-        } else {
-          alert("Unable to submit the order.\n" + result.error);
-          console.log(result.error)
-        }
-      };
-      var handleUpdateOrderResult = function(nonce, order) {
-        cs.createPayment(
-            $rootScope.order.id,
-            nonce,
-            handleCreatePaymentResult
-        );
-      };
-      var handleTokenizeResult = function(error, payload) {
-        if (error) {
-          console.log("An error ocurred tokenizing the payment method.");
-          console.log(error);
-          return;
-        }
-        cs.updateOrder($rootScope.order, function(order) {
-          handleUpdateOrderResult(payload.nonce, order)
-        });
-      };
-      var handleClientCreate = function(error, client) {
+
+      cs.getPaymentToken().then(function(response) {
+        braintree.client.create({authorization: response.data.token}, function(error, client) {
           if (error) {
             console.log("An error ocurred setting up the braintree client.");
             console.log(error);
@@ -250,11 +226,8 @@
 
             $scope.hostedFields = hostedFields;
           });
-      };
-      var handlePaymentToken = function(token) {
-        braintree.client.create({authorization: token}, handleClientCreate); // braintree.client.create
-      };
-      cs.getPaymentToken(handlePaymentToken);
+        });
+      });
     }]) // paymentController
     .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
       // Find the existing order or create a new order
@@ -267,10 +240,10 @@
         return found != null;
       };
 
-      var handleOrder = function(order) {
-        $rootScope.order = order;
-        if (order.id)
-          $cookies.put('order_id', order.id);
+      var handleOrder = function(response) {
+        $rootScope.order = response.data;
+        if ($rootScope.order.id)
+          $cookies.put('order_id', $rootScope.order.id);
         if (!$rootScope.order.shipping_address) {
           $rootScope.order.shipping_address = {};
         }
@@ -286,16 +259,25 @@
         var sku = $location.search()['sku'];
         if (sku && !itemIsInOrder(sku)) {
           var quantity = $location.search()['quantity'] || 1;
-          cs.addItem(order.id, sku, quantity, function(item) {
-            $rootScope.order.items.push(item);
+          cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
+            $rootScope.order.items.push(response.data);
+          }, function(error) {
+            console.log("Unable to add the item to the order.");
+            console.log(error);
           });
         }
       };
 
       if ((typeof orderId) === "undefined") {
-        cs.createOrder(handleOrder);
+        cs.createOrder().then(handleOrder, function(error) {
+          console.log("Unable to create an order");
+          console.log(error);
+        });
       } else {
-        cs.getOrder(orderId, handleOrder);
+        cs.getOrder(orderId).then(handleOrder, function(error) {
+          console.log("Unable to get the order " + orderId);
+          console.log(error);
+        });
       }
     }]); // controller('cartController')
 })();
