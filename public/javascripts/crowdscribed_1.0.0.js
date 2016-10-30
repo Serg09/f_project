@@ -172,7 +172,34 @@
     }])
     .controller('paymentController', ['$rootScope', '$scope', '$q', 'cs', 'workflow', function($rootScope, $scope, $q, cs, workflow) {
 
-      $rootScope.submissionInProgress = false;
+      var StateMachine = function() {
+        this.state = "unstarted";
+      };
+      StateMachine.prototype = {
+        isUnstarted: function() {
+          return this.state == "unstarted";
+        },
+        isInProgress: function() {
+          return this.state == "in-progress";
+        },
+        isComplete: function() {
+          return this.state == "complete";
+        },
+        isFailued: function() {
+          return this.state == "failed";
+        },
+        start: function() {
+          this.state = "in-progress";
+        },
+        complete: function() {
+          this.state = "complete";
+        },
+        fail: function() {
+          this.state = "failed";
+        }
+      };
+
+      $rootScope.submission = new StateMachine();
 
       workflow.create('submission', function(wf) {
         // update order
@@ -207,10 +234,11 @@
       });
 
       $scope.submitPayment = function() {
-        $rootScope.submissionInProgress = true;
+        $rootScope.submission.start();
         workflow.execute('submission').then(function() {
-          $rootScope.submissionInProgress = false;
+          $rootScope.submission.complete();
         }, function(error) {
+          $rootScope.submission.fail();
           console.log("Unable to complete the submission.");
           console.log(error);
         }, function(index) {
