@@ -9,6 +9,7 @@ class Api::V1::BaseController < ApplicationController
 
   rescue_from StandardError do |exception|
     Rails.logger.warn "rescue_from #{exception.inspect}"
+    exception.backtrace.each{|f| Rails.logger.warn "  #{f}"}
     render json: {message: exception.message}, status: :internal_service_error
   end
 
