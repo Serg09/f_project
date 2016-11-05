@@ -102,18 +102,120 @@ describe 'paymentController', ->
         expect(cs.submitOrder).toHaveBeenCalled()
 
     describe 'on failure to submit the order', ->
-      it 'renders an error message'
-      it 'indicates submission failure'
+      beforeEach ->
+        $httpBackend.whenGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
+          [200, 'abc123']
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID).respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        $httpBackend.whenPOST('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/payments').respond ->
+          [201,
+            id: PAYMENT_ID
+          ]
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/submit').respond ->
+          [500,
+            message: 'The server has been stolen'
+          ]
+        controller = $controller 'paymentController',
+          $scope: $scope
+          cs: cs
+        $httpBackend.flush()
+        $scope.submitPayment()
+        $httpBackend.flush()
+      it 'renders an error message', ->
+        expect($scope.errors[0]).toEqual 'The server has been stolen'
 
     describe 'on failure to create a payment', ->
-      it 'renders an error message'
-      it 'indicates submission failure'
+      controller = null
+      beforeEach ->
+        $httpBackend.whenGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
+          [200, 'abc123']
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID).respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        $httpBackend.whenPOST('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/payments').respond ->
+          [500,
+            message: 'Your card has been reported stolen and you will be arrested.'
+          ]
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/submit').respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        controller = $controller 'paymentController',
+          $scope: $scope
+          cs: cs
+        $httpBackend.flush()
+        $scope.submitPayment()
+        $httpBackend.flush()
+      it 'renders an error message', ->
+        expect($scope.errors[0]).toEqual 'Your card has been reported stolen and you will be arrested.'
 
     describe 'on failure to update the order', ->
-      it 'renders an error message'
-      it 'indicates submission failure'
+      controller = null
+      beforeEach ->
+        $httpBackend.whenGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
+          [200, 'abc123']
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID).respond ->
+          [500,
+            message: 'Too many orders this week'
+          ]
+        $httpBackend.whenPOST('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/payments').respond ->
+          [201,
+            id: PAYMENT_ID
+          ]
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/submit').respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        controller = $controller 'paymentController',
+          $scope: $scope
+          cs: cs
+        $httpBackend.flush()
+        $scope.submitPayment()
+        $httpBackend.flush()
+
+      it 'renders an error message', ->
+        expect($scope.errors[0]).toEqual 'Too many orders this week'
 
     describe 'on unsuccessful tokenization', ->
-      it 'renders an error message'
-      it 'indicates submission failure'
+      controller = null
+      beforeEach ->
+        hostedFields.tokenize = (callback) ->
+          callback {code: 'HOSTED_FIELDS_FAILED_TOKENIZATION'}, null
+        $httpBackend.whenGET('http://localhost:3030/api/v1/payments/token').respond (method, url) ->
+          [200, 'abc123']
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID).respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        $httpBackend.whenPOST('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/payments').respond ->
+          [201,
+            id: PAYMENT_ID
+          ]
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/submit').respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
+        controller = $controller 'paymentController',
+          $scope: $scope
+          cs: cs
+        $httpBackend.flush()
+        $scope.submitPayment()
+        $httpBackend.flush()
 
+      it 'renders an error message', ->
+        expect($scope.errors[0]).toEqual 'Tokenization failed. Card may be invalid'

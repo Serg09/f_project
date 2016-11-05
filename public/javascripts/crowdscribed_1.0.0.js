@@ -200,6 +200,7 @@
       };
 
       $rootScope.submission = new StateMachine();
+      $scope.errors = [];
 
       workflow.create('submission', function(wf) {
         // update order
@@ -214,7 +215,22 @@
           } else {
             $scope.hostedFields.tokenize(function(error, payload) {
               if (error) {
-                d.reject(error);
+                var message = "Unable to initialiaze the payment.";
+                switch(error.code) {
+                  case 'HOSTED_FIELDS_EMPTY':
+                    message = 'All fields are empty';
+                    break;
+                  case 'HOSTED_FIELDS_INVALID':
+                    message = 'Some fields are invalid';
+                    break;
+                  case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
+                    message = 'Tokenization failed. Card may be invalid';
+                    break;
+                  case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
+                    message = 'Network error tokenizing the payment';
+                    break;
+                }
+                d.reject({data: {message: message}});
               } else {
                 $scope.nonce = payload.nonce;
                 d.resolve();
@@ -237,12 +253,9 @@
         $rootScope.submission.start();
         workflow.execute('submission').then(function() {
           $rootScope.submission.complete();
-        }, function(error) {
+        }, function(response) {
           $rootScope.submission.fail();
-          console.log("Unable to complete the submission.");
-          console.log(error);
-        }, function(index) {
-          console.log("processed step " + index);
+          $scope.errors.push(response.data.message);
         });
       };
 
