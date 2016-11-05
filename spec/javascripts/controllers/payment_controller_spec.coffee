@@ -6,19 +6,31 @@ describe 'paymentController', ->
   $controller = null
   hostedFields = null
   $scope = null
+  cs = null
   ORDER_ID = 101
   PAYMENT_TOKEN = 'abc123'
+  NONCE = '321bca'
+  PAYMENT_ID = '201'
   beforeEach ->
-    inject (_$rootScope_, _$controller_, _$httpBackend_, _$q_) ->
+    inject (_$rootScope_, _$controller_, _$httpBackend_, _cs_) ->
       $httpBackend = _$httpBackend_
       $rootScope = _$rootScope_
       $scope = $rootScope.$new()
       $controller = _$controller_
+      cs = _cs_
     $rootScope.order =
       id: ORDER_ID
       shipping_address:
         recipient: 'John Doe'
-    hostedFields = jasmine.createSpyObj('hostedFields', ['tokenize'])
+    hostedFields =
+      tokenize: (callback) ->
+        callback(null,
+          nonce: NONCE)
+    spyOn(hostedFields, 'tokenize').and.callThrough()
+
+    csMethods = ['submitOrder', 'createPayment', 'updateOrder', 'getPaymentToken']
+    _.each csMethods, (m)->
+      spyOn(cs, m).and.callThrough()
     window.braintree =
       client:
         create: (token, callback)->
@@ -57,25 +69,37 @@ describe 'paymentController', ->
             shipping_address:
               recipient: 'John Doe'
           ]
+        $httpBackend.whenPOST('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/payments').respond ->
+          [201,
+            id: PAYMENT_ID
+          ]
+        $httpBackend.whenPATCH('http://localhost:3030/api/v1/orders/' + ORDER_ID + '/submit').respond ->
+          [200,
+            id: ORDER_ID
+            shipping_address:
+              recipient: 'John Doe'
+          ]
         controller = $controller 'paymentController',
           $scope: $scope
+          cs: cs
         $httpBackend.flush()
         $scope.submitPayment()
+        $httpBackend.flush()
 
-      it 'indicates the submission is being processed', ->
-        expect($rootScope.submission.isInProgress()).toBe true
+      it 'indicates the submission is completed', ->
+        expect($rootScope.submission.isComplete()).toBe true
 
       it 'tokenizes the payment', ->
         expect(hostedFields.tokenize).toHaveBeenCalled()
 
-      it 'updates the order'
+      it 'updates the order', ->
+        expect(cs.updateOrder).toHaveBeenCalled()
 
-      it 'creates the payment'
+      it 'creates the payment', ->
+        expect(cs.createPayment).toHaveBeenCalled()
 
-      it 'submits the order'
-
-      it 'hides the progress widget'
-      it 'renders a confirmation number'
+      it 'submits the order', ->
+        expect(cs.submitOrder).toHaveBeenCalled()
 
     describe 'on failure to submit the order', ->
       it 'renders an error message'
