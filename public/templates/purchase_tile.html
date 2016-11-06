@@ -1,6 +1,6 @@
 <div class="purchase-tile" ng-controller="purchaseTileController">
   <div class="price">
-    {{ price }}
+    ${{ price }}
   </div>
-  <a href="sample_store_page.html?sku={{ sku }}">Purchase</a>
+  <a class="btn btn-success btn-lg" href="{{ purchasePath }}?sku={{ sku }}">Purchase</a>
 </div>
