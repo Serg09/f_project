@@ -3,20 +3,20 @@
     <tr class="header-row">
       <th class="text-column">SKU</th>
       <th class="text-column">Description</th>
-      <th class="number-column">Price</th>
-      <th class="number-column">Qty.</th>
-      <th class="number-column">Total</th>
+      <th class="number-column text-right">Price</th>
+      <th class="number-column text-right">Qty.</th>
+      <th class="number-column text-right">Total</th>
     </tr>
     <tr ng-repeat="item in order.items">
       <td ng-bind="item.sku"></td>
       <td ng-bind="item.description"></td>
-      <td ng-bind="item.unit_price" class="number-column"></td>
-      <td ng-bind="item.quantity" class="number-column"></td>
-      <td ng-bind="item.extended_price" class="number-column"></td>
+      <td ng-bind="item.unit_price" class="number-column text-right"></td>
+      <td ng-bind="item.quantity" class="number-column text-right"></td>
+      <td ng-bind="item.extended_price" class="number-column text-right"></td>
     </tr>
     <tr class="summary-row">
-      <td colspan="4" class="number-column">Total</td>
-      <td ng-bind="orderTotal" class="number-column"></td>
+      <td colspan="4" class="number-column text-right">Total</td>
+      <td ng-bind="orderTotal()" class="number-column text-right"></td>
     </tr>
   </table>
 

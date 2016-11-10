@@ -512,11 +512,13 @@
         if (!$rootScope.order.items) {
           $rootScope.order.items = [];
         }
-        $rootScope.orderTotal = _.reduce(
+        $rootScope.orderTotal = function() {
+          return _.reduce(
             $rootScope.order.items,
             function(sum, item) {
               return sum + item.extended_price;
             }, 0);
+        };
 
         var sku = $location.search()['sku'];
         if (sku && !itemIsInOrder(sku)) {
