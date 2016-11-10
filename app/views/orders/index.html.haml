@@ -26,7 +26,7 @@
               =link_to submit_order_path(order), method: :patch, class: 'btn btn-xs btn-warning submit-button', title: 'Click here to finalize the order.', 'data-confirm' => 'Are you sure you want to submit this order?' do
                 %span.glyphicon.glyphicon-ok{ 'aria-hidden' => true }
           -else
-            =link_to order_path(order), class: 'btn btn-xs btn-info', title: 'Click here to view the order details' do
+            =link_to order_path(order), class: 'btn btn-xs btn-info view-button', title: 'Click here to view the order details' do
               %span.glyphicon.glyphicon-eye-open{ 'aria-hidden' => true }
           -if order.submitted?
             =link_to export_order_path(order), method: :patch, class: 'btn btn-xs btn-warning export-button', title: 'Click here to send this order to the fulfillment provider.', 'data-confirm' => 'Are you sure you want to send this order for fulfillment?' do
