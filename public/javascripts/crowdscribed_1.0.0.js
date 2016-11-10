@@ -246,7 +246,16 @@
         });
         // submit order
         wf.push(function() {
-          return cs.submitOrder($rootScope.order.id);
+          var d = $q.defer();
+          cs.submitOrder($rootScope.order.id).then(function(response) {
+            $rootScope.order = response.data;
+            d.resolve();
+          }, function(error) {
+            console.log("unable to submit the order");
+            consoel.log(error);
+            d.reject();
+          });
+          return d.promise;
         });
       });
 
