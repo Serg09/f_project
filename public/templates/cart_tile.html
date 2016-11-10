@@ -1,20 +1,27 @@
 <div class="cart-tile" ng-controller="cartController">
-  order items go here
-
-  <table>
-    <tr>
-      <th>SKU</th>
-      <th>Description</th>
-      <th>Price</th>
-      <th>Qty.</th>
-      <th>Total</th>
+  <table ng-hide="submission.isInProgress()" class="table table-striped">
+    <tr class="header-row">
+      <th class="text-column">SKU</th>
+      <th class="text-column">Description</th>
+      <th class="number-column text-right">Price</th>
+      <th class="number-column text-right">Qty.</th>
+      <th class="number-column text-right">Total</th>
     </tr>
     <tr ng-repeat="item in order.items">
-      <td ng-bind="sku">
-      <td ng-bind="description">
-      <td ng-bind="unit_price">
-      <td ng-bind="quantity">
-      <td ng-bind="extended_price">
+      <td ng-bind="item.sku"></td>
+      <td ng-bind="item.description"></td>
+      <td ng-bind="item.unit_price" class="number-column text-right"></td>
+      <td ng-bind="item.quantity" class="number-column text-right"></td>
+      <td ng-bind="item.extended_price" class="number-column text-right"></td>
+    </tr>
+    <tr class="summary-row">
+      <td colspan="4" class="number-column text-right">Total</td>
+      <td ng-bind="orderTotal()" class="number-column text-right"></td>
     </tr>
   </table>
+
+  <div class="confirmation" ng-hide="!submissionComplete()">
+    <h1>Order Submitted</h1>
+    Your order has been submitted. Your confirmation number is {{ confirmationNumber }}.
+  </div>
 </div>

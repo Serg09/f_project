@@ -1,10 +1,17 @@
 class Api::V1::BaseController < ApplicationController
-  protect_from_forgery with: :null_session
+  protect_from_forgery with: :null_session,
+    if: Proc.new{|c| c.request.format.json?}
 
   before_action :destroy_session
   before_action :authenticate!
 
   attr_reader :current_client
+
+  rescue_from StandardError do |exception|
+    Rails.logger.warn "rescue_from #{exception.inspect}"
+    exception.backtrace.each{|f| Rails.logger.warn "  #{f}"}
+    render json: {message: exception.message}, status: :internal_service_error
+  end
 
   rescue_from ActiveRecord::RecordNotFound do |exception|
     render json: {message: 'not found'}, status: :not_found

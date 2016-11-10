@@ -55,9 +55,9 @@ class Payment < ActiveRecord::Base
                                          options: {
                                            submit_for_settlement: true
                                          }
-    responses.create! status: result.status,
+    responses.create! status: result.transaction.status,
                       content: result.to_yaml
-    self.external_id ||= result.id
+    self.external_id ||= result.transaction.id
     if result.success?
       self.external_fee = calculate_fee
       true

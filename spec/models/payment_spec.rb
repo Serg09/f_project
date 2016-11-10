@@ -48,9 +48,7 @@ RSpec.describe Payment, type: :model do
         before do
           allow(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('result', success?: true,
-                                        id: provider_id,
-                                        status: 'approved'))
+            and_return(payment_provider_response('approved', id: provider_id))
         end
 
         it 'changes the state to "approved"' do
@@ -86,9 +84,7 @@ RSpec.describe Payment, type: :model do
         before do
           allow(Braintree::Transaction).to \
             receive(:sale).
-            and_return(double('result', success?: false,
-                                        id: provider_id,
-                                        status: 'no_dice'))
+            and_return(payment_provider_response('no_dice'))
         end
 
         it 'changes the state to "failed"' do

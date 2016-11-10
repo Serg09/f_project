@@ -1,17 +1,20 @@
 <div class="payment-tile" ng-controller="paymentController">
-  <form id="payment-form">
+  <form id="payment-form" ng-submit="submitPayment()" ng-hide="!submission.isUnstarted()">
     <div class="form-group">
-      <label for="card-number">Card Number</label>
-      <div id="card-number"></div>
+      <label class="control-label" for="card-number">Card Number</label>
+      <div class="braintree-field" id="card-number"></div>
     </div>
     <div class="form-group">
-      <label for="cvv">CVV</label>
-      <div id="cvv"></div>
+      <label class="control-label" for="cvv">CVV</label>
+      <div class="braintree-field" id="cvv"></div>
     </div>
     <div class="form-group">
-      <label for="expiration-date">Expiration Date</label>
-      <div id="expiration-date"></div>
+      <label class="control-label" for="expiration-date">Expiration Date</label>
+      <div class="braintree-field" id="expiration-date"></div>
     </div>
-    <input id="submit-payment-button" type="submit" value="Submit" />
+    <input class="btn btn-primary" id="submit-payment-button" type="submit" value="Submit" />
   </form>
+  <div ng-hide="submission.isUnstarted()">
+    Payment is complete.
+  </div>
 </div>

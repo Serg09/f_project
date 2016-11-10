@@ -29,16 +29,14 @@ class Order < ActiveRecord::Base
   belongs_to :client
 
   validates_presence_of :client_id,
-                        :customer_name,
-                        :order_date,
-                        :telephone
+                        :order_date
   validates_length_of :customer_name,
                        maximum: 50
   validates_length_of [:client_order_id,
                        :customer_email],
                        maximum: 100
   validates_length_of :telephone, maximum: 25
-  validates_uniqueness_of :client_order_id
+  validates_uniqueness_of :client_order_id, if: :client_order_id
 
   accepts_nested_attributes_for :shipping_address
 
@@ -107,6 +105,9 @@ class Order < ActiveRecord::Base
   end
 
   def ready_for_submission?
-    items.length > 0
+    items.length > 0 &&
+      customer_name.present? &&
+      shipping_address_id.present? &&
+      telephone.present?
   end
 end
