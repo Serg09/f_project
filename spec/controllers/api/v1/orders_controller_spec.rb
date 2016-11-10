@@ -254,6 +254,7 @@ describe Api::V1::OrdersController do
           it 'returns the order' do
             patch :submit, id: order
             expect(json_response).to include(id: order.id)
+            expect(json_response[:shipping_address]).not_to be_nil
           end
 
           it 'changes the order status to "submitted"' do

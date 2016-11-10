@@ -50,7 +50,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
     if !@order.incipient?
       render json: [], status: :unprocessable_entity
     elsif @order.submit!
-      render json: @order.as_json(include: {items: {methods: [:extended_price]}})
+      render json: @order.as_json(include: {shipping_address: {}, items: {methods: [:extended_price]}})
     else
       render json: {error: "Unable to submit the order."}
     end
