@@ -5,7 +5,8 @@ Feature: View payments for an order
   I need to be able to view payments for an order
 
   Scenario: A user views payments for an order
-    Given "Joe Schmoe" ordered "046853712-0" - "Fair Stood the Wind for France" for $19.99 on 2/27/2016
+    Given today is 2/27/2016
+    And "Joe Schmoe" ordered "046853712-0" - "Fair Stood the Wind for France" for $19.99 on 2/27/2016
     And "Joe Schmoe" paid for and submitted his order
 
     And there is a user with email address "john@doe.com" and password "please01"
@@ -24,10 +25,10 @@ Feature: View payments for an order
 
     When I click the view button within the 1st order row
     Then I should see "Order" within the page title
-    And I should see the following payments table
+    And I should see the following payment table
       | Payment date | State    | External ID | Amount |
-      |    2/27/2016 | approved | ehsr70f9    |  27.05 |
+      |    2/27/2016 | approved | ehsr70f9    | $21.64 |
 
-    When I click the view button within the first payment row
+    When I click the view button within the 1st payment row
     Then I should see "Payment" within the page title
     And I see "Transactions" within the main content
