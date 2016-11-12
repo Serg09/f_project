@@ -36,3 +36,7 @@ Then /^I should see the following (.*) table$/ do |description, expected_table|
   actual_table = parse_table(html_table)
   expected_table.diff! actual_table
 end
+
+Given /^today is (#{DATE})$/ do |date|
+  Timecop.freeze(date)
+end

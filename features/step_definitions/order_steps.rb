@@ -31,3 +31,11 @@ end
 Then /^(#{ORDER}) should be marked as (.*)$/ do |order, status|
   expect(order.status).to eq status
 end
+
+Given /^"([^"]+)" paid for and submitted his order$/ do |customer_name|
+  order = Order.find_by customer_name: customer_name
+  payment = FactoryGirl.create :approved_payment, order: order,
+                                                  amount: order.total,
+                                                  external_id: 'ehsr70f9'
+  order.submit!
+end
