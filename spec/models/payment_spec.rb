@@ -300,6 +300,21 @@ RSpec.describe Payment, type: :model do
     it_behaves_like 'a refundable payment' do
       let (:payment) { FactoryGirl.create(:approved_payment) }
     end
+
+    describe 'as_json' do
+      let (:json) { FactoryGirl.create(:approved_payment).as_json }
+      it 'includes the cc last 4' do
+        expect(json).to include('last_four' => '1111')
+      end
+
+      it 'includes the cc type' do
+        expect(json).to include('credit_card_type' => 'Visa')
+      end
+
+      it 'includes the cc type image url' do
+        expect(json).to include('credit_card_image_url' => 'https://assets.braintreegateway.com/payment_method_logo/visa.png?environment=sandbox')
+      end
+    end
   end
 
   context 'when completed' do

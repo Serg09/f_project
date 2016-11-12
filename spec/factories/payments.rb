@@ -8,12 +8,18 @@ FactoryGirl.define do
       state 'approved'
       external_id  { Faker::Number.hexadecimal(10) }
       external_fee { amount * 0.03 }
+      after(:create) do |payment, evaluator|
+        FactoryGirl.create(:response, payment: payment)
+      end
     end
 
     factory :completed_payment do
       state 'completed'
       external_id  { Faker::Number.hexadecimal(10) }
       external_fee { amount * 0.03 }
+      after(:create) do |payment, evaluator|
+        FactoryGirl.create(:response, payment: payment)
+      end
     end
 
     factory :failed_payment do

@@ -40,6 +40,19 @@ class Payment < ActiveRecord::Base
     end
   end
 
+  def as_json(options = {})
+    base = super(options)
+    parsed = responses.lazy.map{|r| YAML.load(r.content)}.first
+    if parsed
+      transaction = parsed['transaction']
+      credit_card = transaction['credit_card']
+      base['last_four'] = credit_card[:last_4]
+      base['credit_card_type'] = credit_card[:card_type]
+      base['credit_card_image_url'] = credit_card[:image_url]
+    end
+    base
+  end
+
   private
 
   attr_accessor :provider_error

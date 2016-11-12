@@ -242,7 +242,17 @@
         });
         // create payment
         wf.push(function() {
-          return cs.createPayment($rootScope.order.id, $scope.nonce);
+          var d = $q.defer();
+          cs.createPayment($rootScope.order.id, $scope.nonce).then(function(response) {
+
+            console.log("createPayment response");
+            console.log(response);
+
+            d.resolve(response);
+          }, function(error) {
+            d.reject(error);
+          });
+          return d.promise;
         });
         // submit order
         wf.push(function() {
