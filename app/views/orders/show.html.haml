@@ -90,5 +90,5 @@
           %td= payment.external_id
           %td= number_to_currency(payment.amount)
           %td
-            =link_to payment_path(payment), class: 'btn btn-xs view-button', title: 'Click here to view the payment details.' do
+            =link_to payment_path(payment), class: 'btn btn-xs btn-info view-button', title: 'Click here to view the payment details.' do
               %span.glyphicon.glyphicon-eye-open{ 'aria-hidden' => true }
