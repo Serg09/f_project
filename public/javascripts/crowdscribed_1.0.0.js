@@ -244,10 +244,7 @@
         wf.push(function() {
           var d = $q.defer();
           cs.createPayment($rootScope.order.id, $scope.nonce).then(function(response) {
-
-            console.log("createPayment response");
-            console.log(response);
-
+            $rootScope.payment = response.data;
             d.resolve(response);
           }, function(error) {
             d.reject(error);
@@ -522,30 +519,38 @@
       };
 
       var handleOrder = function(response) {
-        $rootScope.order = response.data;
-        if ($rootScope.order.id)
-          $cookies.put('order_id', $rootScope.order.id);
-        if (!$rootScope.order.shipping_address) {
-          $rootScope.order.shipping_address = {country_code: 'US'};
-        }
-        if (!$rootScope.order.items) {
-          $rootScope.order.items = [];
-        }
-        $rootScope.orderTotal = function() {
-          return _.reduce(
-            $rootScope.order.items,
-            function(sum, item) {
-              return sum + item.extended_price;
-            }, 0);
-        };
+        if (response.data.status == 'incipient') {
+          $rootScope.order = response.data;
+          if ($rootScope.order.id)
+            $cookies.put('order_id', $rootScope.order.id);
+          if (!$rootScope.order.shipping_address) {
+            $rootScope.order.shipping_address = {country_code: 'US'};
+          }
+          if (!$rootScope.order.items) {
+            $rootScope.order.items = [];
+          }
+          $rootScope.orderTotal = function() {
+            return _.reduce(
+              $rootScope.order.items,
+              function(sum, item) {
+                return sum + item.extended_price;
+              }, 0);
+          };
 
-        var sku = $location.search()['sku'];
-        if (sku && !itemIsInOrder(sku)) {
-          var quantity = $location.search()['quantity'] || 1;
-          cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
-            $rootScope.order.items.push(response.data);
-          }, function(error) {
-            console.log("Unable to add the item to the order.");
+          var sku = $location.search()['sku'];
+          if (sku && !itemIsInOrder(sku)) {
+            var quantity = $location.search()['quantity'] || 1;
+            cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
+              $rootScope.order.items.push(response.data);
+            }, function(error) {
+              console.log("Unable to add the item to the order.");
+              console.log(error);
+            });
+          }
+        } else {
+          // they've already finished this order, create a new one
+          cs.createOrder().then(handleOrder, function(error) {
+            console.log("Unable to create an order");
             console.log(error);
           });
         }
