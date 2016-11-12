@@ -32,6 +32,6 @@ Rails.application.routes.draw do
   end
   resources :order_items, only: [:edit, :update, :destroy]
   resources :products
-  resources :payments, only: [:show]
+  resources :payments, only: [:index, :show]
   root to: 'pages#welcome'
 end
