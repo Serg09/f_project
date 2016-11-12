@@ -1,4 +1,3 @@
-@wip
 Feature: View payments for an order
   As a user
   In order to get information about payment
@@ -31,4 +30,4 @@ Feature: View payments for an order
 
     When I click the view button within the 1st payment row
     Then I should see "Payment" within the page title
-    And I see "Transactions" within the main content
+    And I should see "Responses" within the main content
