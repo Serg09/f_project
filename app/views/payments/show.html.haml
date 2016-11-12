@@ -1,2 +1,48 @@
-%h1 Payments#show
-%p Find me in app/views/payments/show.html.haml
+=content_for :page_title do
+  Payment
+
+.row
+  .col-md-4
+    %table.table
+      %tr
+        %th Payment date
+        %td.text-right= format_date(@payment.created_at)
+      %tr
+        %th Amount
+        %td.text-right= number_to_currency(@payment.amount)
+      %tr
+        %th Fee
+        %td.text-right= number_to_currency(@payment.external_fee)
+      %tr
+        %th State
+        %td= @payment.state
+      %tr
+        %th External ID
+        %td= @payment.external_id
+      %tr
+        %th Order
+        %td= link_to '%20.6d' % @payment.order.id, order_path(@payment.order)
+.row
+  .col-md-6
+    %h2 Responses
+-@payment.responses.each do |response|
+  .row
+    .col-md-3
+      %table.table
+        %tr
+          %th Date
+          %th Status
+        %tr
+          %td= format_date(response.created_at)
+          %td= response.status
+  .row
+    .col-md-12
+      .panel-group
+        .panel.panel-default
+          .panel-heading
+            %h3.panel-title
+              %a{ 'data-toggle' => 'collapse', href: '#response-content'}
+                content
+          #response-content.panel-collapse.collapse
+            .panel-body
+              %pre= response.content
