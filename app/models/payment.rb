@@ -69,7 +69,7 @@ class Payment < ActiveRecord::Base
                                            submit_for_settlement: true
                                          }
     responses.create! status: result.transaction.status,
-                      content: result.to_yaml
+                      content: result.to_yaml.gsub(/\s\!.*$/, '')
     self.external_id ||= result.transaction.id
     if result.success?
       self.external_fee = calculate_fee
