@@ -12,7 +12,7 @@
     }
   };
 
-  var m = angular.module('crowdscribed', ['ngCookies'])
+  var m = angular.module('crowdscribed', ['ngCookies', 'ui.bootstrap'])
     .config(['$locationProvider', function($locationProvider) {
       $locationProvider.html5Mode({enabled: true,
                                    requireBase: false});
@@ -171,7 +171,7 @@
       $scope.price = 0;
       $scope.purchasePath = csConfiguration.get('purchasePath');
     }])
-    .controller('paymentController', ['$rootScope', '$scope', '$q', 'cs', 'workflow', function($rootScope, $scope, $q, cs, workflow) {
+    .controller('paymentController', ['$rootScope', '$scope', '$q', '$uibModal', '$sce', 'cs', 'workflow', function($rootScope, $scope, $q, $uibModal, $sce, cs, workflow) {
 
       var StateMachine = function() {
         this.state = "unstarted";
@@ -267,12 +267,19 @@
       });
 
       $scope.submitPayment = function() {
+        var modalInstance = $uibModal.open({
+          templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/progress.html'),
+          keyboard: false,
+          backdrop: 'static'
+        });
         $rootScope.submission.start();
         workflow.execute('submission').then(function() {
           $rootScope.submission.complete();
+          modalInstance.close();
         }, function(response) {
           $rootScope.submission.fail();
           $scope.errors.push(response.data.message);
+          modalInstance.close();
         });
       };
 
