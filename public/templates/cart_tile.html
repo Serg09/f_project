@@ -1,5 +1,6 @@
 <div class="cart-tile" ng-controller="cartController">
-  <table ng-hide="submission.isInProgress()" class="table table-striped">
+  <h2 class="cart-header">Items</h2>
+  <table class="table table-striped">
     <tr class="header-row">
       <th class="text-column">SKU</th>
       <th class="text-column">Description</th>
@@ -19,9 +20,4 @@
       <td ng-bind="orderTotal()" class="number-column text-right"></td>
     </tr>
   </table>
-
-  <div class="confirmation" ng-hide="!submissionComplete()">
-    <h1>Order Submitted</h1>
-    Your order has been submitted. Your confirmation number is {{ confirmationNumber }}.
-  </div>
 </div>
