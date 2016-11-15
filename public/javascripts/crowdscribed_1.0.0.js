@@ -53,6 +53,15 @@
         templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/address_tile.html')
       }
     }])
+    .directive('confirmationTile', ['$sce', function($sce) {
+      // -----------------
+      // Confrimation Tile
+      // -----------------
+      return {
+        restrict: 'E',
+        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/confirmation_tile.html')
+      }
+    }])
     .factory('cs', ['$http', function($http) {
       // --------------------
       // Crowdscribed Service

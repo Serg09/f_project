@@ -1,6 +1,6 @@
-<div class="payment-tile" ng-controller="paymentController">
+<div class="payment-tile" ng-controller="paymentController" ng-hide="!submission.isUnstarted()">
   <h2 class="payment-header">Payment</h2>
-  <form id="payment-form" ng-submit="submitPayment()" ng-hide="!submission.isUnstarted()">
+  <form id="payment-form" ng-submit="submitPayment()">
     <div class="form-group">
       <label class="control-label" for="card-number">Card Number</label>
       <div class="braintree-field" id="card-number"></div>
@@ -15,25 +15,4 @@
     </div>
     <input class="btn btn-primary" id="submit-payment-button" type="submit" value="Submit" />
   </form>
-  <div ng-hide="submission.isUnstarted()">
-    Your order has been accepted.
-    <div class="row">
-      <div class="col-sm-8">
-        <table class="table table-condensed">
-          <tr>
-            <th class="text-right">Confirmation Number</th>
-            <td>{{ order.id }}</td>
-          </tr>
-          <tr>
-            <th class="text-right">Payment Method</th>
-            <td><img ng-src="{{payment.credit_card_image_url}}" alt="{{payment.credit_card_type}}" /></td>
-          </tr>
-          <tr>
-            <th class="text-right">Card Number</th>
-            <td>**** **** **** {{ payment.last_four }}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-  </div>
 </div>
