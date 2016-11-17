@@ -85,14 +85,12 @@
       };
       this.updateOrder = function(order) {
         var url = HOST + '/api/v1/orders/' + order.id;
+        var clone = _.clone(order);
+        clone.shipping_address = null
         data = {
-          order: order,
+          order: clone,
           shipping_address: order.shipping_address
         }
-        if(!order.customer_name && order.shipping_address.recipient) {
-          order.customer_name = order.shipping_address.recipient
-        }
-        order.shipping_address = null;
         return $http.patch(url, data, HTTP_CONFIG);
       };
       this.addItem = function(orderId, sku, quantity) {
@@ -181,7 +179,6 @@
       $scope.purchasePath = csConfiguration.get('purchasePath');
     }])
     .controller('paymentController', ['$rootScope', '$scope', '$q', '$uibModal', '$sce', 'cs', 'workflow', function($rootScope, $scope, $q, $uibModal, $sce, cs, workflow) {
-
       var StateMachine = function() {
         this.state = "unstarted";
       };
@@ -215,7 +212,11 @@
       workflow.create('submission', function(wf) {
         // update order
         wf.push(function() {
-          return cs.updateOrder($rootScope.order);
+          var o = $rootScope.order
+          if(!o.customer_name && o.shipping_address.recipient) {
+            o.customer_name = o.shipping_address.recipient
+          }
+          return cs.updateOrder(o);
         });
         // tokenize payment method
         wf.push(function() {
