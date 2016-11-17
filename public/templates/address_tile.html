@@ -1,4 +1,4 @@
-<div class="address-tile" ng-hide="!submission.isUnstarted()">
+<div class="address-tile" ng-hide="submission.isComplete()">
   <h2 class="shipping-header">Ship To</h2>
   <form name="addressForm" novalidate action="#" ng-hide="submission.IsInProgress()">
     <div class="form-group" id="recipient-group" ng-class="{ 'has-error': addressForm.recipient.$invalid && addressForm.recipient.$touched }">

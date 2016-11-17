@@ -1,4 +1,4 @@
-<div class="payment-tile" ng-controller="paymentController" ng-hide="!submission.isUnstarted()">
+<div class="payment-tile" ng-controller="paymentController" ng-hide="submission.isComplete()">
   <h2 class="payment-header">Payment</h2>
   <form id="payment-form" ng-submit="submitPayment()">
     <div class="form-group">
