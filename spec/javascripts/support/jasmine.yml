@@ -12,11 +12,12 @@
 #
 src_files:
   #- assets/application.js
-  - javascripts/angular.js
+  - javascripts/angular.min.js
   - javascripts/angular-cookies.js
   - javascripts/angular-mocks.js
   - javascripts/crowdscribed_1.0.0.js
   - javascripts/underscore-min.js
+  - javascripts/ui-bootstrap-tpls-2.2.0.min.js
 
 # stylesheets
 #
