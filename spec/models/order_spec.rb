@@ -267,6 +267,12 @@ RSpec.describe Order, type: :model do
           order.submit
         end.to change(order, :status).to('submitted')
       end
+
+      it 'sets the confirmation value' do
+        expect do
+          order.submit
+        end.to change(order, :confirmation).from(nil)
+      end
     end
   end
 
