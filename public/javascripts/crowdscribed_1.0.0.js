@@ -269,7 +269,7 @@
             d.resolve();
           }, function(error) {
             console.log("unable to submit the order");
-            consoel.log(error);
+            console.log(error);
             d.reject();
           });
           return d.promise;
