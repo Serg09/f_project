@@ -1,5 +1,6 @@
-<div class="payment-tile" ng-controller="paymentController">
-  <form id="payment-form" ng-submit="submitPayment()" ng-hide="!submission.isUnstarted()">
+<div class="payment-tile" ng-controller="paymentController" ng-hide="submission.isComplete()">
+  <h2 class="payment-header">Payment</h2>
+  <form id="payment-form" ng-submit="submitPayment()">
     <div class="form-group">
       <label class="control-label" for="card-number">Card Number</label>
       <div class="braintree-field" id="card-number"></div>
@@ -14,7 +15,4 @@
     </div>
     <input class="btn btn-primary" id="submit-payment-button" type="submit" value="Submit" />
   </form>
-  <div ng-hide="submission.isUnstarted()">
-    Payment is complete.
-  </div>
 </div>

@@ -4,8 +4,9 @@ module PaymentsHelper
     transaction = double 'transation', status: status,
                                        id: options[:id] || Faker::Number.number(8)
     attributes = {success?: SUCCESS_STATUSES.include?(status),
-                  transaction: transaction}
+                  transaction: transaction,
+                  to_yaml: File.read(Rails.root.join('spec', 'fixtures', 'files', 'payment_response.yml'))}
     attributes[:errors] = errors if options[:errors]
-    double 'response', attributes
+    result = double 'response', attributes
   end
 end

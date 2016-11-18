@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161018014535) do
+ActiveRecord::Schema.define(version: 20161117011502) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -112,11 +112,13 @@ ActiveRecord::Schema.define(version: 20161018014535) do
     t.string   "customer_email",      limit: 100
     t.integer  "ship_method_id"
     t.integer  "shipping_address_id"
+    t.string   "confirmation",        limit: 32
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree
   add_index "orders", ["client_id"], name: "index_orders_on_client_id", using: :btree
   add_index "orders", ["client_order_id"], name: "index_orders_on_client_order_id", unique: true, using: :btree
+  add_index "orders", ["confirmation"], name: "index_orders_on_confirmation", unique: true, using: :btree
   add_index "orders", ["ship_method_id"], name: "index_orders_on_ship_method_id", using: :btree
 
   create_table "packages", force: :cascade do |t|

@@ -1,0 +1,32 @@
+<div id="confirmation-tile" ng-hide="!submission.isComplete()">
+  <h2>Submitted</h2>
+  <p>Your order has been accepted.</p>
+  <table class="table table-condensed">
+    <tr>
+      <th class="text-right col-sm-4">Confirmation Number</th>
+      <td class="col-sm-8">{{ order.confirmation.substr(0, 10) }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">Payment Method</th>
+      <td><img ng-src="{{payment.credit_card_image_url}}" alt="{{payment.credit_card_type}}" /></td>
+    </tr>
+    <tr>
+      <th class="text-right">Card Number</th>
+      <td>**** **** **** {{ payment.last_four }}</td>
+    </tr>
+    <tr>
+      <th class="text-right">Ship To</th>
+      <td>
+        {{ order.shipping_address.recipient }}
+        <br />
+        {{ order.shipping_address.line_1 }}
+        <br />
+        {{ order.shipping_address.line_2 }}
+        <br ng-hide="!order.shipping_address.line_2" />
+        {{ order.shipping_address.city }}, {{ order.shipping_address.state }}  {{ order.shipping_address.postal_code }}
+        <br />
+        {{ order.shipping_address.telephone }}
+      </td>
+    </tr>
+  </table>
+</div>

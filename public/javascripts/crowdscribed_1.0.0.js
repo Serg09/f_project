@@ -12,7 +12,7 @@
     }
   };
 
-  var m = angular.module('crowdscribed', ['ngCookies'])
+  var m = angular.module('crowdscribed', ['ngCookies', 'ui.bootstrap'])
     .config(['$locationProvider', function($locationProvider) {
       $locationProvider.html5Mode({enabled: true,
                                    requireBase: false});
@@ -53,6 +53,15 @@
         templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/address_tile.html')
       }
     }])
+    .directive('confirmationTile', ['$sce', function($sce) {
+      // -----------------
+      // Confrimation Tile
+      // -----------------
+      return {
+        restrict: 'E',
+        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/confirmation_tile.html')
+      }
+    }])
     .factory('cs', ['$http', function($http) {
       // --------------------
       // Crowdscribed Service
@@ -76,14 +85,12 @@
       };
       this.updateOrder = function(order) {
         var url = HOST + '/api/v1/orders/' + order.id;
+        var clone = _.clone(order);
+        clone.shipping_address = null
         data = {
-          order: order,
+          order: clone,
           shipping_address: order.shipping_address
         }
-        if(!order.customer_name && order.shipping_address.recipient) {
-          order.customer_name = order.shipping_address.recipient
-        }
-        order.shipping_address = null;
         return $http.patch(url, data, HTTP_CONFIG);
       };
       this.addItem = function(orderId, sku, quantity) {
@@ -171,8 +178,7 @@
       $scope.price = 0;
       $scope.purchasePath = csConfiguration.get('purchasePath');
     }])
-    .controller('paymentController', ['$rootScope', '$scope', '$q', 'cs', 'workflow', function($rootScope, $scope, $q, cs, workflow) {
-
+    .controller('paymentController', ['$rootScope', '$scope', '$q', '$uibModal', '$sce', 'cs', 'workflow', function($rootScope, $scope, $q, $uibModal, $sce, cs, workflow) {
       var StateMachine = function() {
         this.state = "unstarted";
       };
@@ -206,7 +212,11 @@
       workflow.create('submission', function(wf) {
         // update order
         wf.push(function() {
-          return cs.updateOrder($rootScope.order);
+          var o = $rootScope.order
+          if(!o.customer_name && o.shipping_address.recipient) {
+            o.customer_name = o.shipping_address.recipient
+          }
+          return cs.updateOrder(o);
         });
         // tokenize payment method
         wf.push(function() {
@@ -242,7 +252,14 @@
         });
         // create payment
         wf.push(function() {
-          return cs.createPayment($rootScope.order.id, $scope.nonce);
+          var d = $q.defer();
+          cs.createPayment($rootScope.order.id, $scope.nonce).then(function(response) {
+            $rootScope.payment = response.data;
+            d.resolve(response);
+          }, function(error) {
+            d.reject(error);
+          });
+          return d.promise;
         });
         // submit order
         wf.push(function() {
@@ -252,7 +269,7 @@
             d.resolve();
           }, function(error) {
             console.log("unable to submit the order");
-            consoel.log(error);
+            console.log(error);
             d.reject();
           });
           return d.promise;
@@ -260,12 +277,19 @@
       });
 
       $scope.submitPayment = function() {
+        var modalInstance = $uibModal.open({
+          templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/progress.html'),
+          keyboard: false,
+          backdrop: 'static'
+        });
         $rootScope.submission.start();
         workflow.execute('submission').then(function() {
           $rootScope.submission.complete();
+          modalInstance.close();
         }, function(response) {
           $rootScope.submission.fail();
           $scope.errors.push(response.data.message);
+          modalInstance.close();
         });
       };
 
@@ -512,30 +536,38 @@
       };
 
       var handleOrder = function(response) {
-        $rootScope.order = response.data;
-        if ($rootScope.order.id)
-          $cookies.put('order_id', $rootScope.order.id);
-        if (!$rootScope.order.shipping_address) {
-          $rootScope.order.shipping_address = {country_code: 'US'};
-        }
-        if (!$rootScope.order.items) {
-          $rootScope.order.items = [];
-        }
-        $rootScope.orderTotal = function() {
-          return _.reduce(
-            $rootScope.order.items,
-            function(sum, item) {
-              return sum + item.extended_price;
-            }, 0);
-        };
+        if (response.data.status == 'incipient') {
+          $rootScope.order = response.data;
+          if ($rootScope.order.id)
+            $cookies.put('order_id', $rootScope.order.id);
+          if (!$rootScope.order.shipping_address) {
+            $rootScope.order.shipping_address = {country_code: 'US'};
+          }
+          if (!$rootScope.order.items) {
+            $rootScope.order.items = [];
+          }
+          $rootScope.orderTotal = function() {
+            return _.reduce(
+              $rootScope.order.items,
+              function(sum, item) {
+                return sum + item.extended_price;
+              }, 0);
+          };
 
-        var sku = $location.search()['sku'];
-        if (sku && !itemIsInOrder(sku)) {
-          var quantity = $location.search()['quantity'] || 1;
-          cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
-            $rootScope.order.items.push(response.data);
-          }, function(error) {
-            console.log("Unable to add the item to the order.");
+          var sku = $location.search()['sku'];
+          if (sku && !itemIsInOrder(sku)) {
+            var quantity = $location.search()['quantity'] || 1;
+            cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
+              $rootScope.order.items.push(response.data);
+            }, function(error) {
+              console.log("Unable to add the item to the order.");
+              console.log(error);
+            });
+          }
+        } else {
+          // they've already finished this order, create a new one
+          cs.createOrder().then(handleOrder, function(error) {
+            console.log("Unable to create an order");
             console.log(error);
           });
         }

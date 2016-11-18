@@ -18,6 +18,8 @@
 #  shipping_address_id :integer          not null
 #
 
+require 'securerandom'
+
 class Order < ActiveRecord::Base
   include AASM
 
@@ -55,7 +57,7 @@ class Order < ActiveRecord::Base
     state :shipped
     state :rejected
     event :submit do
-      transitions from: :incipient, to: :submitted, if: :ready_for_submission?
+      transitions from: :incipient, to: :submitted, if: :_submit
     end
     event :export do
       transitions from: :submitted, to: :exporting
@@ -109,5 +111,13 @@ class Order < ActiveRecord::Base
       customer_name.present? &&
       shipping_address_id.present? &&
       telephone.present?
+  end
+
+  private
+
+  def _submit
+    return false unless ready_for_submission?
+    self.confirmation = SecureRandom.hex(16)
+    save
   end
 end
