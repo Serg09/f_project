@@ -3,7 +3,7 @@
 # Table name: orders
 #
 #  id                  :integer          not null, primary key
-#  customer_name       :string(50)       not null
+#  customer_name       :string(50)
 #  telephone           :string(25)
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
@@ -15,7 +15,8 @@
 #  client_order_id     :string(100)
 #  customer_email      :string(100)
 #  ship_method_id      :integer
-#  shipping_address_id :integer          not null
+#  shipping_address_id :integer
+#  confirmation        :string(32)
 #
 
 require 'securerandom'
