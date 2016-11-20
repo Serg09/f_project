@@ -93,6 +93,13 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  describe '#abbreviated_confirmation' do
+    let (:order) { Order.new attributes.merge confirmation: 'abcd123456789012345679012345678' }
+    it 'is the first 8 characters of the full confirmation, separated with a hyphen' do
+      expect(order.abbreviated_confirmation).to eq 'ABCD-1234'
+    end
+  end
+
   describe '#items' do
     it 'is a list of items in the order' do
       order = Order.new attributes

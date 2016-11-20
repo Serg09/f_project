@@ -114,6 +114,11 @@ class Order < ActiveRecord::Base
       telephone.present?
   end
 
+  def abbreviated_confirmation
+    return nil unless confirmation
+    "%s-%s" % confirmation.scan(/.{4}/).map(&:upcase)
+  end
+
   private
 
   def _submit
