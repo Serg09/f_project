@@ -1,4 +1,7 @@
 <div class="purchase-tile" ng-controller="purchaseTileController">
+  <div class="caption" ng-hide="!caption">
+    {{ caption }}
+  </div>
   <div class="price">
     ${{ price }}
   </div>
