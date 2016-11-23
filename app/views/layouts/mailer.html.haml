@@ -1,0 +1,58 @@
+!!!
+%hmtl
+  %head
+    :css
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        color: #747474;
+        font-size: 12pt;
+        line-height: 20px;
+      }
+      h1 {
+        color: #F90;
+        font-weight: bold;
+        font-size: 26px;
+        line-height: 27px;
+      }
+      h2 {
+        color: #333;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 24px;
+      }
+      a {
+        color: #00ADDE;
+        text-decoration:none;
+        font-weight: bold;
+      }
+      .main-content {
+        padding: 16px;
+      }
+      .text-right {
+        text-align: right;
+      }
+      .text-top {
+        vertical-align: top;
+      }
+      .text-bottom{
+        vertical-align: bottom;
+      }
+      .small {
+        font-size: 80%;
+      }
+  %body{ style: 'margin: 0;' }
+    %table
+      -#%tr
+        %td
+          =image_tag attachments['logo.png'].url
+      %tr
+        %td.main-content
+          = yield
+      -if @unsubscribe_url
+        %tr
+          %td
+            %hr
+        %tr
+          %td
+            Click here to
+            =link_to 'unsubscribe', @unsubscribe_url

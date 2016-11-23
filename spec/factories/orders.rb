@@ -18,6 +18,9 @@ FactoryGirl.define do
       evaluator.items.each do |item|
         order.add_item item[:sku], item[:quantity]
       end
+      if %w(submitted exporting exported processing shipped).include? order.status
+        order.update_attribute :confirmation, Faker::Number.hexadecimal(32)
+      end
     end
 
     Order::STATUSES.reject{|s| s == :incipient}.each do |status|

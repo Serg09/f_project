@@ -1,0 +1,10 @@
+%h1 Order Confirmation
+
+%p
+  Your order for #{h number_to_currency(@order.total)} has been submitted.
+  Your confirmation number is
+  %strong #{h @order.abbreviated_confirmation}.
+
+%p
+  For details,
+  =link_to 'click here', order_url(@order.confirmation)
