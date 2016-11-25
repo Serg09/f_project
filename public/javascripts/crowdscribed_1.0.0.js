@@ -23,7 +23,11 @@
       // -------------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/purchase_tile.html')
+        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/purchase_tile.html'),
+        scope: {
+          sku: '=sku',
+          caption: '=caption'
+        }
       }
     }])
     .directive('paymentTile', ['$sce', function($sce) {
@@ -170,11 +174,14 @@
       // ------------------------
       // Purchase Tile Controller
       // ------------------------
-      $scope.$watch('sku', function(newValue, oldValue) {
-        cs.getProduct(newValue).then(function(response) {
+
+      // Lookup the price
+      cs.getProduct($scope.sku).then(function(response) {
+        if(response.data) {
           $scope.price = response.data.price;
-        });
+        }
       });
+
       $scope.price = 0;
       $scope.purchasePath = csConfiguration.get('purchasePath');
     }])
