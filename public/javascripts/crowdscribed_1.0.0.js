@@ -4,14 +4,6 @@
     return;
   }
 
-  var HOST = 'http://localhost:3030';
-  var HTTP_CONFIG = {
-    headers: {
-      'Authorization': 'Token token=fde100e5505140c5a93cede29321cd9c',
-      'Content-Type': 'application/json'
-    }
-  };
-
   var m = angular.module('crowdscribed', ['ngCookies', 'ui.bootstrap'])
     .config(['$locationProvider', function($locationProvider) {
       $locationProvider.html5Mode({enabled: true,
@@ -23,7 +15,7 @@
       // -------------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/purchase_tile.html'),
+        templateUrl: $sce.trustAsResourceUrl(csConfiguration.getHost() + '/templates/purchase_tile.html'),
         scope: {
           sku: '=sku',
           caption: '=caption'
@@ -36,7 +28,7 @@
       // ------------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/payment_tile.html')
+        templateUrl: $sce.trustAsResourceUrl(csConfiguration.getHost() + '/templates/payment_tile.html')
       }
     }])
     .directive('cartTile', ['$sce', function($sce) {
@@ -45,7 +37,7 @@
       // ---------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/cart_tile.html')
+        templateUrl: $sce.trustAsResourceUrl(csConfiguration.getHost() + '/templates/cart_tile.html')
       }
     }])
     .directive('addressTile', ['$sce', function($sce) {
@@ -54,7 +46,7 @@
       // ------------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/address_tile.html')
+        templateUrl: $sce.trustAsResourceUrl(csConfiguration.getHost() + '/templates/address_tile.html')
       }
     }])
     .directive('confirmationTile', ['$sce', function($sce) {
@@ -63,62 +55,70 @@
       // -----------------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/confirmation_tile.html')
+        templateUrl: $sce.trustAsResourceUrl(csConfiguration.getHost() + '/templates/confirmation_tile.html')
       }
     }])
     .factory('cs', ['$http', function($http) {
+
+      var httpConfig = {
+        headers: {
+          'Authorization': 'Token token=' + csConfiguration.get('authToken'),
+          'Content-Type': 'application/json'
+        }
+      };
+
       // --------------------
       // Crowdscribed Service
       // --------------------
       this.getProduct = function(sku) {
         // TODO Put in the proper domain name
-        var url = HOST + '/api/v1/products/' + sku;
-        return $http.get(url, HTTP_CONFIG);
+        var url = csConfiguration.getHost() + '/api/v1/products/' + sku;
+        return $http.get(url, httpConfig);
       }
       this.getPaymentToken = function() {
-        var url = HOST + '/api/v1/payments/token';
-        return $http.get(url, HTTP_CONFIG);
+        var url = csConfiguration.getHost() + '/api/v1/payments/token';
+        return $http.get(url, httpConfig);
       };
       this.createOrder = function() {
-        var url = HOST + '/api/v1/orders'
-        return $http.post(url, {order: {}}, HTTP_CONFIG);
+        var url = csConfiguration.getHost() + '/api/v1/orders'
+        return $http.post(url, {order: {}}, httpConfig);
       };
       this.getOrder = function(orderId) {
-        var url = HOST + '/api/v1/orders/' + orderId
-        return $http.get(url, HTTP_CONFIG);
+        var url = csConfiguration.getHost() + '/api/v1/orders/' + orderId
+        return $http.get(url, httpConfig);
       };
       this.updateOrder = function(order) {
-        var url = HOST + '/api/v1/orders/' + order.id;
+        var url = csConfiguration.getHost() + '/api/v1/orders/' + order.id;
         var clone = _.clone(order);
         clone.shipping_address = null
         data = {
           order: clone,
           shipping_address: order.shipping_address
         }
-        return $http.patch(url, data, HTTP_CONFIG);
+        return $http.patch(url, data, httpConfig);
       };
       this.addItem = function(orderId, sku, quantity) {
-        var url = HOST + '/api/v1/orders/' + orderId + '/items';
+        var url = csConfiguration.getHost() + '/api/v1/orders/' + orderId + '/items';
         var data = {
           item: {
             sku: sku,
             quantity: quantity
           }
         };
-        return $http.post(url, data, HTTP_CONFIG);
+        return $http.post(url, data, httpConfig);
       };
       this.submitOrder = function(orderId) {
-        var url = HOST + '/api/v1/orders/' + orderId + '/submit';
-        return $http.patch(url, {order: {}}, HTTP_CONFIG);
+        var url = csConfiguration.getHost() + '/api/v1/orders/' + orderId + '/submit';
+        return $http.patch(url, {order: {}}, httpConfig);
       };
       this.createPayment = function(orderId, nonce) {
-        var url = HOST + '/api/v1/orders/' + orderId + '/payments';
+        var url = csConfiguration.getHost() + '/api/v1/orders/' + orderId + '/payments';
         var data = {
           payment: {
             nonce: nonce
           }
         };
-        return $http.post(url, data, HTTP_CONFIG);
+        return $http.post(url, data, httpConfig);
       };
       return this;
     }])
@@ -285,7 +285,7 @@
 
       $scope.submitPayment = function() {
         var modalInstance = $uibModal.open({
-          templateUrl: $sce.trustAsResourceUrl(HOST + '/templates/progress.html'),
+          templateUrl: $sce.trustAsResourceUrl(csConfiguration.getHost() + '/templates/progress.html'),
           keyboard: false,
           backdrop: 'static'
         });
@@ -602,8 +602,18 @@
     push: function(key, value) {
       this.settings[key] = value;
     },
+    put: function(key, value) {
+      this.settings[key] = value;
+    },
     get: function(key) {
       return this.settings[key];
+    },
+    getHost: function() {
+      if (window.location.hostname === 'localhost') {
+        return 'http://localhost:3030';
+      } else {
+        return 'https://fulfillment.crowdscribed.com'
+      }
     }
   };
   window.csConfiguration = new CsConfiguration();
