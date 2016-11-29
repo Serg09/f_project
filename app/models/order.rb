@@ -30,6 +30,7 @@ class Order < ActiveRecord::Base
   belongs_to :shipping_address, class_name: 'Address'
   belongs_to :batch
   belongs_to :client
+  belongs_to :ship_method
 
   validates_presence_of :client_id,
                         :order_date
@@ -79,6 +80,14 @@ class Order < ActiveRecord::Base
 
   def total
     items.reduce(0){|sum, i| sum + i.total_price}
+  end
+
+  def shipping_cost
+    return nil unless ship_method
+    # TODO Need to work out these implementation details
+    # maybe we should simply add a shipping_cost attribute to order
+    # and recalculate it when triggered or on demand
+    return ship_method.cost_calculator.calculate(self)
   end
 
   def add_item(product_or_sku, quantity = 1)

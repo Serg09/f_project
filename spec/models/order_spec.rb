@@ -107,6 +107,33 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  context '#ship_method' do
+    let (:ship_method) { FactoryGirl.create :ship_method }
+    let (:order) { Order.new attributes.merge(ship_method_id: ship_method.id) }
+
+    it 'is a reference to the method selected for deliverying the order to the purchase' do
+      expect(order.ship_method).to eq ship_method
+    end
+  end
+
+  context '#shipping_cost' do
+    let (:order) { Order.new attributes }
+    let (:product) { FactoryGirl.create(:product) }
+    context 'when ship_method is nil' do
+      it 'is nil' do
+        item = order.add_item product.sku, 2
+        expect(order.shipping_cost).to be_nil
+      end
+    end
+
+    context 'when ship_method is not nil' do
+      it 'reflects the cost of shipping the items in the order' do
+        item = order.add_item product.sku, 2
+        expect(order.shipping_cost).to eq 5
+      end
+    end
+  end
+
   describe '#all_items_shipped?' do
     let (:order) { FactoryGirl.create(:processing_order, item_count: 1) }
     let (:item) { order.items.first }
