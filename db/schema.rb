@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129023608) do
+ActiveRecord::Schema.define(version: 20161129030641) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -175,6 +175,17 @@ ActiveRecord::Schema.define(version: 20161129023608) do
   end
 
   add_index "responses", ["payment_id"], name: "index_responses_on_payment_id", using: :btree
+
+  create_table "ship_methods", force: :cascade do |t|
+    t.integer  "carrier_id",               null: false
+    t.string   "description",  limit: 100, null: false
+    t.string   "abbreviation", limit: 20,  null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "ship_methods", ["abbreviation"], name: "index_ship_methods_on_abbreviation", unique: true, using: :btree
+  add_index "ship_methods", ["carrier_id", "description"], name: "index_ship_methods_on_carrier_id_and_description", unique: true, using: :btree
 
   create_table "shipment_items", force: :cascade do |t|
     t.integer  "shipment_id",      null: false
