@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129030641) do
+ActiveRecord::Schema.define(version: 20161204232650) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,7 +93,6 @@ ActiveRecord::Schema.define(version: 20161129030641) do
     t.integer  "quantity",                                       null: false
     t.decimal  "unit_price"
     t.decimal  "discount_percentage"
-    t.decimal  "freight_charge"
     t.decimal  "tax"
     t.datetime "created_at",                                     null: false
     t.datetime "updated_at",                                     null: false
@@ -109,18 +108,19 @@ ActiveRecord::Schema.define(version: 20161129030641) do
   create_table "orders", force: :cascade do |t|
     t.string   "customer_name",       limit: 50
     t.string   "telephone",           limit: 25
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.date     "order_date",                                            null: false
+    t.datetime "created_at",                                                                    null: false
+    t.datetime "updated_at",                                                                    null: false
+    t.date     "order_date",                                                                    null: false
     t.integer  "batch_id"
-    t.string   "status",              limit: 30,  default: "incipient", null: false
+    t.string   "status",              limit: 30,                          default: "incipient", null: false
     t.text     "error"
-    t.integer  "client_id",                                             null: false
+    t.integer  "client_id",                                                                     null: false
     t.string   "client_order_id",     limit: 100
     t.string   "customer_email",      limit: 100
     t.integer  "ship_method_id"
     t.integer  "shipping_address_id"
     t.string   "confirmation",        limit: 32
+    t.decimal  "freight_charge",                  precision: 9, scale: 2
   end
 
   add_index "orders", ["batch_id"], name: "index_orders_on_batch_id", using: :btree

@@ -167,7 +167,7 @@ class Lsi::BatchWriter
     io.print ' '      # Internal use only
     io.print ' ' * 5  # Discount percentage
     io.print ' ' * 7  # Internal use only
-    io.print number_of_length((item.freight_charge * 100).to_i, 9)  # freight amount
+    io.print number_of_length(0, 9)  # freight amount
     io.print ' '      # Internal use only
     io.print number_of_length((item.tax * 100).to_i, 9)             # tax amount
     io.print ' '      # Internal use only

@@ -10,6 +10,7 @@ FactoryGirl.define do
     order_date { Faker::Date.backward(5) }
     customer_name { Faker::Name.name }
     telephone { Faker::PhoneNumber.phone_number }
+    freight_charge { Faker::Number.decimal(2) }
 
     after(:create) do |order, evaluator|
       (1..(evaluator.item_count)).each do |i|

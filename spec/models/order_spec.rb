@@ -116,20 +116,20 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  context '#shipping_cost' do
+  context '#freight_charge' do
     let (:order) { Order.new attributes }
     let (:product) { FactoryGirl.create(:product) }
     context 'when ship_method is nil' do
       it 'is nil' do
         item = order.add_item product.sku, 2
-        expect(order.shipping_cost).to be_nil
+        expect(order.freight_charge).to be_nil
       end
     end
 
     context 'when ship_method is not nil' do
       it 'reflects the cost of shipping the items in the order' do
         item = order.add_item product.sku, 2
-        expect(order.shipping_cost).to eq 5
+        expect(order.freight_charge).to eq 5
       end
     end
   end
@@ -163,18 +163,16 @@ RSpec.describe Order, type: :model do
     let!(:i1) do FactoryGirl.create(:order_item, order: order,
                                                  quantity: 1,
                                                  unit_price: 20,
-                                                 freight_charge: 3,
                                                  tax: 1.5)
     end
     let!(:i2) do FactoryGirl.create(:order_item, order: order,
                                                  quantity: 1,
                                                  unit_price: 30,
-                                                 freight_charge: nil,
                                                  tax: nil)
     end
 
     it 'is the sum of the line item totals' do
-      expect(order.total).to eq 54.50
+      expect(order.total).to eq 51.50
     end
   end
 

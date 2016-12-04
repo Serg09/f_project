@@ -10,7 +10,6 @@
 #  quantity            :integer          not null
 #  unit_price          :decimal(, )
 #  discount_percentage :decimal(, )
-#  freight_charge      :decimal(, )
 #  tax                 :decimal(, )
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
@@ -41,7 +40,6 @@ class OrderItem < ActiveRecord::Base
   validates_numericality_of :quantity, greater_than: -1, on: :update, if: :quantity
   [:unit_price,
    :discount_percentage,
-   :freight_charge,
    :tax].each{|f| validates_numericality_of f, greater_than_or_equal_to: 0, if: f}
 
   before_validation :set_defaults
@@ -78,9 +76,7 @@ class OrderItem < ActiveRecord::Base
   end
 
   def total_price
-    (extended_price || 0) +
-      (freight_charge || 0) +
-      (tax || 0)
+    [extended_price, tax].compact.reduce &:+
   end
 
   def total_shipped_quantity
@@ -104,7 +100,6 @@ class OrderItem < ActiveRecord::Base
 
   def set_defaults
     self.discount_percentage = 0 unless discount_percentage
-    self.freight_charge = 0 unless freight_charge
     self.tax = 0 unless tax
   end
 

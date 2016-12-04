@@ -10,7 +10,6 @@ RSpec.describe OrderItem, type: :model do
       description: 'My Book',
       unit_price: 19.99,
       discount_percentage: 0.0,
-      freight_charge: 2.99,
       tax: 1.65
     }
   end
@@ -114,13 +113,6 @@ RSpec.describe OrderItem, type: :model do
     end
   end
 
-  describe '#freight_charge' do
-    it 'cannot be less than zero' do
-      item = OrderItem.new attributes.merge(freight_charge: -0.01)
-      expect(item).to have_at_least(1).error_on :freight_charge
-    end
-  end
-
   describe '#tax' do
     it 'cannot be less than zero' do
       item = OrderItem.new attributes.merge(tax: -0.01)
@@ -132,11 +124,10 @@ RSpec.describe OrderItem, type: :model do
     let(:item) do
       FactoryGirl.create(:order_item, unit_price: 20,
                                       quantity: 2,
-                                      freight_charge: 2.50,
                                       tax: 1.60)
     end
-    it 'is the sum of #unit_price * quantity, #freight_charge, and #tax' do
-      expect(item.total_price).to eq 44.10
+    it 'is the sum of #unit_price * quantity, and #tax' do
+      expect(item.total_price).to eq 41.60
     end
   end
 
