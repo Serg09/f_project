@@ -130,7 +130,7 @@ class Order < ActiveRecord::Base
   end
 
   def freight_charge
-    freight_charge_item.try(:total)
+    freight_charge_item.try(:total_price)
   end
 
   def update_freight_charge!
