@@ -106,9 +106,3 @@ RSpec.describe ShipMethod, type: :model do
     end
   end
 end
-
-class TestShipMethodCalculator
-  def calculate(order)
-    5
-  end
-end
