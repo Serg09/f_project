@@ -116,14 +116,14 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  context '#update_freight_charge' do
+  context '#update_freight_charge!' do
     let (:product) { FactoryGirl.create(:product) }
     before do
       order.add_item product.sku, 2
-      order.update_freight_charge
+      order.update_freight_charge!
     end
     context 'when ship_method is nil' do
-      let (:order) { Order.new attributes }
+      let (:order) { Order.create! attributes }
       it 'is nil' do
         expect(order.freight_charge).to be_nil
       end
@@ -131,7 +131,7 @@ RSpec.describe Order, type: :model do
 
     context 'when ship_method is not nil' do
       let (:order) do
-        Order.new attributes.merge(ship_method_id: ship_method.id)
+        Order.create! attributes.merge(ship_method_id: ship_method.id)
       end
       it 'reflects the cost of shipping the items in the order' do
         expect(order.freight_charge).to eq 5

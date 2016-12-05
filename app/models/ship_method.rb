@@ -21,6 +21,8 @@ class ShipMethod < ActiveRecord::Base
   validates_uniqueness_of :description, scope: :carrier_id
   validates_uniqueness_of :abbreviation
 
+  FREIGHT_CHARGE_SKU = 'FREIGHT'
+
   def calculate_charge(order)
     calculator.calculate order
   end
