@@ -13,6 +13,7 @@ RSpec.describe Order, type: :model do
       shipping_address_id: shipping_address.id
     }
   end
+  let (:ship_method) { FactoryGirl.create :ship_method }
 
   it 'can be created from valid attributes' do
     order = Order.new attributes
@@ -108,7 +109,6 @@ RSpec.describe Order, type: :model do
   end
 
   context '#ship_method' do
-    let (:ship_method) { FactoryGirl.create :ship_method }
     let (:order) { Order.new attributes.merge(ship_method_id: ship_method.id) }
 
     it 'is a reference to the method selected for deliverying the order to the purchase' do
@@ -116,19 +116,24 @@ RSpec.describe Order, type: :model do
     end
   end
 
-  context '#freight_charge' do
-    let (:order) { Order.new attributes }
+  context '#update_freight_charge' do
     let (:product) { FactoryGirl.create(:product) }
+    before do
+      order.add_item product.sku, 2
+      order.update_freight_charge
+    end
     context 'when ship_method is nil' do
+      let (:order) { Order.new attributes }
       it 'is nil' do
-        item = order.add_item product.sku, 2
         expect(order.freight_charge).to be_nil
       end
     end
 
     context 'when ship_method is not nil' do
+      let (:order) do
+        Order.new attributes.merge(ship_method_id: ship_method.id)
+      end
       it 'reflects the cost of shipping the items in the order' do
-        item = order.add_item product.sku, 2
         expect(order.freight_charge).to eq 5
       end
     end

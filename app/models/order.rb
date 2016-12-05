@@ -129,6 +129,10 @@ class Order < ActiveRecord::Base
     "%s-%s" % confirmation.scan(/.{4}/).map(&:upcase)
   end
 
+  def update_freight_charge
+    self.freight_charge = ship_method.try(:calculate_charge, self)
+  end
+
   private
 
   def _submit
