@@ -7,7 +7,8 @@ RSpec.describe ShipMethod, type: :model do
     {
       carrier_id: carrier.id,
       description: 'Really Fast',
-      abbreviation: 'RF'
+      abbreviation: 'RF',
+      calculator_class: 'TestShipMethodCalculator'
     }
   end
 
@@ -87,5 +88,27 @@ RSpec.describe ShipMethod, type: :model do
       ship_method = ShipMethod.new attributes.merge(abbreviation: 'x' * 21)
       expect(ship_method).to have(1).error_on(:abbreviation)
     end
+  end
+
+  describe '#calculator_class' do
+    it 'is required' do
+      ship_method = ShipMethod.new attributes.except(:calculator_class)
+      expect(ship_method).to have(1).error_on(:calculator_class)
+    end
+  end
+
+  describe '#calculate_charge' do
+    let (:order) { FactoryGirl.create :order }
+
+    it 'calculates the charge for the order' do
+      ship_method = ShipMethod.new attributes
+      expect(ship_method.calculate_charge(order)).to eq(5)
+    end
+  end
+end
+
+class TestShipMethodCalculator
+  def calculate(order)
+    5
   end
 end
