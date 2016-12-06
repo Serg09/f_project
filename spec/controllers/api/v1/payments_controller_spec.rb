@@ -9,7 +9,6 @@ describe Api::V1::PaymentsController do
     FactoryGirl.create(:order_item, order: order,
                                     sku: product.sku,
                                     unit_price: 100,
-                                    freight_charge: 0,
                                     tax: 0,
                                     quantity: 1)
   end

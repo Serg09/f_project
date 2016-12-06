@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161117011502) do
+ActiveRecord::Schema.define(version: 20161205002533) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,6 +56,14 @@ ActiveRecord::Schema.define(version: 20161117011502) do
   add_index "books", ["isbn"], name: "index_books_on_isbn", unique: true, using: :btree
   add_index "books", ["title"], name: "index_books_on_title", using: :btree
 
+  create_table "carriers", force: :cascade do |t|
+    t.string   "name",       limit: 100, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "carriers", ["name"], name: "index_carriers_on_name", unique: true, using: :btree
+
   create_table "clients", force: :cascade do |t|
     t.string   "name",                         limit: 100, null: false
     t.string   "abbreviation",                 limit: 5,   null: false
@@ -85,7 +93,6 @@ ActiveRecord::Schema.define(version: 20161117011502) do
     t.integer  "quantity",                                       null: false
     t.decimal  "unit_price"
     t.decimal  "discount_percentage"
-    t.decimal  "freight_charge"
     t.decimal  "tax"
     t.datetime "created_at",                                     null: false
     t.datetime "updated_at",                                     null: false
@@ -167,6 +174,18 @@ ActiveRecord::Schema.define(version: 20161117011502) do
   end
 
   add_index "responses", ["payment_id"], name: "index_responses_on_payment_id", using: :btree
+
+  create_table "ship_methods", force: :cascade do |t|
+    t.integer  "carrier_id",                   null: false
+    t.string   "description",      limit: 100, null: false
+    t.string   "abbreviation",     limit: 20,  null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.string   "calculator_class", limit: 256, null: false
+  end
+
+  add_index "ship_methods", ["abbreviation"], name: "index_ship_methods_on_abbreviation", unique: true, using: :btree
+  add_index "ship_methods", ["carrier_id", "description"], name: "index_ship_methods_on_carrier_id_and_description", unique: true, using: :btree
 
   create_table "shipment_items", force: :cascade do |t|
     t.integer  "shipment_id",      null: false

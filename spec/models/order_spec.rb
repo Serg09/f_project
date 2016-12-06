@@ -13,6 +13,7 @@ RSpec.describe Order, type: :model do
       shipping_address_id: shipping_address.id
     }
   end
+  let (:ship_method) { FactoryGirl.create :ship_method }
 
   it 'can be created from valid attributes' do
     order = Order.new attributes
@@ -107,6 +108,37 @@ RSpec.describe Order, type: :model do
     end
   end
 
+  context '#ship_method' do
+    let (:order) { Order.new attributes.merge(ship_method_id: ship_method.id) }
+
+    it 'is a reference to the method selected for deliverying the order to the purchase' do
+      expect(order.ship_method).to eq ship_method
+    end
+  end
+
+  context '#update_freight_charge!' do
+    let (:product) { FactoryGirl.create(:product) }
+    before do
+      order.add_item product.sku, 2
+      order.update_freight_charge!
+    end
+    context 'when ship_method is nil' do
+      let (:order) { Order.create! attributes }
+      it 'is nil' do
+        expect(order.freight_charge).to be_nil
+      end
+    end
+
+    context 'when ship_method is not nil' do
+      let (:order) do
+        Order.create! attributes.merge(ship_method_id: ship_method.id)
+      end
+      it 'reflects the cost of shipping the items in the order' do
+        expect(order.freight_charge).to eq 5
+      end
+    end
+  end
+
   describe '#all_items_shipped?' do
     let (:order) { FactoryGirl.create(:processing_order, item_count: 1) }
     let (:item) { order.items.first }
@@ -136,18 +168,16 @@ RSpec.describe Order, type: :model do
     let!(:i1) do FactoryGirl.create(:order_item, order: order,
                                                  quantity: 1,
                                                  unit_price: 20,
-                                                 freight_charge: 3,
                                                  tax: 1.5)
     end
     let!(:i2) do FactoryGirl.create(:order_item, order: order,
                                                  quantity: 1,
                                                  unit_price: 30,
-                                                 freight_charge: nil,
                                                  tax: nil)
     end
 
     it 'is the sum of the line item totals' do
-      expect(order.total).to eq 54.50
+      expect(order.total).to eq 51.50
     end
   end
 

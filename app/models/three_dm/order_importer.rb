@@ -64,7 +64,6 @@ module ThreeDM
     add_item_field_mapping(:numitems, :quantity)
     add_item_field_mapping(:unitprice, :unit_price)
     add_item_field_mapping(:weight, :weight)
-    add_item_field_mapping(:itemShipCost, :freight_charge)
 
     def initialize(content, client)
       @content = content

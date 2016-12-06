@@ -27,7 +27,6 @@ describe Lsi::BatchWriter do
                                     quantity: 1,
                                     unit_price: 19.99,
                                     discount_percentage: 0.10,
-                                    freight_charge: 1.99,
                                     tax: 1.65)
   end
   let (:expected_output_path) do

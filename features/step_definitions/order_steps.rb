@@ -6,8 +6,7 @@ Given /^"([^"]+)" ordered "([^"]+)" - "([^"]+)" for (#{DOLLAR_AMOUNT}) on (#{DAT
                                          quantity: 1,
                                          description: description,
                                          unit_price: price,
-                                         tax: price * 0.0825,
-                                         freight_charge: 0)
+                                         tax: price * 0.0825)
 end
 
 Given /^there are the following orders$/ do |table|

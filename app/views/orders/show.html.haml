@@ -58,7 +58,6 @@
         %th Unit price
         %th Ext. price
         %th Tax
-        %th Freight
         %th Tot. price
         %th Weight
         %th Status
@@ -72,7 +71,6 @@
           %td= number_to_currency(item.unit_price)
           %td= number_to_currency(item.extended_price)
           %td= number_to_currency(item.tax)
-          %td= number_to_currency(item.freight_charge)
           %td= number_to_currency(item.total_price)
           %td= item.weight
           %td= item.status

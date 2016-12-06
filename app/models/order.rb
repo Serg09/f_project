@@ -17,6 +17,7 @@
 #  ship_method_id      :integer
 #  shipping_address_id :integer
 #  confirmation        :string(32)
+#  freight_charge      :decimal(9, 2)
 #
 
 require 'securerandom'
@@ -30,6 +31,7 @@ class Order < ActiveRecord::Base
   belongs_to :shipping_address, class_name: 'Address'
   belongs_to :batch
   belongs_to :client
+  belongs_to :ship_method
 
   validates_presence_of :client_id,
                         :order_date
@@ -81,6 +83,14 @@ class Order < ActiveRecord::Base
     items.reduce(0){|sum, i| sum + i.total_price}
   end
 
+  def shipping_cost
+    return nil unless ship_method
+    # TODO Need to work out these implementation details
+    # maybe we should simply add a shipping_cost attribute to order
+    # and recalculate it when triggered or on demand
+    return ship_method.cost_calculator.calculate(self)
+  end
+
   def add_item(product_or_sku, quantity = 1)
     sku = product_or_sku.respond_to?(:sku) ? product_or_sku.sku : product_or_sku
 
@@ -119,7 +129,31 @@ class Order < ActiveRecord::Base
     "%s-%s" % confirmation.scan(/.{4}/).map(&:upcase)
   end
 
+  def freight_charge
+    freight_charge_item.try(:total_price)
+  end
+
+  def update_freight_charge!
+    freight_charge = ship_method.try(:calculate_charge, self)
+    if freight_charge.present?
+      if freight_charge_item.present?
+        freight_charge_item.update_attribute :unit_price, freight_charge
+      else
+        items.create! sku: ShipMethod::FREIGHT_CHARGE_SKU,
+                      description: 'Shipping',
+                      quantity: 1,
+                      unit_price: freight_charge
+      end
+    else
+      freight_charge_item.destroy! if freight_charge_item.present?
+    end
+  end
+
   private
+
+  def freight_charge_item
+    @freight_charge_item ||= items.find_by(sku: ShipMethod::FREIGHT_CHARGE_SKU)
+  end
 
   def _submit
     return false unless ready_for_submission?
