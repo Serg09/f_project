@@ -343,6 +343,7 @@ DEPENDENCIES
   jquery-ui-rails
   launchy
   less-rails
+  nokogiri
   pg
   puma
   rack-cors
