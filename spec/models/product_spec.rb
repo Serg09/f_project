@@ -5,7 +5,8 @@ RSpec.describe Product, type: :model do
     {
       sku: '123456',
       description: 'Deluxe Widget',
-      price: '14.99'
+      price: '14.99',
+      weight: '2.2'
     }
   end
 
@@ -53,6 +54,23 @@ RSpec.describe Product, type: :model do
     it 'must be more than zero' do
       product = Product.new attributes.merge(price: 0)
       expect(product).to have(1).error_on(:price)
+    end
+  end
+
+  describe '#weight' do
+    it 'is required' do
+      product = Product.new attributes.except(:weight)
+      expect(product).to have(1).error_on(:weight)
+    end
+
+    it 'must be a number' do
+      product = Product.new attributes.merge(weight: 'abc')
+      expect(product).to have(1).error_on(:weight)
+    end
+
+    it 'must be more than zero' do
+      product = Product.new attributes.merge(weight: -1)
+      expect(product).to have(1).error_on(:weight)
     end
   end
 end

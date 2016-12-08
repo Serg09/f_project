@@ -5,7 +5,7 @@ class ProductsController < ApplicationController
   respond_to :html
 
   def index
-    @products = Product.paginate(page: params[:page])
+    @products = Product.order(:description).paginate(page: params[:page])
   end
 
   def show
@@ -18,6 +18,9 @@ class ProductsController < ApplicationController
   def create
     @product = Product.new product_params
     flash[:notice] = "The product was created successfully." if @product.save
+
+    puts @product.errors.full_messages
+
     respond_with @product, location: products_path
   end
 
@@ -42,6 +45,6 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:sku, :description, :price)
+    params.require(:product).permit(:sku, :description, :price, :weight)
   end
 end

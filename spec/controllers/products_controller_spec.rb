@@ -6,7 +6,8 @@ RSpec.describe ProductsController, type: :controller do
     {
       sku: '123456',
       description: 'Deluxe Widget',
-      price: '24.99'
+      price: '24.99',
+      weight: '2.1'
     }
   end
 

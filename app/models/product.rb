@@ -8,12 +8,14 @@
 #  price       :decimal(9, 2)
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  weight      :decimal(7, 2)    not null
 #
 
 class Product < ActiveRecord::Base
-  validates_presence_of :sku, :description, :price
+  validates_presence_of :sku, :description, :price, :weight
   validates_uniqueness_of :sku
   validates_length_of :sku, maximum: 20
   validates_length_of :description, maximum: 256
   validates_numericality_of :price, greater_than: 0, if: :price
+  validates_numericality_of :weight, greater_than: 0, if: :weight
 end
