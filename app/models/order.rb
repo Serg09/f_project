@@ -17,7 +17,6 @@
 #  ship_method_id      :integer
 #  shipping_address_id :integer
 #  confirmation        :string(32)
-#  freight_charge      :decimal(9, 2)
 #
 
 require 'securerandom'

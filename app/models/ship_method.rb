@@ -2,12 +2,13 @@
 #
 # Table name: ship_methods
 #
-#  id           :integer          not null, primary key
-#  carrier_id   :integer          not null
-#  description  :string(100)      not null
-#  abbreviation :string(20)       not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
+#  id               :integer          not null, primary key
+#  carrier_id       :integer          not null
+#  description      :string(100)      not null
+#  abbreviation     :string(20)       not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  calculator_class :string(256)      not null
 #
 
 class ShipMethod < ActiveRecord::Base
