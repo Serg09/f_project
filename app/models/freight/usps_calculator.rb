@@ -20,7 +20,7 @@ module Freight
     private
 
     def calculate_rate
-      response = HTTParty.get(uri)
+      response = HTTParty.get(uri.to_s)
       xml = Nokogiri::XML(response.body)
       return xml.at_css('Rate').content.to_f if xml.at_css('Rate')
       raise "Unable to get the rate from USPS: #{xml.at_css('Error/Description').content}"
