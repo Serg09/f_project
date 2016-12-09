@@ -14,6 +14,7 @@ module Freight
     end
 
     def rate
+      @rate ||= calculate_rate
     end
 
     private
