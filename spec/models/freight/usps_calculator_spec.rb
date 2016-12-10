@@ -2,7 +2,8 @@ require 'rails_helper'
 
 describe Freight::UspsCalculator do
   let (:product) { FactoryGirl.create :product, weight: 1.3 }
-  let (:order) { FactoryGirl.create(:order) }
+  let (:address) { FactoryGirl.create :address, postal_code: '75225' }
+  let (:order) { FactoryGirl.create(:order, shipping_address: address) }
   let (:calculator) { Freight::UspsCalculator.new order }
   let (:response_body) do
     <<-XML
@@ -34,22 +35,75 @@ describe Freight::UspsCalculator do
       expect(calculator.rate).to eq 7.35
     end
 
-    it 'sends a request with the correct order weight' do
-      expect(HTTParty).to \
-        receive(:get).
-        with(usps_param('Pounds', '1')).
-        and_return(http_response)
+    tests = [
+      {
+        css: 'Service',
+        expected: 'PRIORITY',
+        description: 'service'
+      },
+      {
+        css: 'Pounds',
+        expected: '2',
+        description: 'weight (pounds)'
+      },
+      {
+        css: 'Ounces',
+        expected: '10',
+        description: 'weight (ounces)'
+      },
+      {
+        css: 'ZipOrigination',
+        expected: '37086',
+        description: 'origination postal code'
+      },
+      {
+        css: 'ZipDestination',
+        expected: '75225',
+        description: 'destination postal code'
+      },
+      {
+        css: 'Container',
+        expected: 'RECTANGULAR',
+        description: 'container'
+      },
+      {
+        css: 'Size',
+        expected: 'LARGE',
+        description: 'size'
+      },
+      {
+        css: 'Width',
+        expected: '12',
+        description: 'width'
+      },
+      {
+        css: 'Height',
+        expected: '12',
+        description: 'height'
+      },
+      {
+        css: 'Length',
+        expected: '12',
+        description: 'length'
+      },
+      {
+        css: 'Girth',
+        expected: '48',
+        description: 'grith'
+      }
+    ]
+    tests.select{|t| t[:expected]}.each do |test|
+      it "sends a request with the correct #{test[:description]}" do
+        expect(HTTParty).to \
+          receive(:get).
+          with(usps_param(test[:css], test[:expected])).
+          and_return(http_response)
 
-      calculator.rate
+        calculator.rate
+      end
     end
-
-    it 'sends a request with the correct origination postal code'
-    it 'sends a request with the correct destination postal code'
-    it 'sends a request with the correct container'
-    it 'sends a request with the correct size'
-    it 'sends a request with the correct width'
-    it 'sends a request with the correct length'
-    it 'sends a request with the correct height'
-    it 'sends a request with the correct girth'
+    tests.reject{|t| t[:expected]}.each do |test|
+      it "sends a request with the correct #{test[:description]}"
+    end
   end
 end

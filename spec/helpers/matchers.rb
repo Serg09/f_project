@@ -25,7 +25,7 @@ RSpec::Matchers.define :usps_param do |css, expected|
   end
 
   description do
-    "have value '#{expected}' in the XML at '#{css}'"
+    "XML param value '#{expected}' in the XML at '#{css}'"
   end
 
   failure_message do |actual|
