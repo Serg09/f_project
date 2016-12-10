@@ -3,7 +3,11 @@ require 'rails_helper'
 describe Freight::UspsCalculator do
   let (:product) { FactoryGirl.create :product, weight: 1.3 }
   let (:address) { FactoryGirl.create :address, postal_code: '75225' }
-  let (:order) { FactoryGirl.create(:order, shipping_address: address) }
+  let (:ship_method) { FactoryGirl.create :ship_method }
+  let (:order) do
+    FactoryGirl.create(:order, shipping_address: address,
+                               ship_method: ship_method)
+  end
   let (:calculator) { Freight::UspsCalculator.new order }
   let (:response_body) do
     <<-XML
@@ -36,11 +40,6 @@ describe Freight::UspsCalculator do
     end
 
     tests = [
-      {
-        css: 'Service',
-        expected: 'PRIORITY',
-        description: 'service'
-      },
       {
         css: 'Pounds',
         expected: '2',
@@ -104,6 +103,57 @@ describe Freight::UspsCalculator do
     end
     tests.reject{|t| t[:expected]}.each do |test|
       it "sends a request with the correct #{test[:description]}"
+    end
+
+    # USPS1P   USPS Priority
+    # USPSBP   USPS Media
+    # USPSBPAH USPS AK/HI
+    context 'when ship method "USPS1P" is selected' do
+      let (:ship_method) { FactoryGirl.create :ship_method, abbreviation: 'USPS1P' }
+      it "sends a request with the correct service" do
+        expect(HTTParty).to \
+          receive(:get).
+          with(usps_param('Service', 'PRIORITY')).
+          and_return(http_response)
+
+        calculator.rate
+      end
+    end
+
+    context 'when ship method "USPS1P" is selected' do
+      let (:ship_method) { FactoryGirl.create :ship_method, abbreviation: 'USPS1P' }
+      it "sends a request with the 'PRIORITY' service" do
+        expect(HTTParty).to \
+          receive(:get).
+          with(usps_param('Service', 'PRIORITY')).
+          and_return(http_response)
+
+        calculator.rate
+      end
+    end
+
+    context 'when ship method "USPSBP" is selected' do
+      let (:ship_method) { FactoryGirl.create :ship_method, abbreviation: 'USPSBP' }
+      it "sends a request with the 'MEDIA' service" do
+        expect(HTTParty).to \
+          receive(:get).
+          with(usps_param('Service', 'MEDIA')).
+          and_return(http_response)
+
+        calculator.rate
+      end
+    end
+
+    context 'when ship method "USPSBPAH" is selected' do
+      let (:ship_method) { FactoryGirl.create :ship_method, abbreviation: 'USPSBPAH' }
+      it "sends a request with the 'PRIORITY' service" do
+        expect(HTTParty).to \
+          receive(:get).
+          with(usps_param('Service', 'PRIORITY')).
+          and_return(http_response)
+
+        calculator.rate
+      end
     end
   end
 end

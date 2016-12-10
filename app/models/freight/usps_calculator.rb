@@ -36,11 +36,17 @@ module Freight
         }.map{|k,v| "#{k}=#{v}"}.join('&')
     end
 
+    def service
+      order.ship_method.abbreviation == 'USPSBP' ?
+        'MEDIA' :
+        'PRIORITY'
+    end
+
     def request_xml
       Nokogiri::XML::Builder.new do |xml|
         xml.RateV4Request(USERID: @@config.username) do
           xml.Package(ID: SecureRandom.uuid) do
-            xml.Service 'PRIORITY' # TODO get this from the shipping method
+            xml.Service service
             xml.ZipOrigination @@config.origination_postal_code
             xml.ZipDestination order.shipping_address.postal_code
             xml.Pounds total_weight.floor
