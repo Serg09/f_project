@@ -13,11 +13,7 @@ module Freight
       self.order = order
     end
 
-    def rate
-      @rate ||= calculate_rate
-    end
-
-    private
+    protected
 
     def calculate_rate
       response = HTTParty.get(uri.to_s)
@@ -25,6 +21,8 @@ module Freight
       return xml.at_css('Rate').content.to_f if xml.at_css('Rate')
       raise "Unable to get the rate from USPS: #{xml.at_css('Error/Description').content}"
     end
+
+    private
 
     def uri
       URI::HTTP.build \
