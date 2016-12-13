@@ -42,6 +42,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
       end
     end
     @order.save!
+    @order.update_freight_charge!
     render json: @order
   end
 

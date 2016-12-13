@@ -38,7 +38,21 @@ class OrdersController < ApplicationController
   def update
     if can? :update, @order
       @order.update_attributes order_params
-      flash[:notice] = 'The order was updated successfully.' if @order.save
+      if params[:shipping_address]
+        if @order.shipping_address_id
+          @order.shipping_address.update_attributes shipping_address_params
+          @order.shipping_address.save!
+        else
+          shipping_address = Address.new shipping_address_params
+          shipping_address.save!
+
+          @order.shipping_address = shipping_address
+        end
+      end
+      if @order.save
+        flash[:notice] = 'The order was updated successfully.'
+        @order.update_freight_charge!
+      end
       respond_with @order, location: orders_path(status: :incipient)
     else
       redirect_to order_path(@order), alert: 'This order cannot be edited.'
@@ -118,7 +132,8 @@ class OrdersController < ApplicationController
              :client_order_id,
              :customer_name,
              :customer_email,
-             :telephone).
+             :telephone,
+             :ship_method_id).
       tap do |attr|
         if attr[:order_date].present?
           attr[:order_date] = Chronic.parse(attr[:order_date])
