@@ -3,10 +3,20 @@ require 'uri'
 
 module Freight
   class UspsCalculator < BaseCalculator
-    def self.configure
-      klass = Struct.new('UspsCalculatorConfiguration', :origination_postal_code, :username)
-      @@config = klass.new(nil, nil)
-      yield @@config
+    class Configuration
+      attr_accessor :origination_postal_code, :username
+    end
+
+    class << self
+      attr_writer :config
+
+      def config
+        @config ||= Configuration.new
+      end
+
+      def configure
+        yield config
+      end
     end
 
     def initialize(order)
@@ -25,8 +35,9 @@ module Freight
     private
 
     def uri
-      URI::HTTP.build \
-        host: 'production.shippingapiscom',
+      @uri ||= URI::HTTP.build \
+        protocol: 'http',
+        host: 'production.shippingapis.com',
         path: '/ShippingApi.dll',
         query: {
           API: 'RateV4',
@@ -42,10 +53,10 @@ module Freight
 
     def request_xml
       Nokogiri::XML::Builder.new do |xml|
-        xml.RateV4Request(USERID: @@config.username) do
+        xml.RateV4Request(USERID: self.class.config.username) do
           xml.Package(ID: SecureRandom.uuid) do
             xml.Service service
-            xml.ZipOrigination @@config.origination_postal_code
+            xml.ZipOrigination self.class.config.origination_postal_code
             xml.ZipDestination order.shipping_address.postal_code
             xml.Pounds total_weight.floor
             xml.Ounces ((total_weight % 1) * 16).round
