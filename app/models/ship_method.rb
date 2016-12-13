@@ -25,12 +25,6 @@ class ShipMethod < ActiveRecord::Base
   FREIGHT_CHARGE_SKU = 'FREIGHT'
 
   def calculate_charge(order)
-    calculator.calculate order
-  end
-
-  private
-
-  def calculator
-    @calculator ||= calculator_class.constantize.new
+    calculator_class.constantize.new(order).rate
   end
 end
