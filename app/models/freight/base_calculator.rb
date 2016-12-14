@@ -15,7 +15,10 @@ module Freight
     def total_weight
       @total_weight ||= order.items.reduce(0) do |sum, item|
         product = Product.find_by_sku(item.sku)
-        sum + (product.weight * item.quantity)
+        item_weight = product.present? ?
+          product.weight * item.quantity :
+          0
+        sum + item_weight
       end
     end
   end
