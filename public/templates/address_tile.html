@@ -33,7 +33,12 @@
       <div class="col-md-3">
         <div class="form-group" id="postal-code-group">
           <label class="control-label" for="postal-code">Postal Code</label>
-          <input id="postal-code" type="text" class="form-control" ng-model="order.shipping_address.postal_code" required />
+          <input id="postal-code"
+                 type="text"
+                 class="form-control"
+                 ng-blur="updateFreightCharge()"
+                 ng-model="order.shipping_address.postal_code"
+                 required />
         </div>
       </div>
     </div>
@@ -52,6 +57,16 @@
           <input id="telephone" type="text" class="form-control" ng-model="order.telephone" required />
         </div>
       </div>
+    </div>
+    <div class="form-group" id="ship-method-group">
+      <label for="ship-method">Ship Method</label>
+      <select id="ship-method"
+              class="form-control"
+              ng-change="updateFreightCharge()"
+              ng-model="order.ship_method_id"
+              required>
+        <option ng-repeat="shipMethod in shipMethods" value="{{shipMethod.id}}">{{ shipMethod.description }}</option>
+      </select>
     </div>
   </form>
 </div>
