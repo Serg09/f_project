@@ -32,6 +32,9 @@
         %th Shipping address
         %td= render 'shared/address', address: @order.shipping_address
       %tr
+        %th Ship Method
+        %td= @order.ship_method.description
+      %tr
         %th Telephone
         %td= @order.telephone
       %tr
