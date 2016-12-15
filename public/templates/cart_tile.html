@@ -17,7 +17,7 @@
     </tr>
     <tr class="summary-row">
       <td colspan="4" class="number-column text-right">Total</td>
-      <td ng-bind="orderTotal()" class="number-column text-right"></td>
+      <td ng-bind="orderTotal() | currency:'USD $'" class="number-column text-right"></td>
     </tr>
   </table>
 </div>
