@@ -64,9 +64,8 @@
               class="form-control"
               ng-change="updateFreightCharge()"
               ng-model="order.ship_method_id"
-              required>
-        <option ng-repeat="shipMethod in shipMethods" value="{{shipMethod.id}}">{{ shipMethod.description }}</option>
-      </select>
+              ng-options="shipMethod.id as shipMethod.description for shipMethod in shipMethods track by shipMethod.id"
+              required />
     </div>
   </form>
 </div>
