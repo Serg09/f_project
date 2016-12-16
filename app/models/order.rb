@@ -139,7 +139,7 @@ class Order < ActiveRecord::Base
         freight_charge_item.update_attribute :unit_price, freight_charge
       else
         items.create! sku: ShipMethod::FREIGHT_CHARGE_SKU,
-                      description: 'Shipping',
+                      description: 'Shipping & Handling',
                       quantity: 1,
                       unit_price: freight_charge
       end
