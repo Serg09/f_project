@@ -34,5 +34,6 @@ Feature: Add an order item
     Then I should see "The order item was created successfully." within the notification area
     And I should see "Edit order" within the page title
     And I should see the following order item table
-      | SKU    | Description   | Unit price | Qty | Ext. price | Total price |
-      | 123456 | Deluxe Widget |      19.99 |   2 |      39.98 |       39.98 |
+      | SKU     | Description         | Unit price | Qty | Ext. price | Total price |
+      | 123456  | Deluxe Widget       |      19.99 |   2 |      39.98 |       39.98 |
+      | FREIGHT | Shipping & Handling |       5.00 |   1 |       5.00 |        5.00 |

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe OrderItemsController, type: :controller do
   let (:product) { FactoryGirl.create(:product) }
-  let (:order) { FactoryGirl.create(:incipient_order) }
+  let (:order) { FactoryGirl.create(:incipient_order, ship_method: nil) }
   let (:order_item) { FactoryGirl.create(:order_item, order: order,
                                                       quantity: 1) }
   let (:attributes) do

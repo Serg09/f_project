@@ -10,4 +10,8 @@
   =f.label :price, class: 'control-label'
   =f.number_field :price, max: 20, class: 'form-control', step: 0.01
   =help_blocks(product, :price)
+.form-group{ class: form_group_class(product, :weight) }
+  =f.label :weight, class: 'control-label'
+  =f.number_field :weight, max: 20, class: 'form-control', step: 0.01
+  =help_blocks(product, :weight)
 =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the product.'

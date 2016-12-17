@@ -70,11 +70,15 @@
       // --------------------
       // Crowdscribed Service
       // --------------------
+      this.getShipMethods = function() {
+        var url = csConfiguration.getHost() + '/api/v1/ship_methods';
+        return $http.get(url, httpConfig);
+      };
       this.getProduct = function(sku) {
         // TODO Put in the proper domain name
         var url = csConfiguration.getHost() + '/api/v1/products/' + sku;
         return $http.get(url, httpConfig);
-      }
+      };
       this.getPaymentToken = function() {
         var url = csConfiguration.getHost() + '/api/v1/payments/token';
         return $http.get(url, httpConfig);
@@ -532,6 +536,36 @@
       ];
     }]) // paymentController
     .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
+
+      // Look up ship methods
+      cs.getShipMethods().then(function(response) {
+        $rootScope.shipMethods = response.data;
+      },
+      function (error) {
+        console.log("Unable to get the ship methods from the service.");
+        console.log(error);
+      });
+
+      $rootScope.updateFreightCharge = function() {
+        order = $rootScope.order;
+        if (order != null &&
+            order.ship_method_id != null &&
+            order.shipping_address.postal_code != null &&
+            order.items.length != 0) {
+          // it would also be good to know if the order has changed before
+          // we start calling the service
+
+          // maybe we need to block the app while this call happens?
+          cs.updateOrder($rootScope.order).then(function(response) {
+            $rootScope.order = response.data;
+          },
+          function(error) {
+            console.log("Unable to update the order to get an updated freight charge.");
+            console.log(error);
+          });
+        }
+      };
+
       // Find the existing order or create a new order
       var orderId = $cookies.get('order_id');
 

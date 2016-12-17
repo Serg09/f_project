@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :products, only: [:index], defaults: {format: :json}
       get 'products/:sku', to: 'products#show', defaults: {format: :json}
+      resources :ship_methods, only: [:index], defaults: {format: :json}
       resources :orders, only: [:index, :show, :create, :update], defaults: {format: :json} do
         resources :order_items, only: [:index, :create], path: 'items', defaults: {format: :json}
         resources :payments, only: [:create], defaults: {format: :json}

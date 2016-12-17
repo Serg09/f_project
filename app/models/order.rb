@@ -17,7 +17,6 @@
 #  ship_method_id      :integer
 #  shipping_address_id :integer
 #  confirmation        :string(32)
-#  freight_charge      :decimal(9, 2)
 #
 
 require 'securerandom'
@@ -140,7 +139,7 @@ class Order < ActiveRecord::Base
         freight_charge_item.update_attribute :unit_price, freight_charge
       else
         items.create! sku: ShipMethod::FREIGHT_CHARGE_SKU,
-                      description: 'Shipping',
+                      description: 'Shipping & Handling',
                       quantity: 1,
                       unit_price: freight_charge
       end

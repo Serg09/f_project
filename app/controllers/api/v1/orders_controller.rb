@@ -21,10 +21,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
 
   def show
     authorize! :show, @order
-    render json: @order.as_json(include: [
-      :shipping_address,
-      items: {methods: [:extended_price]}
-    ])
+    render json: order_json
   end
 
   def update
@@ -42,7 +39,8 @@ class Api::V1::OrdersController < Api::V1::BaseController
       end
     end
     @order.save!
-    render json: @order
+    @order.update_freight_charge!
+    render json: order_json
   end
 
   def submit
@@ -60,6 +58,13 @@ class Api::V1::OrdersController < Api::V1::BaseController
 
   def load_order
     @order = Order.find(params[:id])
+  end
+
+  def order_json
+    @order.as_json(include: [
+      :shipping_address,
+      items: {methods: [:extended_price]}
+    ])
   end
 
   def order_params
