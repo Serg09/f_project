@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Api::V1::OrderItemsController, type: :controller do
   let (:client) { FactoryGirl.create(:client) }
-  let (:order) { FactoryGirl.create(:order, client: client) }
+  let (:order) { FactoryGirl.create(:order, client: client, ship_method: nil) }
   let!(:item) { FactoryGirl.create(:order_item, order: order, quantity: 3) }
   let (:product) { FactoryGirl.create(:product, price: 9.99) }
   let (:attributes) do
