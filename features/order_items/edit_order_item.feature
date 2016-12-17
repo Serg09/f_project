@@ -1,4 +1,3 @@
-@wip
 Feature: Edit an order item
   As an administrator
   In order to correct a mistake
@@ -13,7 +12,7 @@ Feature: Edit an order item
     And client "ACME Publishing" has an order on 3/2/2016
     And order for client "ACME Publishing" on 3/2/2016 has the following items
       | SKU    | Quantity |
-      | 123456 |         2|
+      | 123456 |        2 |
 
     Given there is a user with email "john@doe.com" and password "please01"
     And I am signed in as "john@doe.com/please01"
@@ -41,5 +40,6 @@ Feature: Edit an order item
     Then I should see "The order item was updated successfully." within the notification area
     And I should see "Edit order" within the page title
     And I should see the following order item table
-      | SKU    | Description   | Unit price | Qty | Ext. price | Total price |
-      | 123456 | Deluxe Widget |      19.99 |   3 |      59.97 |       59.97 |
+      | SKU     | Description         | Unit price | Qty | Ext. price | Total price |
+      | 123456  | Deluxe Widget       |      19.99 |   3 |      59.97 |       59.97 |
+      | FREIGHT | Shipping & Handling |       5.00 |   1 |       5.00 |        5.00 |

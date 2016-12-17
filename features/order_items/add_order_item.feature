@@ -1,4 +1,3 @@
-@wip
 Feature: Add an order item
   As an administrator
   In order to allow the purchase of a product

@@ -1,4 +1,3 @@
-@wip
 Feature: Remove an order item
   As an administrator
   In order to correct a mistake
@@ -41,4 +40,4 @@ Feature: Remove an order item
     And I should see the following order item table
       | SKU     | Description         | Unit price | Qty | Ext. price | Total price |
       | 234567  | Premium Widget      |      24.99 |   1 |      24.99 |       24.99 |
-      | FREIGHT | Shipping & Handling |       5.00 |   1 |       5.00 |       05.00 |
+      | FREIGHT | Shipping & Handling |       5.00 |   1 |       5.00 |        5.00 |
