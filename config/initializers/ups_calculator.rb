@@ -2,7 +2,7 @@ Freight::UpsCalculator.configure do |config|
   ADDRESS = Struct.new :line_1, :line_2, :city, :state, :postal_code, :country_code
   config.company_address = ADDRESS.new '1234 Test St',
                                        'Suite 100',
-                                       'Portland', 
+                                       'Portland',
                                        'OR',
                                        '99999',
                                        'US'
