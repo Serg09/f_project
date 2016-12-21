@@ -10,7 +10,7 @@ describe Freight::UpsCalculator do
 
   describe '#rate' do
     let (:calculator) { Freight::UpsCalculator.new(order) }
-    let (:http_response) do
+    let (:response_body) do
       <<-JSON
       {
         "RateResponse": {
@@ -88,6 +88,8 @@ describe Freight::UpsCalculator do
       }
       JSON
     end
+    let (:http_response) { double 'HttpResponse', body: response_body }
+
     before do
       expect(HTTParty).to receive(:post).
         and_return(http_response)
