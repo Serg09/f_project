@@ -6,7 +6,9 @@ module Freight
         :access_key,
         :rate_service_url,
         :company_name,
-        :account_number
+        :account_number,
+        :company_address,
+        :origination_company
     end
 
     class << self
