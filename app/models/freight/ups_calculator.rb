@@ -36,8 +36,13 @@ module Freight
     end
 
     def fetch_rate
-      response = HTTParty.post(config.rate_service_url, request_body)
-      puts response.inspect
+      http_response = HTTParty.post(config.rate_service_url, request_body)
+      data = JSON.parse(http_response.body, symbolize_names: true)
+      BigDecimal.new data.dig(:RateResponse,
+                              :RatedShipment,
+                              :RatedPackage,
+                              :TotalCharges,
+                              :MonetaryValue)
     end
 
     def ups_security
