@@ -59,14 +59,7 @@ module Freight
 
     def shipper
       {
-        "Name": config.company_name,
-        "ShipperNumber": config.account_number,
         "Address": {
-          "AddressLine": [
-            config.company_address.line_1
-          ],
-          "City": config.company_address.city,
-          "StateProvinceCode": config.company_address.state,
           "PostalCode": config.company_address.postal_code,
           "CountryCode": config.company_address.country_code,
         }
@@ -75,14 +68,7 @@ module Freight
 
     def ship_to
       {
-        "Name": @order.shipping_address.recipient,
         "Address": {
-          "AddressLine": [
-            @order.shipping_address.line_1,
-            @order.shipping_address.line_2
-          ].compact,
-          "City": @order.shipping_address.city,
-          "StateProvinceCode": @order.shipping_address.state,
           "PostalCode": @order.shipping_address.postal_code,
           "CountryCode": @order.shipping_address.country_code,
         }
@@ -95,14 +81,7 @@ module Freight
 
     def ship_from
       {
-        "Name": origination_company,
         "Address": {
-          "AddressLine": [
-            origination_company.address.line_1,
-            origination_company.address.line_2
-          ].compact,
-          "City": origination_company.address.city,
-          "StateProvinceCode": origination_company.address.state,
           "PostalCode": origination_company.address.postal_code,
           "CountryCode": origination_company.address.country_code
         }
