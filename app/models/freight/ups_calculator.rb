@@ -36,7 +36,13 @@ module Freight
     end
 
     def fetch_rate
-      http_response = HTTParty.post(config.rate_service_url, request_body)
+      http_response = HTTParty.post \
+        config.rate_service_url,
+        body: request_body,
+        headers: {
+          'Content-Type' => 'application/json',
+          'Accept' => 'application/json'
+        }
       data = JSON.parse(http_response.body, symbolize_names: true)
       BigDecimal.new data.dig(:RateResponse,
                               :RatedShipment,
@@ -58,6 +64,7 @@ module Freight
     end
 
     def shipper
+      rails 'Freight::UpsCalculator configuration is incomplete: company_address is missing' unless config.company_address
       {
         "Address": {
           "PostalCode": config.company_address.postal_code,
