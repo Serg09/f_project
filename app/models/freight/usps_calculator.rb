@@ -8,8 +8,6 @@ module Freight
     end
 
     class << self
-      attr_writer :config
-
       def config
         @config ||= Configuration.new
       end
