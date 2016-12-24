@@ -44,6 +44,9 @@ module Freight
           'Accept' => 'application/json'
         }
       data = JSON.parse(http_response.body, symbolize_names: true)
+      if data[:Error]
+        raise "Unable to get the rate from UPS: #{data[:Error][:Description]}"
+      end
       BigDecimal.new data.dig(:RateResponse,
                               :RatedShipment,
                               :RatedPackage,
@@ -112,10 +115,10 @@ module Freight
         },
         "PackageWeight": {
           "UnitOfMeasurement": {
-            "Code": "Lbs",
+            "Code": "LBS",
             "Description": "pounds"
           },
-          "Weight": total_weight
+          "Weight": total_weight.to_s
         }
       }
     end
@@ -129,10 +132,7 @@ module Freight
           "Code": "03",
           "Description": "Service Code Description"
         },
-        "Package": package,
-        "ShipmentRatingOptions": {
-          "NegotiatedRatesIndicator": ""
-        }
+        "Package": package
       }
     end
 
@@ -152,7 +152,7 @@ module Freight
       {
         "UPSSecurity": ups_security,
         "RateRequest": rate_request
-      }
+      }.to_json
     end
   end
 end
