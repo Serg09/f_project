@@ -43,9 +43,6 @@ module Freight
           'Content-Type' => 'application/json',
           'Accept' => 'application/json'
         }
-
-      Rails.logger.debug "response body: #{http_response.body}"
-
       data = JSON.parse(http_response.body, symbolize_names: true)
       raise_on_error data
       BigDecimal.new data.dig(:RateResponse,
@@ -161,7 +158,7 @@ module Freight
     def raise_on_error(data)
       types = {
         Error: [:Error, :Description],
-        Fault: [:Fault, :detail, :ErrorDetail, :PrimaryErrorCode, :Description]
+        Fault: [:Fault, :detail, :Errors, :ErrorDetail, :PrimaryErrorCode, :Description]
       }
       types.each_pair do |k, v|
         if data[k]
