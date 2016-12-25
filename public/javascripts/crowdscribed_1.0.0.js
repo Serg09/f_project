@@ -643,7 +643,10 @@
       return this.settings[key];
     },
     getHost: function() {
-      if (window.location.hostname === 'localhost') {
+      var configuredValue = this.settings['fulfillmentHost'];
+      if (configuredValue != null) {
+        return this.settings['fulfillmentHost']
+      } else if (window.location.hostname === 'localhost') {
         return 'http://localhost:3030';
       } else {
         return 'https://fulfillment.crowdscribed.com'
