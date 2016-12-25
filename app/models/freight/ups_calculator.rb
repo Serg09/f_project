@@ -65,7 +65,7 @@ module Freight
     end
 
     def shipper
-      rails 'Freight::UpsCalculator configuration is incomplete: company_address is missing' unless config.company_address
+      raise 'Freight::UpsCalculator configuration is incomplete: company_address is missing' unless config.company_address
       {
         "Address": {
           "PostalCode": config.company_address.postal_code,
