@@ -43,6 +43,9 @@ module Freight
           'Content-Type' => 'application/json',
           'Accept' => 'application/json'
         }
+
+      Rails.logger.debug "response body: #{http_response.body}"
+
       data = JSON.parse(http_response.body, symbolize_names: true)
       if data[:Error]
         raise "Unable to get the rate from UPS: #{data[:Error][:Description]}"
