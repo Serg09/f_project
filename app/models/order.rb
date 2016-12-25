@@ -137,6 +137,7 @@ class Order < ActiveRecord::Base
     if freight_charge.present?
       if freight_charge_item.present?
         freight_charge_item.update_attribute :unit_price, freight_charge
+        items(true)
       else
         items.create! sku: ShipMethod::FREIGHT_CHARGE_SKU,
                       description: 'Shipping & Handling',
