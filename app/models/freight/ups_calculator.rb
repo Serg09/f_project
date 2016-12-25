@@ -47,9 +47,7 @@ module Freight
       Rails.logger.debug "response body: #{http_response.body}"
 
       data = JSON.parse(http_response.body, symbolize_names: true)
-      if data[:Error]
-        raise "Unable to get the rate from UPS: #{data[:Error][:Description]}"
-      end
+      raise_on_error data
       BigDecimal.new data.dig(:RateResponse,
                               :RatedShipment,
                               :RatedPackage,
@@ -156,6 +154,20 @@ module Freight
         "UPSSecurity": ups_security,
         "RateRequest": rate_request
       }.to_json
+    end
+
+    # Accepts parsed JSON from the web service and raises
+    # an error if the data indicates an error has ocurred
+    def raise_on_error(data)
+      types = {
+        Error: [:Error, :Description],
+        Fault: [:Fault, :detail, :ErrorDetail, :PrimaryErrorCode, :Description]
+      }
+      types.each_pair do |k, v|
+        if data[k]
+          raise "Unable to get the rate from UPS: #{data.dig *v}"
+        end
+      end
     end
   end
 end
