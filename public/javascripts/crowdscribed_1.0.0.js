@@ -644,6 +644,10 @@
     },
     getHost: function() {
       var configuredValue = this.settings['fulfillmentHost'];
+
+      console.log("getHost");
+      console.log(configuredValue);
+
       if (configuredValue != null) {
         return this.settings['fulfillmentHost']
       } else if (window.location.hostname === 'localhost') {
