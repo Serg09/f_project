@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161217000340) do
+ActiveRecord::Schema.define(version: 20161228042052) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -177,12 +177,13 @@ ActiveRecord::Schema.define(version: 20161217000340) do
   add_index "responses", ["payment_id"], name: "index_responses_on_payment_id", using: :btree
 
   create_table "ship_methods", force: :cascade do |t|
-    t.integer  "carrier_id",                   null: false
-    t.string   "description",      limit: 100, null: false
-    t.string   "abbreviation",     limit: 20,  null: false
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-    t.string   "calculator_class", limit: 256, null: false
+    t.integer  "carrier_id",                                   null: false
+    t.string   "description",      limit: 100,                 null: false
+    t.string   "abbreviation",     limit: 20,                  null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.string   "calculator_class", limit: 256,                 null: false
+    t.boolean  "active",                       default: false, null: false
   end
 
   add_index "ship_methods", ["abbreviation"], name: "index_ship_methods_on_abbreviation", unique: true, using: :btree

@@ -24,6 +24,8 @@ class ShipMethod < ActiveRecord::Base
 
   FREIGHT_CHARGE_SKU = 'FREIGHT'
 
+  scope :active, ->{ where(active: true) }
+
   def calculate_charge(order)
     calculator_class.constantize.new(order).rate
   end
