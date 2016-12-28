@@ -13,7 +13,6 @@ usps = Carrier.find_by(name: 'USPS') || Carrier.create(name: 'USPS')
   { abbreviation: 'USPSBPAH', description: 'USPS AK/HI'   , active: false },
 ].
   lazy.
-  reject{|a| ShipMethod.find_by(abbreviation: a[:abbreviation])}.
   map do |a|
     a.merge carrier_id: usps.id, calculator_class: 'Freight::UspsCalculator'
   end.
@@ -39,7 +38,6 @@ ups = Carrier.find_by(name: 'UPS') || Carrier.create(name: 'UPS')
   { abbreviation: 'UPSSDAR' , description: 'UPS 2nd Day'                , active: true }
 ].
   lazy.
-  reject{|a| ShipMethod.find_by(abbreviation: a[:abbreviation])}.
   map do |a|
     a.merge carrier_id: ups.id, calculator_class: 'Freight::UpsCalculator'
   end.
