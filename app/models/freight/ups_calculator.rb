@@ -21,6 +21,23 @@ module Freight
       end
     end
 
+    Service = Struct.new(:code, :description)
+    SERVICES = {
+      'UPSNDAR' => Service.new('01', 'Next Day Air'),
+      'UPSSDAR'  => Service.new('02', '2nd Day Air'),
+      'UPSGSRNA' => Service.new('03', 'Ground'),
+      'UPS3DAS'  => Service.new('12', '3 Day Select'),
+      #''         => Service.new('13', 'Next Day Air Saver'),
+      #''         => Service.new('14', 'UPS Next Day Air Early'),
+      #''         => Service.new('59', '2nd Day Air A.M.'),
+      #''         => Service.new('07', 'Worldwide Express'),
+      #''         => Service.new('08', 'Worldwide Expedited'),
+      #''         => Service.new('11', 'Standard'),
+      #''         => Service.new('54', 'Worldwide Express Plus'),
+      #''         => Service.new('65', 'Saver'),
+      #''         => Service.new('96', 'UPS Worldwide Express Freight'),
+    }
+
     def initialize(order)
       @order = order
     end
@@ -122,13 +139,14 @@ module Freight
     end
 
     def shipment
+      service = SERVICES[@order.ship_method.abbreviation]
       {
         "Shipper": shipper,
         "ShipTo": ship_to,
         "ShipFrom": ship_from,
         "Service": {
-          "Code": "03",
-          "Description": "Service Code Description"
+          "Code": service.code,
+          "Description": service.description
         },
         "Package": package
       }
