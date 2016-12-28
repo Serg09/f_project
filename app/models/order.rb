@@ -135,6 +135,7 @@ class Order < ActiveRecord::Base
   def update_freight_charge!
     freight_charge = ship_method.try(:calculate_charge, self)
     if freight_charge.present?
+      freight_charge = freight_charge.ceil
       if freight_charge_item.present?
         freight_charge_item.update_attribute :unit_price, freight_charge
         items(true)
