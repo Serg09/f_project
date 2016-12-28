@@ -11,9 +11,9 @@
     <tr ng-repeat="item in order.items">
       <td ng-bind="item.sku"></td>
       <td ng-bind="item.description"></td>
-      <td ng-bind="item.unit_price" class="number-column text-right"></td>
+      <td ng-bind="item.unit_price | number:2" class="number-column text-right"></td>
       <td ng-bind="item.quantity" class="number-column text-right"></td>
-      <td ng-bind="item.extended_price" class="number-column text-right"></td>
+      <td ng-bind="item.extended_price | number:2" class="number-column text-right"></td>
     </tr>
     <tr class="summary-row">
       <td colspan="4" class="number-column text-right">Total</td>
