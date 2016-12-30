@@ -4,5 +4,6 @@ FactoryGirl.define do
     description { Faker::Company.buzzword }
     abbreviation { SecureRandom.hex(10) }
     calculator_class 'TestShipMethodCalculator'
+    active true
   end
 end

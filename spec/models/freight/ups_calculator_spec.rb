@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 describe Freight::UpsCalculator do
-  let (:order) { FactoryGirl.create :order }
+  let (:ship_method) { FactoryGirl.create :ship_method, abbreviation: 'UPSGSRNA' }
+  let (:order) { FactoryGirl.create :order, ship_method: ship_method }
 
   it 'can be created with an order' do
     calculator = Freight::UpsCalculator.new(order)

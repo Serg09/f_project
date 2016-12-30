@@ -26,6 +26,7 @@ class OrderItem < ActiveRecord::Base
   has_many :shipment_items
 
   before_create :set_line_item_number
+  after_destroy :reset_line_numbers
 
   validates_presence_of :order_id,
                         :sku,
@@ -105,5 +106,14 @@ class OrderItem < ActiveRecord::Base
 
   def set_line_item_number
     self.line_item_no = order.items.count + 1
+  end
+
+  def reset_line_numbers
+    line_item_no = 0
+    order.items.each do |item|
+      line_item_no += 1
+      item.line_item_no = line_item_no
+      item.save!
+    end
   end
 end

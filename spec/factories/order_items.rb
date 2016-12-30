@@ -1,9 +1,6 @@
 FactoryGirl.define do
   factory :order_item do
     order
-    sequence :line_item_no do |n|
-      n
-    end
     sku { Faker::Code.isbn }
     description { Faker::Book.title }
     quantity { Faker::Number.between(1, 5) }
