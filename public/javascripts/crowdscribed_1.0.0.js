@@ -111,6 +111,10 @@
         };
         return $http.post(url, data, httpConfig);
       };
+      this.updateItem = function(item) {
+        var url = CROWDSCRIBED_HOST + '/api/v1/items/' + item.id;
+        return $http.patch(url, { item: item }, httpConfig);
+      };
       this.submitOrder = function(orderId) {
         var url = CROWDSCRIBED_HOST + '/api/v1/orders/' + orderId + '/submit';
         return $http.patch(url, {order: {}}, httpConfig);
@@ -564,6 +568,20 @@
             console.log(error);
           });
         }
+      };
+
+      $rootScope.updateItem = function(item) {
+        cs.updateItem(item).then(function(updatedItem) {
+          cs.getOrder($rootScope.order.id).then(function(response) {
+            $rootScope.order = response.data;
+          }, function(error) {
+            console.log("Unable to get the updated order after updating an item.");
+            console.log(error);
+          });
+        }, function(error) {
+          console.log("Unable to update the item.");
+          console.log(error);
+        });
       };
 
       // Find the existing order or create a new order

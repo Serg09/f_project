@@ -2,17 +2,19 @@
   <h2 class="cart-header">Items</h2>
   <table class="table table-striped">
     <tr class="header-row">
-      <th class="text-column">SKU</th>
-      <th class="text-column">Description</th>
-      <th class="number-column text-right">Price</th>
-      <th class="number-column text-right">Qty.</th>
-      <th class="number-column text-right">Total</th>
+      <th class="col-sm-2 text-column">SKU</th>
+      <th class="col-sm-4 text-column">Description</th>
+      <th class="col-sm-2 number-column text-right">Price</th>
+      <th class="col-sm-2 number-column text-right">Qty.</th>
+      <th class="col-sm-2 number-column text-right">Total</th>
     </tr>
     <tr ng-repeat="item in order.items">
       <td ng-bind="item.sku"></td>
       <td ng-bind="item.description"></td>
       <td ng-bind="item.unit_price | number:2" class="number-column text-right"></td>
-      <td ng-bind="item.quantity" class="number-column text-right"></td>
+      <td>
+        <input class="form-control" size="3" type="number" ng-model="item.quantity" step="1" min="1" max="999" ng-change="updateItem(item)" />
+      </td>
       <td ng-bind="item.extended_price | number:2" class="number-column text-right"></td>
     </tr>
     <tr class="summary-row">
