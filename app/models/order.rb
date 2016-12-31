@@ -24,7 +24,7 @@ require 'securerandom'
 class Order < ActiveRecord::Base
   include AASM
 
-  has_many :items, class_name: 'OrderItem'
+  has_many :items, ->{order(:line_item_no).distinct}, class_name: 'OrderItem'
   has_many :shipments
   has_many :payments
   belongs_to :shipping_address, class_name: 'Address'
@@ -109,7 +109,9 @@ class Order < ActiveRecord::Base
   end
 
   def all_items_shipped?
-    items.map(&:shipped?).all?
+    items.
+      select(&:standard_item?).
+      map(&:shipped?).all?
   end
 
   def updatable?
@@ -133,7 +135,7 @@ class Order < ActiveRecord::Base
   end
 
   def update_freight_charge!
-    freight_charge = ship_method.try(:calculate_charge, self)
+    freight_charge = calculate_freight_charge
     if freight_charge.present?
       freight_charge = freight_charge.ceil
       if freight_charge_item.present?
@@ -150,7 +152,26 @@ class Order < ActiveRecord::Base
     end
   end
 
+  def reset_line_numbers
+    line_item_no = 0
+    items.select(&:standard_item?).each do |item|
+      line_item_no += 1
+      item.line_item_no = line_item_no
+      item.save!
+    end
+    items.select{|i| !i.standard_item?}.each do |item|
+      line_item_no += 1
+      item.line_item_no = line_item_no
+      item.save!
+    end
+  end
+
   private
+
+  def calculate_freight_charge
+    return nil unless items.select(&:standard_item?).any?
+    ship_method.try(:calculate_charge, self)
+  end
 
   def freight_charge_item
     @freight_charge_item ||= items.find_by(sku: ShipMethod::FREIGHT_CHARGE_SKU)

@@ -131,6 +131,22 @@ RSpec.describe OrderItem, type: :model do
     end
   end
 
+  describe '#standard_item?' do
+    context 'for a regular, user-added item' do
+      let (:item) { FactoryGirl.create(:order_item, sku: '1234') }
+      it 'returns true' do
+        expect(item.standard_item?).to be true
+      end
+    end
+
+    context 'for a special, system-added item' do
+      let (:item) { FactoryGirl.create(:order_item, sku: ShipMethod::FREIGHT_CHARGE_SKU) }
+      it 'returns false' do
+        expect(item.standard_item?).to be false
+      end
+    end
+  end
+
   describe '#shipment_items' do
     it 'is a list of shipment items associated with the order item' do
       item = OrderItem.new attributes

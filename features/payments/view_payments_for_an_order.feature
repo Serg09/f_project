@@ -20,13 +20,13 @@ Feature: View payments for an order
     When I click "Submitted" within the secondary menu
     And I should see the following order table
       | Order date | Customer name |  Total |
-      |  2/27/2016 | Joe Schmoe    | $21.64 |
+      |  2/27/2016 | Joe Schmoe    | $26.64 |
 
     When I click the view button within the 1st order row
     Then I should see "Order" within the page title
     And I should see the following payment table
       | Payment date | State    | External ID | Amount |
-      |    2/27/2016 | approved | ehsr70f9    | $21.64 |
+      |    2/27/2016 | approved | ehsr70f9    | $26.64 |
 
     When I click the view button within the 1st payment row
     Then I should see "Payment" within the page title

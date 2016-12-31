@@ -2,22 +2,34 @@
   <h2 class="cart-header">Items</h2>
   <table class="table table-striped">
     <tr class="header-row">
-      <th class="text-column">SKU</th>
-      <th class="text-column">Description</th>
-      <th class="number-column text-right">Price</th>
-      <th class="number-column text-right">Qty.</th>
-      <th class="number-column text-right">Total</th>
+      <th class="col-sm-2 text-column">SKU</th>
+      <th class="col-sm-4 text-column">Description</th>
+      <th class="col-sm-2 number-column text-right">Price</th>
+      <th class="col-sm-2 number-column text-right">Qty.</th>
+      <th class="col-sm-2 number-column text-right">Total</th>
+      <th>&nbsp;</th>
     </tr>
     <tr ng-repeat="item in order.items">
       <td ng-bind="item.sku"></td>
       <td ng-bind="item.description"></td>
       <td ng-bind="item.unit_price | number:2" class="number-column text-right"></td>
-      <td ng-bind="item.quantity" class="number-column text-right"></td>
+      <td class="number-column text-right">
+        <span ng-bind="item.quantity" ng-hide="canEditItemQuantity(item)" />
+        <input class="form-control" size="3" type="number" ng-model="item.quantity" step="1" min="1" max="999" ng-change="updateItem(item)" ng-hide="!canEditItemQuantity(item)" />
+      </td>
       <td ng-bind="item.extended_price | number:2" class="number-column text-right"></td>
+      <td>
+        <div class="btn-group">
+          <button ng-hide="!canEditItemQuantity(item)" class="btn btn-xs btn-danger" ng-click="removeItem(item)" title="Click here to remove this item from your cart.">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true" />
+          </button>
+        </div>
+      </td>
     </tr>
     <tr class="summary-row">
       <td colspan="4" class="number-column text-right">Total</td>
       <td ng-bind="orderTotal() | currency:'USD $'" class="number-column text-right"></td>
+      <td>&nbsp;</td>
     </tr>
   </table>
 </div>

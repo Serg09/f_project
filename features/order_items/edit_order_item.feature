@@ -31,6 +31,7 @@ Feature: Edit an order item
     And I should see the following order item table
       | SKU    | Description   | Unit price | Qty | Ext. price | Total price |
       | 123456 | Deluxe Widget |      19.99 |   2 |      39.98 |       39.98 |
+      | FREIGHT | Shipping & Handling |       5.00 |   1 |       5.00 |        5.00 |
 
     When I click the edit button within the 1st order item row
     Then I should see "Edit order item" within the page title

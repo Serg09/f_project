@@ -111,6 +111,14 @@
         };
         return $http.post(url, data, httpConfig);
       };
+      this.updateItem = function(item) {
+        var url = CROWDSCRIBED_HOST + '/api/v1/items/' + item.id;
+        return $http.patch(url, { item: item }, httpConfig);
+      };
+      this.removeItem = function(itemId) {
+        var url = CROWDSCRIBED_HOST + '/api/v1/items/' + itemId;
+        return $http.delete(url, httpConfig);
+      };
       this.submitOrder = function(orderId) {
         var url = CROWDSCRIBED_HOST + '/api/v1/orders/' + orderId + '/submit';
         return $http.patch(url, {order: {}}, httpConfig);
@@ -566,6 +574,37 @@
         }
       };
 
+      var refreshOrder = function() {
+        cs.getOrder($rootScope.order.id).then(function(response) {
+          $rootScope.order = response.data;
+        }, function(error) {
+          console.log("Unable to get the updated order after updating an item.");
+          console.log(error);
+        });
+      };
+
+      $rootScope.updateItem = function(item) {
+        cs.updateItem(item).then(function(updatedItem) {
+          refreshOrder();
+        }, function(error) {
+          console.log("Unable to update the item.");
+          console.log(error);
+        });
+      };
+
+      $rootScope.removeItem = function(item) {
+        cs.removeItem(item.id).then(function() {
+          refreshOrder();
+        }, function(error) {
+          console.log("Unable to remove the item from the order.");
+          console.log(error);
+        });
+      }
+
+      $rootScope.canEditItemQuantity = function(item) {
+        return item.sku != "FREIGHT";
+      };
+
       // Find the existing order or create a new order
       var orderId = $cookies.get('order_id');
 
@@ -599,7 +638,7 @@
           if (sku && !itemIsInOrder(sku)) {
             var quantity = $location.search()['quantity'] || 1;
             cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
-              $rootScope.order.items.push(response.data);
+              refreshOrder();
             }, function(error) {
               console.log("Unable to add the item to the order.");
               console.log(error);

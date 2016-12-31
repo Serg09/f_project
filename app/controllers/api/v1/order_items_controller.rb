@@ -11,7 +11,6 @@ class Api::V1::OrderItemsController < Api::V1::BaseController
   def create
     authorize! :update, @order
     item = @order.add_item params[:item][:sku], params[:item][:quantity] || 1
-    @order.update_freight_charge!
     render json: item.as_json(methods: :extended_price)
   end
 
@@ -19,7 +18,6 @@ class Api::V1::OrderItemsController < Api::V1::BaseController
     authorize! :update, @order_item
     @order_item.update_attributes quantity: params[:item][:quantity]
     @order_item.save
-    @order_item.order.update_freight_charge!
     render json: @order_item
   end
 

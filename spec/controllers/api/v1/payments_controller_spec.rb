@@ -64,7 +64,7 @@ describe Api::V1::PaymentsController do
           post :create, order_id: order, payment: attributes
           result = JSON.parse(response.body, symbolize_names: true)
           expect(result).to include state: 'approved',
-                                    amount: 100
+                                    amount: 105 # includes shipping, added automatically
         end
       end
 
