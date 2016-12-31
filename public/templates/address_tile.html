@@ -64,7 +64,7 @@
               class="form-control"
               ng-change="updateFreightCharge()"
               ng-model="order.ship_method_id"
-              ng-options="shipMethod.id as shipMethod.description for shipMethod in shipMethods track by shipMethod.id"
+              ng-options="shipMethod.id as shipMethod.description for shipMethod in shipMethods"
               required />
     </div>
   </form>
