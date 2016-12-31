@@ -137,6 +137,18 @@ RSpec.describe Order, type: :model do
         expect(order.freight_charge).to eq 5
       end
     end
+
+    context 'when the last item is removed' do
+      let (:order) do
+        Order.create! attributes.merge(ship_method_id: ship_method.id)
+      end
+      before { order.add_item product.sku }
+      it 'removes the shipping item' do
+        expect do
+          order.items.first.destroy!
+        end.to change(order.items, :count).by(-2)
+      end
+    end
   end
 
   describe '#all_items_shipped?' do

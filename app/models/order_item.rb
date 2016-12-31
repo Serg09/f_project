@@ -26,7 +26,7 @@ class OrderItem < ActiveRecord::Base
   has_many :shipment_items
 
   before_create :set_line_item_number
-  after_destroy :reset_line_numbers
+  after_destroy :refresh_order
 
   validates_presence_of :order_id,
                         :sku,
@@ -97,6 +97,10 @@ class OrderItem < ActiveRecord::Base
     unit_price * quantity
   end
 
+  def standard_item?
+    sku != ShipMethod::FREIGHT_CHARGE_SKU
+  end
+
   private
 
   def set_defaults
@@ -108,12 +112,8 @@ class OrderItem < ActiveRecord::Base
     self.line_item_no = order.items.count + 1
   end
 
-  def reset_line_numbers
-    line_item_no = 0
-    order.items.each do |item|
-      line_item_no += 1
-      item.line_item_no = line_item_no
-      item.save!
-    end
+  def refresh_order
+    order.reset_line_numbers
+    order.update_freight_charge!
   end
 end
