@@ -18,6 +18,6 @@ Feature: View orders
     Then I should see "Orders" within the page title
     And I should see the following order table
       | Order date | Customer name   |  Total |
-      |   3/2/2016 | Sally Readerton | $27.05 |
-      |  2/27/2016 | Joe Schmoe      | $21.64 |
-      |  1/17/2016 | Billy Bookworm  | $19.47 |
+      |   3/2/2016 | Sally Readerton | $32.05 |
+      |  2/27/2016 | Joe Schmoe      | $26.64 |
+      |  1/17/2016 | Billy Bookworm  | $24.47 |

@@ -13,7 +13,6 @@ class OrderItemsController < ApplicationController
   def create
     @order_item = @order.add_item order_item_params[:sku], order_item_params[:quantity]
     flash[:notice] = 'The order item was created successfully.' if @order_item.save
-    @order.update_freight_charge!
     respond_with @order_item, location: edit_order_path(@order_item.order_id)
   end
 
@@ -23,7 +22,6 @@ class OrderItemsController < ApplicationController
   def update
     @order_item.update_attributes order_item_params
     flash[:notice] = 'The order item was updated successfully.' if @order_item.save
-    @order_item.order.update_freight_charge!
     respond_with @order_item, location: edit_order_path(@order_item.order_id)
   end
 

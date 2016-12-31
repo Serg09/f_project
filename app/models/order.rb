@@ -24,7 +24,7 @@ require 'securerandom'
 class Order < ActiveRecord::Base
   include AASM
 
-  has_many :items, ->{order :line_item_no}, class_name: 'OrderItem'
+  has_many :items, ->{order(:line_item_no).distinct}, class_name: 'OrderItem'
   has_many :shipments
   has_many :payments
   belongs_to :shipping_address, class_name: 'Address'
@@ -109,7 +109,9 @@ class Order < ActiveRecord::Base
   end
 
   def all_items_shipped?
-    items.map(&:shipped?).all?
+    items.
+      select(&:standard_item?).
+      map(&:shipped?).all?
   end
 
   def updatable?
@@ -152,7 +154,12 @@ class Order < ActiveRecord::Base
 
   def reset_line_numbers
     line_item_no = 0
-    items.each do |item|
+    items.select(&:standard_item?).each do |item|
+      line_item_no += 1
+      item.line_item_no = line_item_no
+      item.save!
+    end
+    items.select{|i| !i.standard_item?}.each do |item|
       line_item_no += 1
       item.line_item_no = line_item_no
       item.save!

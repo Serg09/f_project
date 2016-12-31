@@ -189,7 +189,7 @@ RSpec.describe Order, type: :model do
     end
 
     it 'is the sum of the line item totals' do
-      expect(order.total).to eq 51.50
+      expect(order.total).to eq 56.50 # includes $5 FREIGHT line item, added automatically
     end
   end
 
@@ -219,7 +219,8 @@ RSpec.describe Order, type: :model do
       it 'adds an item to the order' do
         expect do
           order.add_item product.sku
-        end.to change(order.items, :count).by(1)
+        end.to change(order.items, :count).by(2)
+        # add FREIGHT item automatically
       end
 
       it 'returns the item' do
@@ -265,7 +266,8 @@ RSpec.describe Order, type: :model do
     it 'adds a item to the order' do
       expect do
         order << sku
-      end.to change(order.items, :count).by(1)
+      end.to change(order.items, :count).by(2)
+      # adds FREIGHT item automatically
     end
 
     it 'returns the new item' do

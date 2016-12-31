@@ -34,6 +34,7 @@ Feature: Remove an order item
       | SKU     | Description         | Unit price | Qty | Ext. price | Total price |
       | 123456  | Deluxe Widget       |      19.99 |   2 |      39.98 |       39.98 |
       | 234567  | Premium Widget      |      24.99 |   1 |      24.99 |       24.99 |
+      | FREIGHT | Shipping & Handling |       5.00 |   1 |       5.00 |        5.00 |
 
     When I click the delete button within the 1st order item row
     Then I should see "The order item was removed successfully." within the notification area
