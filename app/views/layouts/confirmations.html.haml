@@ -1,0 +1,11 @@
+!!!
+%html{lang: 'en'}
+  %head
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
+    %title Order Confirmation
+    =stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true
+  %body
+    .container
+      =yield

@@ -1,0 +1,43 @@
+%h1 Order Confirmation
+%h2=@order.client.name
+
+.row
+  .col-md-4
+    %h3 Ship To
+    %p
+      =@order.shipping_address.recipient
+      %br
+      =@order.shipping_address.line_1
+      %br
+      -if @order.shipping_address.line_2.present?
+        =@order.shipping_address.line_2
+        %br
+      #{h @order.shipping_address.city}, #{h @order.shipping_address.state}&nbsp;&nbsp;#{h @order.shipping_address.postal_code}
+    %h3 Payments
+    %table.table
+      %tr
+        %th Amount
+        %th Status
+      -@order.payments.each do |payment|
+        %tr
+          %td= number_to_currency(payment.amount)
+          %td= payment.state
+  .col-md-8
+    %h3 Items
+    %table.table.table-striped
+      %tr
+        %th SKU
+        %th Description
+        %th.text-right Price
+        %th.text-right Qty.
+        %th.text-right Total
+      -@order.items.each do |item|
+        %tr
+          %td= item.sku
+          %td= item.description
+          %td.text-right= number_to_currency(item.unit_price)
+          %td.text-right= item.quantity
+          %td.text-right= number_to_currency(item.extended_price)
+      %tr.summary-row
+        %td.text-right{ colspan: 4} Total:
+        %td.text-right= number_to_currency(@order.total)

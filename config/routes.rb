@@ -31,6 +31,7 @@ Rails.application.routes.draw do
       patch :export
     end
   end
+  resources :confirmations, only: [:show]
   resources :order_items, only: [:edit, :update, :destroy]
   resources :products
   resources :payments, only: [:index, :show]
