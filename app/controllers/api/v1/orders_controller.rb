@@ -50,7 +50,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
     elsif @order.submit!
       render json: @order.as_json(include: {shipping_address: {}, items: {methods: [:extended_price]}})
     else
-      render json: {error: "Unable to submit the order."}
+      render json: {error: "Unable to submit the order."}, status: :internal_server_error
     end
   end
 
