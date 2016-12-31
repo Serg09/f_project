@@ -20,7 +20,7 @@
       <td ng-bind="item.extended_price | number:2" class="number-column text-right"></td>
       <td>
         <div class="btn-group">
-          <button class="btn btn-xs btn-danger" ng-click="removeItem(item)" title="Click here to remove this item from your card.">
+          <button ng-hide="!canEditItemQuantity(item)" class="btn btn-xs btn-danger" ng-click="removeItem(item)" title="Click here to remove this item from your card.">
             <span class="glyphicon glyphicon-remove" aria-hidden="true" />
           </button>
         </div>
