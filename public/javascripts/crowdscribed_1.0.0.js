@@ -584,6 +584,10 @@
         });
       };
 
+      $rootScope.canEditItemQuantity = function(item) {
+        return item.sku != "FREIGHT";
+      };
+
       // Find the existing order or create a new order
       var orderId = $cookies.get('order_id');
 
