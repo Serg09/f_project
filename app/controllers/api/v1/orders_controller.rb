@@ -48,6 +48,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
     if !@order.incipient?
       render json: [], status: :unprocessable_entity
     elsif @order.submit!
+      OrderMailer.purchase_confirmation(@order).deliver_now
       render json: @order.as_json(include: {shipping_address: {}, items: {methods: [:extended_price]}})
     else
       render json: {error: "Unable to submit the order."}, status: :internal_server_error
