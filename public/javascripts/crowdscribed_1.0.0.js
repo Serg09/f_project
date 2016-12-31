@@ -638,7 +638,7 @@
           if (sku && !itemIsInOrder(sku)) {
             var quantity = $location.search()['quantity'] || 1;
             cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
-              $rootScope.order.items.push(response.data);
+              refreshOrder();
             }, function(error) {
               console.log("Unable to add the item to the order.");
               console.log(error);
