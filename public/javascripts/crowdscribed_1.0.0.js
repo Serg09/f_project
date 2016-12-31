@@ -226,7 +226,11 @@
       };
 
       $rootScope.submission = new StateMachine();
-      $scope.errors = [];
+      $rootScope.errors = [];
+      $scope.removeError = function(error) {
+        var index = $rootScope.errors.indexOf(error);
+        $rootScope.errors.splice(index, index+1);
+      };
 
       workflow.create('submission', function(wf) {
         // update order
@@ -245,19 +249,19 @@
           } else {
             $scope.hostedFields.tokenize(function(error, payload) {
               if (error) {
-                var message = "Unable to initialiaze the payment.";
+                var message = "Unable to create the payment. Please try again.";
                 switch(error.code) {
                   case 'HOSTED_FIELDS_EMPTY':
-                    message = 'All fields are empty';
+                    message = 'All payment fields are empty. Please supply appropriate values.';
                     break;
                   case 'HOSTED_FIELDS_INVALID':
-                    message = 'Some fields are invalid';
+                    message = 'Some payment fields are invalid. Please doubl check them and try again.';
                     break;
                   case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
-                    message = 'Tokenization failed. Card may be invalid';
+                    message = 'Payment failed. Card may be invalid';
                     break;
                   case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
-                    message = 'Network error tokenizing the payment';
+                    message = 'There was a network error creating the payment.';
                     break;
                 }
                 d.reject({data: {message: message}});
@@ -287,8 +291,7 @@
             $rootScope.order = response.data;
             d.resolve();
           }, function(error) {
-            console.log("unable to submit the order");
-            console.log(error);
+            $rootScope.errors.add("Unable to submit the order.");
             d.reject();
           });
           return d.promise;
@@ -307,7 +310,7 @@
           modalInstance.close();
         }, function(response) {
           $rootScope.submission.fail();
-          $scope.errors.push(response.data.message);
+          $rootScope.errors.push(response.data.message);
           modalInstance.close();
         });
       };
@@ -315,8 +318,7 @@
       cs.getPaymentToken().then(function(response) {
         braintree.client.create({authorization: response.data.token}, function(error, client) {
           if (error) {
-            console.log("An error ocurred setting up the braintree client.");
-            console.log(error);
+            $rootScope.errors.add("Unable to set up the payment form.");
             return;
           }
 
@@ -344,8 +346,7 @@
             }
           }, function(error, hostedFields) {
             if (error) {
-              console.log("An error ocurred setting up the hosted fields.");
-              console.log(error);
+              $rootScope.errors.push("Unable to set up the payment fields.");
               return;
             }
 
@@ -550,8 +551,7 @@
         $rootScope.shipMethods = response.data;
       },
       function (error) {
-        console.log("Unable to get the ship methods from the service.");
-        console.log(error);
+        $rootScope.errors.push("Unable to get the ship methods from the service.");
       });
 
       $rootScope.updateFreightCharge = function() {
@@ -568,8 +568,7 @@
             $rootScope.order = response.data;
           },
           function(error) {
-            console.log("Unable to update the order to get an updated freight charge.");
-            console.log(error);
+            $rootScope.errors.push("Unable to update the order in order update the freight charge.");
           });
         }
       };
@@ -578,8 +577,7 @@
         cs.getOrder($rootScope.order.id).then(function(response) {
           $rootScope.order = response.data;
         }, function(error) {
-          console.log("Unable to get the updated order after updating an item.");
-          console.log(error);
+          $rootScope.errors.push("Unable to get the updated order.");
         });
       };
 
@@ -587,8 +585,7 @@
         cs.updateItem(item).then(function(updatedItem) {
           refreshOrder();
         }, function(error) {
-          console.log("Unable to update the item.");
-          console.log(error);
+          $rootScope.errors.push("Unable to update the order item.");
         });
       };
 
@@ -596,8 +593,7 @@
         cs.removeItem(item.id).then(function() {
           refreshOrder();
         }, function(error) {
-          console.log("Unable to remove the item from the order.");
-          console.log(error);
+          $rootScope.errors.push("Unable to remove the item from the order.");
         });
       }
 
@@ -640,28 +636,24 @@
             cs.addItem($rootScope.order.id, sku, quantity).then(function(response) {
               refreshOrder();
             }, function(error) {
-              console.log("Unable to add the item to the order.");
-              console.log(error);
+              $rootScope.errors.push("Unable to add the item to the order.");
             });
           }
         } else {
           // they've already finished this order, create a new one
           cs.createOrder().then(handleOrder, function(error) {
-            console.log("Unable to create an order");
-            console.log(error);
+            $rootScope.errors.push("Unable to create an order");
           });
         }
       };
 
       if ((typeof orderId) === "undefined") {
         cs.createOrder().then(handleOrder, function(error) {
-          console.log("Unable to create an order");
-          console.log(error);
+          $rootScope.errors.push("Unable to create an order");
         });
       } else {
         cs.getOrder(orderId).then(handleOrder, function(error) {
-          console.log("Unable to get the order " + orderId);
-          console.log(error);
+          $rootScope.errors.push("Unable to get the order.");
         });
       }
     }]); // controller('cartController')
