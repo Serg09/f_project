@@ -602,7 +602,7 @@
       }
 
       $rootScope.canEditItemQuantity = function(item) {
-        return item.sku != "FREIGHT";
+        return item.sku != "FREIGHT" && !$rootScope.submission.isComplete();
       };
 
       // Find the existing order or create a new order
