@@ -112,11 +112,11 @@
         return $http.post(url, data, httpConfig);
       };
       this.updateItem = function(item) {
-        var url = CROWDSCRIBED_HOST + '/api/v1/items/' + item.id;
+        var url = CROWDSCRIBED_HOST + '/api/v1/order_items/' + item.id;
         return $http.patch(url, { item: item }, httpConfig);
       };
       this.removeItem = function(itemId) {
-        var url = CROWDSCRIBED_HOST + '/api/v1/items/' + itemId;
+        var url = CROWDSCRIBED_HOST + '/api/v1/order_items/' + itemId;
         return $http.delete(url, httpConfig);
       };
       this.submitOrder = function(orderId) {

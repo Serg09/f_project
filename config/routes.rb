@@ -14,7 +14,7 @@ Rails.application.routes.draw do
           patch :submit, defaults: {format: :json}
         end
       end
-      resources :order_items, only: [:update, :destroy], defaults: {format: :json}, path: 'items'
+      resources :order_items, only: [:update, :destroy], defaults: {format: :json}
       resources :payments, only: [] do
         collection do
           get :token, defaults: {format: :json}
@@ -25,7 +25,7 @@ Rails.application.routes.draw do
 
   resources :clients
   resources :orders do
-    resources :order_items, only: [:new, :create]
+    resources :order_items, only: [:new, :create], path: 'items'
     member do
       patch :submit
       patch :export
