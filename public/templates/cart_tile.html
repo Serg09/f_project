@@ -7,6 +7,7 @@
       <th class="col-sm-2 number-column text-right">Price</th>
       <th class="col-sm-2 number-column text-right">Qty.</th>
       <th class="col-sm-2 number-column text-right">Total</th>
+      <th>&nbsp;</th>
     </tr>
     <tr ng-repeat="item in order.items">
       <td ng-bind="item.sku"></td>
@@ -17,10 +18,18 @@
         <input class="form-control" size="3" type="number" ng-model="item.quantity" step="1" min="1" max="999" ng-change="updateItem(item)" ng-hide="!canEditItemQuantity(item)" />
       </td>
       <td ng-bind="item.extended_price | number:2" class="number-column text-right"></td>
+      <td>
+        <div class="btn-group">
+          <button class="btn btn-xs btn-danger" ng-click="removeItem(item)" title="Click here to remove this item from your card.">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true" />
+          </button>
+        </div>
+      </td>
     </tr>
     <tr class="summary-row">
       <td colspan="4" class="number-column text-right">Total</td>
       <td ng-bind="orderTotal() | currency:'USD $'" class="number-column text-right"></td>
+      <td>&nbsp;</td>
     </tr>
   </table>
 </div>
