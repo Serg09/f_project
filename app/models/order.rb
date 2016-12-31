@@ -24,7 +24,7 @@ require 'securerandom'
 class Order < ActiveRecord::Base
   include AASM
 
-  has_many :items, class_name: 'OrderItem'
+  has_many :items, ->{order :line_item_no}, class_name: 'OrderItem'
   has_many :shipments
   has_many :payments
   belongs_to :shipping_address, class_name: 'Address'
