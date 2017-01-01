@@ -22,6 +22,18 @@
         }
       }
     }])
+    .directive('multiPurchaseTile', ['$sce', function($sce) {
+      // -------------------
+      // Multi-Purchase Tile
+      // -------------------
+      return {
+        restrict: 'E',
+        templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/multi_purchase_tile.html'),
+        scope: {
+          products: '=products',
+        }
+      }
+    }])
     .directive('paymentTile', ['$sce', function($sce) {
       // ------------
       // Payment Tile
@@ -195,6 +207,22 @@
       });
 
       $scope.price = 0;
+      $scope.purchasePath = CROWDSCRIBED_PURCHASE_PATH;
+    }])
+    .controller('multiPurchaseTileController', ['$scope', 'cs', function($scope, cs) {
+      // ------------------------------
+      // Multi Purchase Tile Controller
+      // ------------------------------
+
+      console.log("products");
+      console.log($scope.products);
+
+      _.each($scope.products, function(product) {
+        cs.getProduct(product.sku).then(function(response) {
+          product.caption = product.caption + " - " + response.data.price;
+        });
+      });
+      $scope.selectedSku = $scope.products[0].sku;
       $scope.purchasePath = CROWDSCRIBED_PURCHASE_PATH;
     }])
     .controller('paymentController', ['$rootScope', '$scope', '$q', '$uibModal', '$sce', 'cs', 'workflow', function($rootScope, $scope, $q, $uibModal, $sce, cs, workflow) {

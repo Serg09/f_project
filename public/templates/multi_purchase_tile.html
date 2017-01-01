@@ -1,0 +1,12 @@
+<div class="purchase-tile" ng-controller="multiPurchaseTileController" ng-hide="suppressDisplay()">
+  <p>
+    <select id="sku"
+            class="form-control"
+            ng-model="selectedSku"
+            ng-options="product.sku as product.caption for product in products"
+            />
+  </p>
+  <p class="text-center">
+    <a class="btn btn-success btn-lg" href="{{ purchasePath }}?sku={{ selectedSku }}">Purchase</a>
+  </p>
+</div>
