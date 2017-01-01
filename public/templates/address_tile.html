@@ -2,40 +2,42 @@
   <h2 class="shipping-header">Ship To</h2>
   <form name="addressForm" novalidate action="#" ng-hide="submission.IsInProgress()">
     <div class="form-group" id="recipient-group" ng-class="{ 'has-error': addressForm.recipient.$invalid && addressForm.recipient.$touched }">
-      <label class="control-label" for="recipient">Recipient</label>
+      <label class="control-label required" for="recipient">Recipient</label>
       <input id="recipient" type="text" name="recipient" class="form-control" ng-model="order.shipping_address.recipient" required autofocus />
     </div>
     <div class="form-group" id="email-group" ng-class="{ 'has-error': addressForm.customer_email.$invalid && addressForm.customer_email.$touched }">
-      <label class="control-label" for="customer_email">Email</label>
-      <input id="customer_email" type="text" name="customer_email" class="form-control" ng-model="order.customer_email" required />
+      <label class="control-label required" for="customer_email">Email</label>
+      <input id="customer_email" type="text" name="customer_email" class="form-control" pattern="^\w+@\w+\.\w+$" ng-model="order.customer_email" required />
     </div>
-    <div class="form-group" id="line-1-group">
-      <label for="line-1">Line 1</label>
-      <input id="line-1" type="text" class="form-control" ng-model="order.shipping_address.line_1" required />
+    <div class="form-group" id="line-1-group" ng-class="{ 'has-error': addressForm.line_1.$invalid && addressForm.line_1.$touched }">
+      <label for="line-1" class="control-label required">Line 1</label>
+      <input id="line-1" name="line_1" type="text" class="form-control" ng-model="order.shipping_address.line_1" required />
     </div>
     <div class="form-group" id="line-2-group">
       <label class="control-label" for="line-2">Line 2</label>
       <input id="line-2" type="text" class="form-control" ng-model="order.shipping_address.line_2" />
     </div>
     <div class="row">
-      <div class="col-md-7">
-        <div class="form-group" id="city-group">
-          <label class="control-label" for="city">City</label>
-          <input id="city" type="text" class="form-control" ng-model="order.shipping_address.city" required />
+      <div class="col-sm-6">
+        <div class="form-group" id="city-group" ng-class="{ 'has-error': addressForm.city.$invalid && addressForm.city.$touched }">
+          <label class="control-label required" for="city">City</label>
+          <input id="city" name="city" type="text" class="form-control" ng-model="order.shipping_address.city" required />
         </div>
       </div>
-      <div class="col-md-2">
-        <div class="form-group" id="state-group">
-          <label class="control-label" for="state">State</label>
-          <input id="state" type="text" class="form-control" ng-model="order.shipping_address.state" required />
+      <div class="col-sm-3">
+        <div class="form-group" id="state-group" ng-class="{ 'has-error': addressForm.state.$invalid && addressForm.state.$touched }">
+          <label class="control-label required" for="state">State</label>
+          <input id="state" name="state" maxlength="2" type="text" class="form-control" ng-model="order.shipping_address.state" required />
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-sm-3">
         <div class="form-group" id="postal-code-group">
-          <label class="control-label" for="postal-code">Postal Code</label>
+          <label class="control-label required" for="postal-code">Postal Code</label>
           <input id="postal-code"
+                 name="postal_code"
                  type="text"
                  class="form-control"
+                 pattern="^[a-zA-Z0-9]{5,}$"
                  ng-blur="updateFreightCharge()"
                  ng-model="order.shipping_address.postal_code"
                  required />
@@ -43,23 +45,23 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6">
-        <div class="form-group" id="country-code-group">
-          <label class="control-label" for="country-code">Country Code</label>
-          <select id="country-code" class="form-control" ng-model="order.shipping_address.country_code">
+      <div class="col-sm-6">
+        <div class="form-group" id="country-code-group" ng-class="{ 'has-error': addressForm.country_code.$invalid && addressForm.country_code.$touched }">
+          <label class="control-label required" for="country-code">Country Code</label>
+          <select id="country-code" name="country_code" class="form-control" ng-model="order.shipping_address.country_code">
             <option ng-repeat="country in countries" value="{{country.abbreviation}}">{{country.name}}</option>
           </select>
         </div>
       </div>
-      <div class="form-group" id="telephone-group">
-        <div class="col-md-6">
-          <label class="control-label" for="telephone">Telephone</label>
-          <input id="telephone" type="text" class="form-control" ng-model="order.telephone" required />
+      <div class="col-sm-6">
+        <div class="form-group" id="telephone-group" ng-class="{ 'has-error': addressForm.telephone.$invalid && addressForm.telephone.$touched}">
+          <label class="control-label required" for="telephone">Telephone</label>
+          <input id="telephone" name="telephone" type="text" class="form-control" ng-model="order.telephone" required />
         </div>
       </div>
     </div>
     <div class="form-group" id="ship-method-group">
-      <label for="ship-method">Ship Method</label>
+      <label for="ship-method" class="control-label required">Ship Method</label>
       <select id="ship-method"
               class="form-control"
               ng-change="updateFreightCharge()"

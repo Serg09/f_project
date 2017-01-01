@@ -291,12 +291,34 @@
             $rootScope.order = response.data;
             d.resolve();
           }, function(error) {
-            $rootScope.errors.add("Unable to submit the order.");
+            $rootScope.errors.push("Unable to submit the order.");
             d.reject();
           });
           return d.promise;
         });
       });
+
+      $scope.readyToSubmit = function() {
+        if (typeof $rootScope.order === "undefined") {
+          return false;
+        }
+        var o = $rootScope.order;
+        return o.customer_email != null &&
+          typeof(o.shipping_address) !== "undefined" &&
+          o.shipping_address != null &&
+          o.shipping_address.recipient != null &&
+          o.shipping_address.line_1 != null &&
+          o.shipping_address.city != null &&
+          o.shipping_address.state != null &&
+          o.shipping_address.postal_code != null &&
+          o.shipping_address.country_code != null &&
+          o.telephone != null &&
+          o.ship_method_id != null;
+      };
+
+      $scope.preventSubmission = function() {
+        return !$scope.readyToSubmit();
+      };
 
       $scope.submitPayment = function() {
         var modalInstance = $uibModal.open({
@@ -308,9 +330,11 @@
         workflow.execute('submission').then(function() {
           $rootScope.submission.complete();
           modalInstance.close();
-        }, function(response) {
+        }, function(error) {
           $rootScope.submission.fail();
-          $rootScope.errors.push(response.data.message);
+          if (typeof(error) !== "undefined") {
+            $rootScope.errors.push(error);
+          }
           modalInstance.close();
         });
       };
@@ -318,7 +342,7 @@
       cs.getPaymentToken().then(function(response) {
         braintree.client.create({authorization: response.data.token}, function(error, client) {
           if (error) {
-            $rootScope.errors.add("Unable to set up the payment form.");
+            $rootScope.errors.push("Unable to set up the payment form.");
             return;
           }
 
