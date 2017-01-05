@@ -349,22 +349,27 @@
       };
 
       $scope.submitPayment = function() {
-        var modalInstance = $uibModal.open({
-          templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/progress.html'),
-          keyboard: false,
-          backdrop: 'static'
-        });
-        $rootScope.submission.start();
-        workflow.execute('submission').then(function() {
-          $rootScope.submission.complete();
-          modalInstance.close();
-        }, function(error) {
-          $rootScope.submission.fail();
-          if (typeof(error) !== "undefined") {
-            $rootScope.errors.push(error);
-          }
-          modalInstance.close();
-        });
+        $rootScope.errors.length = 0;
+        if ($scope.preventSubmission()) {
+          $rootScope.errors.push("Your order has not yet gone through. Please complete the required fields in order to process your order.");
+        } else {
+          var modalInstance = $uibModal.open({
+            templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/progress.html'),
+            keyboard: false,
+            backdrop: 'static'
+          });
+          $rootScope.submission.start();
+          workflow.execute('submission').then(function() {
+            $rootScope.submission.complete();
+            modalInstance.close();
+          }, function(error) {
+            $rootScope.submission.fail();
+            if (typeof(error) !== "undefined") {
+              $rootScope.errors.push(error);
+            }
+            modalInstance.close();
+          });
+        }
       };
 
       cs.getPaymentToken().then(function(response) {
