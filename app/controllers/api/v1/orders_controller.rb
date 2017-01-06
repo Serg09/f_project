@@ -64,7 +64,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
   def order_json
     @order.as_json(include: [
       :shipping_address,
-      items: {methods: [:extended_price]}
+      items: {methods: [:extended_price, :standard_item?]}
     ])
   end
 
