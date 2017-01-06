@@ -401,15 +401,25 @@ RSpec.describe Order, type: :model do
       end
     end
 
-    context 'but does not have a shipping address' do
-      it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create(factory_key, item_count: 1, shipping_address: nil) }
+    context 'and contains a physical fulfillment item' do
+      context 'but does not have a shipping address' do
+        it_behaves_like 'an unsubmittable order' do
+          let (:order) { FactoryGirl.create(factory_key, item_count: 1, shipping_address: nil) }
+        end
+      end
+
+      context 'but does not have a telephone number' do
+        it_behaves_like 'an unsubmittable order' do
+          let (:order) { FactoryGirl.create(factory_key, item_count: 1, telephone: nil) }
+        end
       end
     end
 
-    context 'but does not have a telephone number' do
-      it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create(factory_key, item_count: 1, telephone: nil) }
+    context 'and contains an electronic delivery item' do
+      context 'but does not have a delivery email address' do
+        it_behaves_like 'an unsubmittable order' do
+          let (:order) { FactoryGirl.create(factory_key, delivery_email: nil) }
+        end
       end
     end
   end

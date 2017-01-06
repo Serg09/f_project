@@ -12,8 +12,18 @@
 #
 
 class Product < ActiveRecord::Base
-  validates_presence_of :sku, :description, :price, :weight
+  FULFILLMENT_TYPES = %w(physical electronic)
+
+  FULFILLMENT_TYPES.each do |t|
+    define_method "#{t}?" do
+      fulfillment_type == t
+    end
+  end
+
+  validates_presence_of :sku, :description, :price, :fulfillment_type
+  validates_presence_of :weight, if: :physical?
   validates_uniqueness_of :sku
+  validates_inclusion_of :fulfillment_type, in: FULFILLMENT_TYPES
   validates_length_of :sku, maximum: 20
   validates_length_of :description, maximum: 256
   validates_numericality_of :price, greater_than: 0, if: :price

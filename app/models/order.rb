@@ -98,7 +98,8 @@ class Order < ActiveRecord::Base
     items.create! sku: product.sku,
                   description: product.description,
                   quantity: quantity,
-                  unit_price: product.price
+                  unit_price: product.price,
+                  fulfillment_type: product.fulfillment_type
   rescue StandardError => e
     Rails.logger.warn "Error adding product with SKU #{sku} to order #{id}. #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     nil

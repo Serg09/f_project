@@ -32,7 +32,10 @@ class OrderItem < ActiveRecord::Base
 
   validates_presence_of :order_id,
                         :sku,
-                        :quantity
+                        :quantity,
+                        :fulfillment_type
+
+  validates_inclusion_of :fulfillment_type, in: Product::FULFILLMENT_TYPES
 
   validates_length_of :sku, maximum: 30
   validates_length_of :description, maximum: 250
