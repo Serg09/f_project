@@ -9,6 +9,7 @@ FactoryGirl.define do
     client_order_id { Faker::Number.hexadecimal(12) }
     order_date { Faker::Date.backward(5) }
     customer_name { Faker::Name.name }
+    customer_email { Faker::Internet.email }
     telephone { Faker::PhoneNumber.phone_number }
     ship_method
 
