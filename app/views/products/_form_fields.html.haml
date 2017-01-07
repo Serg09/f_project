@@ -12,7 +12,7 @@
   =help_blocks(product, :price)
 .form-group{ class: form_group_class(product, :fulfillment_type) }
   =f.label :fulfillment_type, class: 'control-label'
-  =f.select :fulfillment_type, fulfillment_type_options, {}, class: 'form-control'
+  =f.select :fulfillment_type, fulfillment_type_options(product.fulfillment_type), {}, class: 'form-control'
   =help_blocks(product, :weight)
 .form-group{ class: form_group_class(product, :weight) }
   =f.label :weight, class: 'control-label'
