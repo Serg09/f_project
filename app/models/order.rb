@@ -17,6 +17,7 @@
 #  ship_method_id      :integer
 #  shipping_address_id :integer
 #  confirmation        :string(32)
+#  delivery_email      :string(100)
 #
 
 require 'securerandom'

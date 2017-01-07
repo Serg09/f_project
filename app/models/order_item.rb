@@ -17,6 +17,7 @@
 #  accepted_quantity   :integer
 #  shipped_quantity    :integer
 #  weight              :decimal(, )
+#  fulfillment_type    :string(15)       default("physical"), not null
 #
 
 class OrderItem < ActiveRecord::Base
