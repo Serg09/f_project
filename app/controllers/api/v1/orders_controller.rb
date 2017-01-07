@@ -77,6 +77,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
       params.require(:order).permit(:customer_name,
                                     :telephone,
                                     :customer_email,
+                                    :delivery_email,
                                     :ship_method_id).merge(defaults)
     else
       defaults
