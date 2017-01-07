@@ -383,9 +383,26 @@ RSpec.describe Order, type: :model do
       let (:order) { FactoryGirl.create(factory_key) }
     end
 
-    context 'and ready for submission' do
-      it_behaves_like 'a submittable order' do
-        let (:order) { FactoryGirl.create(factory_key, item_count: 1) }
+    context 'and requires physical delivery' do
+      context 'and is ready for submission' do
+        it_behaves_like 'a submittable order' do
+          let (:order) { FactoryGirl.create(factory_key, item_count: 1) }
+        end
+      end
+    end
+
+    context 'and requires electronic delivery' do
+      context 'and is ready for submission' do
+        let (:product) { FactoryGirl.create :electronic_product }
+        before { order << product }
+
+        it_behaves_like 'a submittable order' do
+          let (:order) do
+            FactoryGirl.create :order, shipping_address: nil,
+                                       delivery_email: Faker::Internet.email,
+                                       telephone: nil
+          end
+        end
       end
     end
 

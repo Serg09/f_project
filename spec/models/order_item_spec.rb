@@ -131,7 +131,12 @@ RSpec.describe OrderItem, type: :model do
       expect(item).to be_valid
     end
 
-    it 'cannot be anything other than "physical" or "electronic"' do
+    it 'can be "none"' do
+      item = OrderItem.new attributes.merge(fulfillment_type: 'none')
+      expect(item).to be_valid
+    end
+
+    it 'cannot be anything other than "physical" or "electronic", or "none"' do
       item = OrderItem.new attributes.merge(fulfillment_type: 'hoping')
       expect(item).to have(1).error_on(:fulfillment_type)
     end

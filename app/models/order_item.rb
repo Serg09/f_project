@@ -23,6 +23,8 @@
 class OrderItem < ActiveRecord::Base
   include AASM
 
+  FULFILLMENT_TYPES = Product::FULFILLMENT_TYPES + ['none']
+
   belongs_to :order
   has_many :shipment_items
 
@@ -36,7 +38,7 @@ class OrderItem < ActiveRecord::Base
                         :quantity,
                         :fulfillment_type
 
-  validates_inclusion_of :fulfillment_type, in: Product::FULFILLMENT_TYPES
+  validates_inclusion_of :fulfillment_type, in: FULFILLMENT_TYPES
 
   validates_length_of :sku, maximum: 30
   validates_length_of :description, maximum: 250

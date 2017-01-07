@@ -123,8 +123,9 @@ class Order < ActiveRecord::Base
   def ready_for_submission?
     items.length > 0 &&
       customer_name.present? &&
-      shipping_address_id.present? &&
-      telephone.present?
+      customer_email.present? &&
+      physical_delivery_requirements_satisfied? &&
+      electronic_delivery_requirements_satisfied?
   end
 
   def abbreviated_confirmation
@@ -147,7 +148,8 @@ class Order < ActiveRecord::Base
         items.create! sku: ShipMethod::FREIGHT_CHARGE_SKU,
                       description: 'Shipping & Handling',
                       quantity: 1,
-                      unit_price: freight_charge
+                      unit_price: freight_charge,
+                      fulfillment_type: 'none'
       end
     else
       freight_charge_item.destroy! if freight_charge_item.present?
@@ -169,6 +171,23 @@ class Order < ActiveRecord::Base
   end
 
   private
+
+  Product::FULFILLMENT_TYPES.each do |t|
+    define_method "#{t}_delivery?" do
+      items.any?{|i| i.fulfillment_type == t}
+    end
+  end
+
+  def physical_delivery_requirements_satisfied?
+    return true unless physical_delivery?
+    shipping_address_id.present? &&
+      telephone.present?
+  end
+
+  def electronic_delivery_requirements_satisfied?
+    return true unless electronic_delivery?
+    delivery_email.present?
+  end
 
   def calculate_freight_charge
     return nil unless items.select(&:standard_item?).any?

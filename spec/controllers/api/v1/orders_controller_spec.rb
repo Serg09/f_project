@@ -245,16 +245,41 @@ describe Api::V1::OrdersController do
     # TODO Share this with the non-api controller spec?
     context 'with an incipient order' do
       context 'that belongs to the client' do
-        describe 'patch :submit' do
+        context 'and required physical delivery' do
+          describe 'patch :submit' do
+            it 'is successful' do
+              patch :submit, id: order
+              expect(response).to have_http_status :success
+            end
+
+            it 'returns the order' do
+              patch :submit, id: order
+              expect(json_response).to include(id: order.id)
+              expect(json_response[:shipping_address]).not_to be_nil
+            end
+
+            it 'changes the order status to "submitted"' do
+              expect do
+                patch :submit, id: order
+                order.reload
+              end.to change(order, :status).to 'submitted'
+            end
+          end
+        end
+
+        context 'for electronic delivery' do
+          let (:order) do
+            FactoryGirl.create :order, client: client,
+                                       shipping_address: nil,
+                                       telephone: nil,
+                                       delivery_email: Faker::Internet.email
+          end
+          let (:product) { FactoryGirl.create :electronic_product }
+          before { order << product }
+
           it 'is successful' do
             patch :submit, id: order
             expect(response).to have_http_status :success
-          end
-
-          it 'returns the order' do
-            patch :submit, id: order
-            expect(json_response).to include(id: order.id)
-            expect(json_response[:shipping_address]).not_to be_nil
           end
 
           it 'changes the order status to "submitted"' do
@@ -262,6 +287,11 @@ describe Api::V1::OrdersController do
               patch :submit, id: order
               order.reload
             end.to change(order, :status).to 'submitted'
+          end
+
+          it 'returns the order' do
+            patch :submit, id: order
+            expect(json_response).to include(id: order.id)
           end
         end
       end

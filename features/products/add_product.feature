@@ -20,7 +20,7 @@ Feature: Add product
     When I fill in "SKU" with "123456"
     And I fill in "Description" with "Deluxe Widget"
     And I fill in "Price" with "19.99"
-    And I select "physical" from the "Fulfillment type" list
+    And I select "Physical" from the "Fulfillment type" list
     And I fill in "Weight" with "1.5"
     And I click "Save"
     Then I should see "Products" within the page title
@@ -32,7 +32,7 @@ Feature: Add product
     When I fill in "SKU" with "123456"
     And I fill in "Description" with "Deluxe Digital Widget"
     And I fill in "Price" with "19.99"
-    And I select "electronic" from the "Fulfillment type" list
+    And I select "Electronic" from the "Fulfillment type" list
     And I click "Save"
     Then I should see "Products" within the page title
     And I should see the following product table
