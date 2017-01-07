@@ -108,8 +108,10 @@
         var clone = _.clone(order);
         clone.shipping_address = null
         data = {
-          order: clone,
-          shipping_address: order.shipping_address
+          order: clone
+        }
+        if (order.shipping_id) {
+          data.shipping_address = order.shipping_address
         }
         return $http.patch(url, data, httpConfig);
       };
@@ -264,11 +266,18 @@
         // update order
         wf.push(function() {
           var o = $rootScope.order
-          if(!o.customer_name && o.shipping_address.recipient) {
+          if(!o.customer_name &&
+              typeof(o.shipping_address) !== "undefined" &&
+              o.shipping_address.recipient) {
             o.customer_name = o.shipping_address.recipient
           }
-          // TODO handle the error herer if one is returned
-          return cs.updateOrder(o);
+          var d = $q.defer();
+          cs.updateOrder(o).then(function(response) {
+            d.resolve(response);
+          }, function(error) {
+            d.reject(error.data.message);
+          });
+          return d.promise;
         });
         // tokenize payment method
         wf.push(function() {
