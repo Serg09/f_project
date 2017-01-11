@@ -35,6 +35,9 @@ class Order < ActiveRecord::Base
 
   validates_presence_of :client_id,
                         :order_date
+  validates_presence_of :delivery_email, if: ->{ submitted? && electronic_delivery? }
+  validates_presence_of :customer_name, if: :submitted?
+  validates_presence_of [:shipping_address_id, :telephone], if: ->{ submitted? && physical_delivery? }
   validates_length_of :customer_name,
                        maximum: 50
   validates_length_of [:client_order_id,
@@ -42,6 +45,7 @@ class Order < ActiveRecord::Base
                        maximum: 100
   validates_length_of :telephone, maximum: 25
   validates_uniqueness_of :client_order_id, if: :client_order_id
+  validate :at_least_one_item, if: :submitted?
 
   accepts_nested_attributes_for :shipping_address
 
@@ -53,14 +57,14 @@ class Order < ActiveRecord::Base
   STATUSES = [:incipient, :submitted, :exporting, :exported, :processing, :shipped, :rejected]
   aasm(:status, whiny_transitions: false) do
     state :incipient, initial: true
-    state :submitted
+    state :submitted, before_enter: :ensure_confirmation
     state :exporting
     state :exported
     state :processing
     state :shipped
     state :rejected
     event :submit do
-      transitions from: :incipient, to: :submitted, if: :_submit
+      transitions from: :incipient, to: :submitted
     end
     event :export do
       transitions from: :submitted, to: :exporting
@@ -198,9 +202,11 @@ class Order < ActiveRecord::Base
     @freight_charge_item ||= items.find_by(sku: ShipMethod::FREIGHT_CHARGE_SKU)
   end
 
-  def _submit
-    return false unless ready_for_submission?
-    self.confirmation = SecureRandom.hex(16)
-    save
+  def ensure_confirmation
+    self.confirmation ||= SecureRandom.hex(16)
+  end
+
+  def at_least_one_item
+    errors.add(:items, 'cannot be empty') unless items.any?
   end
 end
