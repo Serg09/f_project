@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Api::V1::OrdersController do
   let (:client) { FactoryGirl.create :client }
-  let!(:order) { FactoryGirl.create :order, client: client, item_count: 1 }
+  let!(:order) { FactoryGirl.create :submitted_order, client: client }
   let!(:other_order) { FactoryGirl.create :order }
   let (:attributes) do
     {
@@ -245,7 +245,11 @@ describe Api::V1::OrdersController do
     # TODO Share this with the non-api controller spec?
     context 'with an incipient order' do
       context 'that belongs to the client' do
-        context 'and required physical delivery' do
+        let (:order) { FactoryGirl.create :incipient_order, client: client }
+        context 'and requires physical delivery' do
+          let (:product) { FactoryGirl.create :product }
+          before { order << product }
+
           describe 'patch :submit' do
             it 'is successful' do
               patch :submit, id: order
@@ -301,60 +305,60 @@ describe Api::V1::OrdersController do
 
     context 'with a submited order' do
       it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create :submitted_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :submitted_order, client: client }
       end
       it_behaves_like 'another client\'s order' do
-        let (:order) { FactoryGirl.create :submitted_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :submitted_order, client: client }
       end
     end
 
     context 'with an exporting order' do
       it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create :exporting_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :exporting_order, client: client }
       end
 
       it_behaves_like 'another client\'s order' do
-        let (:order) { FactoryGirl.create :exporting_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :exporting_order, client: client }
       end
     end
 
     context 'with an exported order' do
       it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create :exported_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :exported_order, client: client }
       end
 
       it_behaves_like 'another client\'s order' do
-        let (:order) { FactoryGirl.create :exported_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :exported_order, client: client }
       end
     end
 
     context 'with an processing order' do
       it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create :processing_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :processing_order, client: client }
       end
 
       it_behaves_like 'another client\'s order' do
-        let (:order) { FactoryGirl.create :processing_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :processing_order, client: client }
       end
     end
 
     context 'with an shipped order' do
       it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create :shipped_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :shipped_order, client: client }
       end
 
       it_behaves_like 'another client\'s order' do
-        let (:order) { FactoryGirl.create :shipped_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :shipped_order, client: client }
       end
     end
 
     context 'with an rejected order' do
       it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create :rejected_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :rejected_order, client: client }
       end
 
       it_behaves_like 'another client\'s order' do
-        let (:order) { FactoryGirl.create :rejected_order, client: client, item_count: 1 }
+        let (:order) { FactoryGirl.create :rejected_order, client: client }
       end
     end
   end
