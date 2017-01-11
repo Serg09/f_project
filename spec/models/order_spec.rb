@@ -370,8 +370,7 @@ RSpec.describe Order, type: :model do
   end
 
   context 'that is incipient' do
-    let (:factory_key) { :incipient_order }
-    let (:order) { FactoryGirl.create(factory_key) }
+    let (:order) { FactoryGirl.create(:incipient_order) }
 
     describe 'updatable?' do
       it 'returns true' do
@@ -379,130 +378,85 @@ RSpec.describe Order, type: :model do
       end
     end
 
-    it_behaves_like 'an unexportable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
+    include_examples 'an unexportable order'
 
     context 'and requires physical delivery' do
+      let (:product) { FactoryGirl.create :product }
+      before{ order << product }
+
       context 'and is ready for submission' do
-        it_behaves_like 'a submittable order' do
-          let (:order) { FactoryGirl.create(factory_key, item_count: 1) }
-        end
+        include_examples 'a submittable order'
+      end
+
+      context 'but does not have a shipping address' do
+        before { order.shipping_address_id = nil }
+        include_examples 'an unsubmittable order'
+      end
+
+      context 'but does not have a telephone number' do
+        before { order.telephone = nil }
+        include_examples 'an unsubmittable order'
       end
     end
 
     context 'and requires electronic delivery' do
-      context 'and is ready for submission' do
-        let (:product) { FactoryGirl.create :electronic_product }
-        before { order << product }
+      let (:product) { FactoryGirl.create :electronic_product }
+      before{ order << product }
 
-        it_behaves_like 'a submittable order' do
-          let (:order) do
-            FactoryGirl.create :order, shipping_address: nil,
-                                       delivery_email: Faker::Internet.email,
-                                       telephone: nil
-          end
-        end
+      context 'and is ready for submission' do
+        before { order.delivery_email = Faker::Internet.email }
+
+        include_examples 'a submittable order'
+      end
+
+      context 'but does not have a delivery email address' do
+        before { order.delivery_email = nil }
+        include_examples 'an unsubmittable order'
       end
     end
 
     context 'but does not have any items' do
-      it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create(factory_key) }
-      end
+      include_examples 'an unsubmittable order'
     end
 
     context 'but does not have a customer name' do
-      it_behaves_like 'an unsubmittable order' do
-        let (:order) { FactoryGirl.create(factory_key, item_count: 1, customer_name: nil) }
-      end
-    end
-
-    context 'and contains a physical fulfillment item' do
-      context 'but does not have a shipping address' do
-        it_behaves_like 'an unsubmittable order' do
-          let (:order) { FactoryGirl.create(factory_key, item_count: 1, shipping_address: nil) }
-        end
-      end
-
-      context 'but does not have a telephone number' do
-        it_behaves_like 'an unsubmittable order' do
-          let (:order) { FactoryGirl.create(factory_key, item_count: 1, telephone: nil) }
-        end
-      end
-    end
-
-    context 'and contains an electronic delivery item' do
-      context 'but does not have a delivery email address' do
-        it_behaves_like 'an unsubmittable order' do
-          let (:order) { FactoryGirl.create(factory_key, delivery_email: nil) }
-        end
-      end
+      before { order.customer_name = nil }
+      include_examples 'an unsubmittable order'
     end
   end
 
   context 'that is submitted' do
-    let (:factory_key) { :submitted_order }
-    it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unsubmittable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an exportable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
+    let (:order ) { FactoryGirl.create :submitted_order }
+    include_examples 'an immutable order'
+    include_examples 'an unsubmittable order'
+    include_examples 'an exportable order'
   end
 
   context 'that is exported' do
-    let (:factory_key) { :exported_order }
-    it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unsubmittable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unexportable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
+    let (:order) { FactoryGirl.create :exported_order }
+    include_examples 'an immutable order'
+    include_examples 'an unsubmittable order'
+    include_examples 'an unexportable order'
   end
 
   context 'that is processing' do
-    let (:factory_key) { :processing_order }
-    it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unsubmittable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unexportable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
+    let (:order) { FactoryGirl.create :processing_order }
+    include_examples 'an immutable order'
+    include_examples 'an unsubmittable order'
+    include_examples 'an unexportable order'
   end
 
   context 'that is shipped' do
-    let (:factory_key) { :shipped_order }
-    it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unsubmittable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unexportable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
+    let (:order) { FactoryGirl.create :shipped_order }
+    include_examples 'an immutable order'
+    include_examples 'an unsubmittable order'
+    include_examples 'an unexportable order'
   end
 
   context 'that is rejected' do
-    let (:factory_key) { :rejected_order }
-    it_behaves_like 'an immutable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unsubmittable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
-    it_behaves_like 'an unexportable order' do
-      let (:order) { FactoryGirl.create(factory_key) }
-    end
+    let (:order) { FactoryGirl.create :rejected_order }
+    include_examples 'an immutable order'
+    include_examples 'an unsubmittable order'
+    include_examples 'an unexportable order'
   end
 end
