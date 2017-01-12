@@ -5,7 +5,7 @@ describe ExportProcessor do
 
   context 'when unbatched orders are present' do
     let (:ftp) { double('ftp') }
-    let!(:order1) { FactoryGirl.create(:submitted_order, item_count: 1) }
+    let!(:order1) { FactoryGirl.create(:submitted_order) }
 
     describe '#perform' do
       context 'on success' do

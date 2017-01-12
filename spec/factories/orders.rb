@@ -14,6 +14,7 @@ FactoryGirl.define do
         after(:create) do |order|
           order << FactoryGirl.create(:product)
           order.status = status
+          order.confirmation ||= SecureRandom.hex(16)
           order.save!
         end
       end

@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Api::V1::PaymentsController do
   let (:client) { FactoryGirl.create :client }
   let (:payment_token) { SecureRandom.base64(512) }
-  let (:order) { FactoryGirl.create(:order, client: client, item_count: 0) }
+  let (:order) { FactoryGirl.create(:order, client: client) }
   let (:product) { FactoryGirl.create(:product, price: 100) }
   let!(:order_item) do
     FactoryGirl.create(:order_item, order: order,

@@ -152,7 +152,7 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#all_items_shipped?' do
-    let (:order) { FactoryGirl.create(:processing_order, item_count: 1) }
+    let (:order) { FactoryGirl.create(:processing_order) }
     let (:item) { order.items.first }
     context 'when all items have been shipped' do
       before { item.acknowledge!; item.ship! }

@@ -36,7 +36,7 @@ RSpec.describe Batch, type: :model do
       let (:existing_batch) { FactoryGirl.create(:batch) }
       let!(:batched_order) { FactoryGirl.create(:exported_order, batch: existing_batch) }
 
-      let!(:o1) { FactoryGirl.create(:submitted_order, item_count: 1) }
+      let!(:o1) { FactoryGirl.create(:submitted_order) }
 
       it 'creates a new batch' do
         expect do

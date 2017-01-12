@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :shipment do
-    association :order, factory: :order, item_count: 1
+    association :order, factory: :shipped_order
     external_id { Faker::Number.hexadecimal(10) }
     ship_date { Faker::Date.between(2.days.ago, 2.days.from_now) }
     quantity 1
