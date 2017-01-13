@@ -342,12 +342,6 @@ RSpec.describe Order, type: :model do
           order.reload
         end.not_to change(order, :status)
       end
-
-      it 'is invalid' do
-        order.submit
-        order.save
-        expect(order).not_to be_valid
-      end
     end
   end
 
