@@ -1,23 +1,25 @@
 require 'rails_helper'
 
 describe Lsi::AsnProcessor do
-  let!(:order1) { FactoryGirl.create(:processing_order) }
-  let!(:order_item_1_1) { FactoryGirl.create(:processing_order_item, order: order1, quantity: 50) }
-  let!(:order2) { FactoryGirl.create(:processing_order) }
-  let!(:order_item_2_1) { FactoryGirl.create(:processing_order_item, order: order2, quantity: 20) }
+  let!(:order1) { FactoryGirl.create(:processing_order, item_attributes: [{quantity: 50}]) }
+  let (:order_item_1_1) { order1.items.first }
+  let!(:order2) { FactoryGirl.create(:processing_order, item_attributes: [{quantity: 20}]) }
+  let (:order_item_2_1) { order2.items.first }
   let!(:order3) { FactoryGirl.create(:processing_order) }
-  let!(:order_item_3_1) { FactoryGirl.create(:processing_order_item, order: order3) }
+  let (:order_item_3_1) { order3.items.first }
   let!(:order4) { FactoryGirl.create(:processing_order) }
-  let!(:order5) { FactoryGirl.create(:processing_order) }
-  let!(:order_item_5_1) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_2) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_3) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_4) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_5) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_6) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_7) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_8) { FactoryGirl.create(:processing_order_item, order: order5) }
-  let!(:order_item_5_9) { FactoryGirl.create(:processing_order_item, order: order5) }
+  let!(:order5) { FactoryGirl.create(:processing_order, item_attributes: (1..9).map{|i| {quantity: 1}}) }
+  before do
+    [order1,
+     order2,
+     order2,
+     order4,
+     order5].each do |order|
+       order.items.select(&:standard_item?).each do |item|
+         item.acknowledge!
+       end
+     end
+  end
 
   let (:filename) { 'lsi_advanced_shipping_notification_sample.txt' }
   let (:file_content) { File.read(Rails.root.join('spec', 'fixtures', 'files', filename)) }
