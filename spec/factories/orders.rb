@@ -11,8 +11,17 @@ FactoryGirl.define do
 
     Order::STATUSES.reject{|s| s == :incipient}.each do |status|
       factory "#{status}_order".to_sym do
-        after(:create) do |order|
-          order << FactoryGirl.create(:product)
+        transient do
+          item_attributes [
+            {quantity: 1}
+          ]
+        end
+        after(:create) do |order, evaluator|
+          evaluator.item_attributes.each do |attr|
+            sku = attr[:sku] || FactoryGirl.create(:product).sku
+            quantity = attr[:quantity] || 1
+            order.add_item sku, quantity
+          end
           order.status = status
           order.confirmation ||= SecureRandom.hex(16)
           order.save!
