@@ -53,6 +53,9 @@ class OrderItem < ActiveRecord::Base
 
   before_validation :set_defaults
 
+  scope :physical, ->{where fulfillment_type: 'physical'}
+  scope :electronic, ->{where fulfillment_type: 'electronic'}
+
   aasm(:status, whiny_transitions: false) do
     state :new, initial: true
     state :processing, :partially_shipped, :shipped, :rejected, :back_ordered, :cancelled

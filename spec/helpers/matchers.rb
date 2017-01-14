@@ -36,3 +36,26 @@ RSpec::Matchers.define :usps_param do |css, expected|
     "expected XML not to have '#{expected}' at '#{css}', but it did: #{parse_xml(actual)}"
   end
 end
+
+RSpec::Matchers.define :include_sku do |product_or_sku|
+  sku = (product_or_sku.respond_to?(:sku) ?
+         product_or_sku.sku :
+         product_or_sku).upcase
+
+  match do |content|
+    begin
+      index = (content || "").index sku
+      !!index
+    rescue
+      false
+    end
+  end
+
+  failure_message do |actual|
+    "expected the content to include the SKU \"#{sku}\""
+  end
+
+  failure_message_when_negated do |actual|
+    "expected the content not to include the SKU \"#{sku}\""
+  end
+end

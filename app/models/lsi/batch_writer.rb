@@ -89,7 +89,7 @@ class Lsi::BatchWriter
     write_order_header(io, order)
     write_order_address(io, order)
     write_order_comments(io, order)
-    order.items.each{|i| write_order_item(io, i)}
+    order.items.physical.each{|i| write_order_item(io, i)}
     3 + order.items.count # return the number of lines written
   end
 
