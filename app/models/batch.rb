@@ -26,10 +26,14 @@ class Batch < ActiveRecord::Base
   scope :by_status, ->(status){where(status: status)}
 
   def self.batch_orders
-    return nil unless Order.ready_for_export.any?
+    to_batch = Order.
+      ready_for_export.
+      select(&:physical_delivery?).
+      to_a
+    return unless to_batch.any?
 
     Batch.create!.tap do |b|
-      Order.ready_for_export.each{|o| b.orders << o}
+      to_batch.each{|o| b.orders << o}
     end
   end
 

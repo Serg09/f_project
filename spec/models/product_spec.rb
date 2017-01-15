@@ -58,9 +58,20 @@ RSpec.describe Product, type: :model do
   end
 
   describe '#weight' do
-    it 'is required' do
-      product = Product.new attributes.except(:weight)
-      expect(product).to have(1).error_on(:weight)
+    context 'for a product with physical fulfillment' do
+      it 'is required' do
+        product = Product.new attributes.except(:weight)
+        expect(product).to have(1).error_on(:weight)
+      end
+    end
+
+    context 'for a product with electronic fulfillment' do
+      it 'may be nil' do
+        product = Product.new attributes.
+          except(:weight).
+          merge(fulfillment_type: :electronic)
+        expect(product).to be_valid
+      end
     end
 
     it 'must be a number' do
@@ -71,6 +82,23 @@ RSpec.describe Product, type: :model do
     it 'must be more than zero' do
       product = Product.new attributes.merge(weight: -1)
       expect(product).to have(1).error_on(:weight)
+    end
+  end
+
+  describe '#fulfillment_type' do
+    it 'defaults to "physical"' do
+      product = Product.new attributes
+      expect(product.fulfillment_type).to eq 'physical'
+    end
+
+    it 'can be "electronic"' do
+      product = Product.new attributes.merge(fulfillment_type: 'electronic')
+      expect(product).to be_valid
+    end
+
+    it 'cannot be anything except "physical" or "electronic"' do
+      product = Product.new attributes.merge(fulfillment_type: 'wishing')
+      expect(product).to have(1).error_on :fulfillment_type
     end
   end
 end

@@ -17,10 +17,13 @@
 #  accepted_quantity   :integer
 #  shipped_quantity    :integer
 #  weight              :decimal(, )
+#  fulfillment_type    :string(15)       default("physical"), not null
 #
 
 class OrderItem < ActiveRecord::Base
   include AASM
+
+  FULFILLMENT_TYPES = Product::FULFILLMENT_TYPES + ['none']
 
   belongs_to :order
   has_many :shipment_items
@@ -32,7 +35,10 @@ class OrderItem < ActiveRecord::Base
 
   validates_presence_of :order_id,
                         :sku,
-                        :quantity
+                        :quantity,
+                        :fulfillment_type
+
+  validates_inclusion_of :fulfillment_type, in: FULFILLMENT_TYPES
 
   validates_length_of :sku, maximum: 30
   validates_length_of :description, maximum: 250
@@ -46,6 +52,9 @@ class OrderItem < ActiveRecord::Base
    :tax].each{|f| validates_numericality_of f, greater_than_or_equal_to: 0, if: f}
 
   before_validation :set_defaults
+
+  scope :physical, ->{where fulfillment_type: 'physical'}
+  scope :electronic, ->{where fulfillment_type: 'electronic'}
 
   aasm(:status, whiny_transitions: false) do
     state :new, initial: true

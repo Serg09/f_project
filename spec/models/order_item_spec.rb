@@ -120,6 +120,28 @@ RSpec.describe OrderItem, type: :model do
     end
   end
 
+  describe '#fulfillment_type' do
+    it 'defaults to "physical"' do
+      item = OrderItem.new attributes
+      expect(item.fulfillment_type).to eq 'physical'
+    end
+
+    it 'can be "electronic"' do
+      item = OrderItem.new attributes.merge(fulfillment_type: 'electronic')
+      expect(item).to be_valid
+    end
+
+    it 'can be "none"' do
+      item = OrderItem.new attributes.merge(fulfillment_type: 'none')
+      expect(item).to be_valid
+    end
+
+    it 'cannot be anything other than "physical" or "electronic", or "none"' do
+      item = OrderItem.new attributes.merge(fulfillment_type: 'hoping')
+      expect(item).to have(1).error_on(:fulfillment_type)
+    end
+  end
+
   describe '#total_price' do
     let(:item) do
       FactoryGirl.create(:order_item, unit_price: 20,

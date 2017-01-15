@@ -17,6 +17,7 @@
 #  ship_method_id      :integer
 #  shipping_address_id :integer
 #  confirmation        :string(32)
+#  delivery_email      :string(100)
 #
 
 require 'securerandom'
@@ -34,6 +35,9 @@ class Order < ActiveRecord::Base
 
   validates_presence_of :client_id,
                         :order_date
+  validates_presence_of :delivery_email, if: ->{ submitted? && electronic_delivery? }
+  validates_presence_of :customer_name, if: ->{ submitted? && physical_delivery? }
+  validates_presence_of [:shipping_address_id, :telephone], if: ->{ submitted? && physical_delivery? }
   validates_length_of :customer_name,
                        maximum: 50
   validates_length_of [:client_order_id,
@@ -41,6 +45,7 @@ class Order < ActiveRecord::Base
                        maximum: 100
   validates_length_of :telephone, maximum: 25
   validates_uniqueness_of :client_order_id, if: :client_order_id
+  validate :at_least_one_item, if: :submitted?
 
   accepts_nested_attributes_for :shipping_address
 
@@ -52,14 +57,14 @@ class Order < ActiveRecord::Base
   STATUSES = [:incipient, :submitted, :exporting, :exported, :processing, :shipped, :rejected]
   aasm(:status, whiny_transitions: false) do
     state :incipient, initial: true
-    state :submitted
+    state :submitted, before_enter: :ensure_confirmation
     state :exporting
     state :exported
     state :processing
     state :shipped
     state :rejected
     event :submit do
-      transitions from: :incipient, to: :submitted, if: :_submit
+      transitions from: :incipient, to: :submitted
     end
     event :export do
       transitions from: :submitted, to: :exporting
@@ -98,7 +103,8 @@ class Order < ActiveRecord::Base
     items.create! sku: product.sku,
                   description: product.description,
                   quantity: quantity,
-                  unit_price: product.price
+                  unit_price: product.price,
+                  fulfillment_type: product.fulfillment_type
   rescue StandardError => e
     Rails.logger.warn "Error adding product with SKU #{sku} to order #{id}. #{e.class.name}: #{e.message}\n  #{e.backtrace.join("\n  ")}"
     nil
@@ -120,9 +126,9 @@ class Order < ActiveRecord::Base
 
   def ready_for_submission?
     items.length > 0 &&
-      customer_name.present? &&
-      shipping_address_id.present? &&
-      telephone.present?
+      customer_email.present? &&
+      physical_delivery_requirements_satisfied? &&
+      electronic_delivery_requirements_satisfied?
   end
 
   def abbreviated_confirmation
@@ -145,7 +151,8 @@ class Order < ActiveRecord::Base
         items.create! sku: ShipMethod::FREIGHT_CHARGE_SKU,
                       description: 'Shipping & Handling',
                       quantity: 1,
-                      unit_price: freight_charge
+                      unit_price: freight_charge,
+                      fulfillment_type: 'none'
       end
     else
       freight_charge_item.destroy! if freight_charge_item.present?
@@ -166,7 +173,24 @@ class Order < ActiveRecord::Base
     end
   end
 
+  Product::FULFILLMENT_TYPES.each do |t|
+    define_method "#{t}_delivery?" do
+      items.any?{|i| i.fulfillment_type == t}
+    end
+  end
+
   private
+
+  def physical_delivery_requirements_satisfied?
+    return true unless physical_delivery?
+    shipping_address_id.present? &&
+      telephone.present?
+  end
+
+  def electronic_delivery_requirements_satisfied?
+    return true unless electronic_delivery?
+    delivery_email.present?
+  end
 
   def calculate_freight_charge
     return nil unless items.select(&:standard_item?).any?
@@ -177,9 +201,11 @@ class Order < ActiveRecord::Base
     @freight_charge_item ||= items.find_by(sku: ShipMethod::FREIGHT_CHARGE_SKU)
   end
 
-  def _submit
-    return false unless ready_for_submission?
-    self.confirmation = SecureRandom.hex(16)
-    save
+  def ensure_confirmation
+    self.confirmation ||= SecureRandom.hex(16)
+  end
+
+  def at_least_one_item
+    errors.add(:items, 'cannot be empty') unless items.any?
   end
 end

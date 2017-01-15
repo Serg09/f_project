@@ -30,18 +30,29 @@
         %td= @order.customer_name
       %tr
         %th Shipping address
-        %td= render 'shared/address', address: @order.shipping_address
+        %td
+          -if @order.shipping_address
+            = render 'shared/address', address: @order.shipping_address
       %tr
         %th Ship Method
-        %td= @order.ship_method.description
+        %td
+          -if @order.ship_method
+            = @order.ship_method.description
       %tr
         %th Telephone
         %td= @order.telephone
       %tr
-        %th Email
+        %th Customer email
         %td
           -if @order.customer_email.present?
             =link_to @order.customer_email, "mailto:#{@order.customer_email}"
+          -else
+            &nbsp;
+      %tr
+        %th Delivery email
+        %td
+          -if @order.delivery_email.present?
+            =link_to @order.delivery_email, "mailto:#{@order.delivery_email}"
           -else
             &nbsp;
   .col-md-1

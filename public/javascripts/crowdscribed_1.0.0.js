@@ -52,13 +52,13 @@
         templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/cart_tile.html')
       }
     }])
-    .directive('addressTile', ['$sce', function($sce) {
-      // ------------
-      // Address Tile
-      // ------------
+    .directive('deliveryTile', ['$sce', function($sce) {
+      // -------------
+      // Delivery Tile
+      // -------------
       return {
         restrict: 'E',
-        templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/address_tile.html')
+        templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/delivery_tile.html')
       }
     }])
     .directive('confirmationTile', ['$sce', function($sce) {
@@ -108,8 +108,10 @@
         var clone = _.clone(order);
         clone.shipping_address = null
         data = {
-          order: clone,
-          shipping_address: order.shipping_address
+          order: clone
+        }
+        if (order.shipping_address) {
+          data.shipping_address = order.shipping_address
         }
         return $http.patch(url, data, httpConfig);
       };
@@ -264,10 +266,18 @@
         // update order
         wf.push(function() {
           var o = $rootScope.order
-          if(!o.customer_name && o.shipping_address.recipient) {
+          if(!o.customer_name &&
+              typeof(o.shipping_address) !== "undefined" &&
+              o.shipping_address.recipient) {
             o.customer_name = o.shipping_address.recipient
           }
-          return cs.updateOrder(o);
+          var d = $q.defer();
+          cs.updateOrder(o).then(function(response) {
+            d.resolve(response);
+          }, function(error) {
+            d.reject(error.data.message);
+          });
+          return d.promise;
         });
         // tokenize payment method
         wf.push(function() {
@@ -326,22 +336,58 @@
         });
       });
 
+      $rootScope.hasElectronicDelivery = function() {
+        if (typeof $rootScope.order === "undefined") {
+          return false;
+        }
+        return _.some($rootScope.order.items, function(i) {
+          return i.fulfillment_type == 'electronic';
+        });
+      };
+
+      $rootScope.hasPhysicalDelivery = function() {
+        if (typeof $rootScope.order === "undefined") {
+          return false;
+        }
+        return _.some($rootScope.order.items, function(i) {
+          return i.fulfillment_type == 'physical';
+        });
+      };
+
+      var physicalDeliveryRequirementsSatisfied = function() {
+        if (typeof $rootScope.order === "undefined") {
+          return false;
+        }
+        if ($rootScope.hasPhysicalDelivery()) {
+          var o = $rootScope.order;
+          return typeof(o.shipping_address) !== "undefined" &&
+            o.shipping_address != null &&
+            o.shipping_address.recipient != null &&
+            o.shipping_address.line_1 != null &&
+            o.shipping_address.city != null &&
+            o.shipping_address.state != null &&
+            o.shipping_address.postal_code != null &&
+            o.shipping_address.country_code != null &&
+            o.telephone != null &&
+            o.ship_method_id != null;
+        }
+        return true;
+      };
+
+      var electronicDeliveryRequirementsSatisfied = function() {
+        if ($rootScope.hasElectronicDelivery()) {
+          return $rootScope.order.delivery_email != null;
+        }
+        return true;
+      };
+
       $scope.readyToSubmit = function() {
         if (typeof $rootScope.order === "undefined") {
           return false;
         }
-        var o = $rootScope.order;
-        return o.customer_email != null &&
-          typeof(o.shipping_address) !== "undefined" &&
-          o.shipping_address != null &&
-          o.shipping_address.recipient != null &&
-          o.shipping_address.line_1 != null &&
-          o.shipping_address.city != null &&
-          o.shipping_address.state != null &&
-          o.shipping_address.postal_code != null &&
-          o.shipping_address.country_code != null &&
-          o.telephone != null &&
-          o.ship_method_id != null;
+        return $rootScope.order.customer_email != null &&
+          physicalDeliveryRequirementsSatisfied() &&
+          electronicDeliveryRequirementsSatisfied();
       };
 
       $scope.preventSubmission = function() {

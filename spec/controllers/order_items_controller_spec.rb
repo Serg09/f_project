@@ -133,33 +133,28 @@ RSpec.describe OrderItemsController, type: :controller do
     end
 
     context 'for a submitted order' do
-      it_behaves_like 'an immutable order' do
-        let (:order) { FactoryGirl.create(:submitted_order) }
-      end
+      let!(:order) { FactoryGirl.create(:submitted_order) }
+      include_examples 'an immutable order'
     end
 
     context 'for an exported order' do
-      it_behaves_like 'an immutable order' do
-        let (:order) { FactoryGirl.create(:exported_order) }
-      end
+      let!(:order) { FactoryGirl.create(:exported_order) }
+      include_examples 'an immutable order'
     end
 
     context 'for a processing order' do
-      it_behaves_like 'an immutable order' do
-        let (:order) { FactoryGirl.create(:processing_order) }
-      end
+      let!(:order) { FactoryGirl.create(:processing_order) }
+      include_examples 'an immutable order'
     end
 
     context 'for a shipped order' do
-      it_behaves_like 'an immutable order' do
-        let (:order) { FactoryGirl.create(:shipped_order) }
-      end
+      let!(:order) { FactoryGirl.create(:shipped_order) }
+      include_examples 'an immutable order'
     end
 
     context 'for a rejected order' do
-      it_behaves_like 'an immutable order' do
-        let (:order) { FactoryGirl.create(:rejected_order) }
-      end
+      let!(:order) { FactoryGirl.create(:rejected_order) }
+      include_examples 'an immutable order'
     end
   end
 

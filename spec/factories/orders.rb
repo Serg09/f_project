@@ -1,9 +1,5 @@
 FactoryGirl.define do
   factory :order, aliases: [:incipient_order] do
-    transient do
-      item_count 0
-      items []
-    end
     association :shipping_address, factory: :address
     client
     client_order_id { Faker::Number.hexadecimal(12) }
@@ -13,21 +9,23 @@ FactoryGirl.define do
     telephone { Faker::PhoneNumber.phone_number }
     ship_method
 
-    after(:create) do |order, evaluator|
-      (1..(evaluator.item_count)).each do |i|
-        order.items << FactoryGirl.create(:order_item, order: order)
-      end
-      evaluator.items.each do |item|
-        order.add_item item[:sku], item[:quantity]
-      end
-      if %w(submitted exporting exported processing shipped).include? order.status
-        order.update_attribute :confirmation, Faker::Number.hexadecimal(32)
-      end
-    end
-
     Order::STATUSES.reject{|s| s == :incipient}.each do |status|
       factory "#{status}_order".to_sym do
-        status status
+        transient do
+          item_attributes [
+            {quantity: 1}
+          ]
+        end
+        after(:create) do |order, evaluator|
+          evaluator.item_attributes.each do |attr|
+            sku = attr[:sku] || FactoryGirl.create(:product).sku
+            quantity = attr[:quantity] || 1
+            order.add_item sku, quantity
+          end
+          order.status = status
+          order.confirmation ||= SecureRandom.hex(16)
+          order.save!
+        end
       end
     end
   end

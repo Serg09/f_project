@@ -5,9 +5,18 @@ describe ExportProcessor do
 
   context 'when unbatched orders are present' do
     let (:ftp) { double('ftp') }
-    let!(:order1) { FactoryGirl.create(:submitted_order, item_count: 1) }
+    let (:physical_product) { FactoryGirl.create :product }
+    let (:electronic_product) { FactoryGirl.create :electronic_product }
+    let!(:order) do
+      FactoryGirl.create :submitted_order,
+        delivery_email: Faker::Internet.email,
+        item_attributes: [
+          {sku: physical_product.sku},
+          {sku: electronic_product.sku}
+        ]
+    end
 
-    describe '#perform' do
+    describe '::perform' do
       context 'on success' do
         before(:each) do
           allow(ftp).to receive(:chdir)
@@ -35,6 +44,20 @@ describe ExportProcessor do
           batch = Batch.last
           expect(batch.status).to eq Batch.DELIVERED
         end
+
+        it 'includes the physical fulfillment items' do
+          expect(REMOTE_FILE_PROVIDER).to receive(:send_file) do |file, remotefile, folder|
+            expect(file.read).to include_sku physical_product
+          end
+          ExportProcessor.perform
+        end
+
+        it 'omits elecront fulfillment items' do
+          expect(REMOTE_FILE_PROVIDER).to receive(:send_file) do |file, remotefile, folder|
+            expect(file.read).not_to include_sku electronic_product
+          end
+          ExportProcessor.perform
+        end
       end
 
       context 'on failure' do
@@ -46,6 +69,29 @@ describe ExportProcessor do
           ExportProcessor.perform
           batch = Batch.last
           expect(batch.status).to eq Batch.NEW
+        end
+      end
+    end
+
+    context 'but only contain electronic delivery items' do
+      let!(:order) do
+        FactoryGirl.create :submitted_order,
+          delivery_email: Faker::Internet.email,
+          item_attributes: [
+            {sku: electronic_product.sku}
+          ]
+      end
+
+      describe '::perform' do
+        it 'does not create a batch' do
+          expect do
+            ExportProcessor.perform
+          end.not_to change(Batch, :count)
+        end
+
+        it 'does not upload a file' do
+          expect(REMOTE_FILE_PROVIDER).not_to receive(:send_file)
+          ExportProcessor.perform
         end
       end
     end

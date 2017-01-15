@@ -1,0 +1,89 @@
+<div class="delivery-tile" ng-hide="submission.isComplete()">
+  <div id="contact">
+    <h2>Contact Information</h2>
+    <form name="contactForm" novalidate action="#" ng-hide="submission.isInProgress()">
+      <div class="form-group" id="email-group" ng-class="{ 'has-error': contactForm.customer_email.$invalid && contactForm.customer_email.$touched }">
+        <label class="control-label required" for="customer_email">Email</label>
+        <input id="customer_email" type="text" name="customer_email" class="form-control" pattern="^\w+@\w+\.\w+$" ng-model="order.customer_email" required autofocus />
+      </div>
+    </form>
+  </div>
+  <div id="electronic-delivery">
+    <h2 class="electronic-delivery-header">Email To</h2>
+    <form name="electronicDeliveryForm" novalidate action="#" ng-hide="submission.isInProgress()">
+      <div class="form-group" id="delivery-email-group" ng-class="{ 'has-error': electronicDeliveryForm.deliveryEmail.$invalid && electronicDeliveryForm.deliveryEmail.$touched }">
+        <label class="control-label" ng-class="{required: hasElectronicDelivery()}" for="deliveryEmail">e-Reader Email</label>
+        <input id="deliveryEmail" type="email" name="deliveryEmail" class="form-control" ng-model="order.delivery_email" ng-required="hasElectronicDelivery()" />
+      </div>
+    </form>
+  </div>
+  <div id="physical-delivery">
+    <h2 class="physical-delivery-header">Ship To</h2>
+    <form name="physicalDeliveryForm" novalidate action="#" ng-hide="submission.IsInProgress()">
+      <div class="form-group" id="recipient-group" ng-class="{ 'has-error': physicalDeliveryForm.recipient.$invalid && physicalDeliveryForm.recipient.$touched }">
+        <label class="control-label" ng-class="{required: hasPhysicalDelivery()}" for="recipient">Recipient</label>
+        <input id="recipient" type="text" name="recipient" class="form-control" ng-model="order.shipping_address.recipient" ng-required="hasPhysicalDelivery()" />
+      </div>
+      <div class="form-group" id="line-1-group" ng-class="{ 'has-error': physicalDeliveryForm.line_1.$invalid && physicalDeliveryForm.line_1.$touched }">
+        <label for="line-1" class="control-label" ng-class="{required: hasPhysicalDelivery()}">Line 1</label>
+        <input id="line-1" name="line_1" type="text" class="form-control" ng-model="order.shipping_address.line_1" ng-required="hasPhysicalDelivery()" />
+      </div>
+      <div class="form-group" id="line-2-group">
+        <label class="control-label" for="line-2">Line 2</label>
+        <input id="line-2" type="text" class="form-control" ng-model="order.shipping_address.line_2" />
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group" id="city-group" ng-class="{ 'has-error': physicalDeliveryForm.city.$invalid && physicalDeliveryForm.city.$touched }">
+            <label class="control-label" ng-class="{required: hasPhysicalDelivery()}" for="city">City</label>
+            <input id="city" name="city" type="text" class="form-control" ng-model="order.shipping_address.city" ng-required="hasPhysicalDelivery()" />
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group" id="state-group" ng-class="{ 'has-error': physicalDeliveryForm.state.$invalid && physicalDeliveryForm.state.$touched }">
+            <label class="control-label" ng-class="{required: hasPhysicalDelivery()}" for="state">State</label>
+            <input id="state" name="state" maxlength="2" type="text" class="form-control" ng-model="order.shipping_address.state" ng-required="hasPhysicalDelivery()" />
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group" id="postal-code-group">
+            <label class="control-label" ng-class="{required: hasPhysicalDelivery()}" for="postal-code">Postal Code</label>
+            <input id="postal-code"
+                  name="postal_code"
+                  type="text"
+                  class="form-control"
+                  pattern="^[a-zA-Z0-9]{5,}$"
+                  ng-blur="updateFreightCharge()"
+                  ng-model="order.shipping_address.postal_code"
+                  ng-required="hasPhysicalDelivery()" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group" id="country-code-group" ng-class="{ 'has-error': physicalDeliveryForm.country_code.$invalid && physicalDeliveryForm.country_code.$touched }">
+            <label class="control-label" ng-class="{required: hasPhysicalDelivery()}" for="country-code">Country Code</label>
+            <select id="country-code" name="country_code" class="form-control" ng-model="order.shipping_address.country_code">
+              <option ng-repeat="country in countries" value="{{country.abbreviation}}">{{country.name}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group" id="telephone-group" ng-class="{ 'has-error': physicalDeliveryForm.telephone.$invalid && physicalDeliveryForm.telephone.$touched}">
+            <label class="control-label" ng-class="{required: hasPhysicalDelivery()}" for="telephone">Telephone</label>
+            <input id="telephone" name="telephone" type="text" class="form-control" ng-model="order.telephone" ng-required="hasPhysicalDelivery()" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group" id="ship-method-group">
+        <label for="ship-method" class="control-label" ng-class="{required: hasPhysicalDelivery()}">Ship Method</label>
+        <select id="ship-method"
+                class="form-control"
+                ng-change="updateFreightCharge()"
+                ng-model="order.ship_method_id"
+                ng-options="shipMethod.id as shipMethod.description for shipMethod in shipMethods"
+                ng-required="hasPhysicalDelivery()" />
+      </div>
+    </form>
+  </div>
+</div>

@@ -9,11 +9,11 @@ describe Lsi::PoaProcessor do
   let (:sku_2) { '123456987X' }
   let!(:product_1) { FactoryGirl.create(:product, sku: sku_1) }
   let!(:product_2) { FactoryGirl.create(:product, sku: sku_2) }
-  let (:order1) { FactoryGirl.create(:exported_order) }
-  let!(:item1_1) { order1 << sku_1 }
-  let (:order2) { FactoryGirl.create(:exported_order) }
-  let!(:item2_1) { order2 << sku_1 }
-  let!(:item2_2) { order2 << sku_2  }
+  let (:order1) { FactoryGirl.create(:exported_order, item_attributes: [{sku: sku_1}]) }
+  let!(:item1_1) { order1.items.first }
+  let (:order2) { FactoryGirl.create(:exported_order, item_attributes: [{sku: sku_1},{sku: sku_2}]) }
+  let!(:item2_1) { order2.items.select{|i| i.sku == sku_1}.first }
+  let!(:item2_2) { order2.items.select{|i| i.sku == sku_2}.first }
   let!(:batch) { FactoryGirl.create(:batch, orders: [order1, order2]) }
 
 

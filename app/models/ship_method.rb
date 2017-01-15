@@ -9,6 +9,7 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  calculator_class :string(256)      not null
+#  active           :boolean          default(FALSE), not null
 #
 
 class ShipMethod < ActiveRecord::Base
@@ -27,6 +28,7 @@ class ShipMethod < ActiveRecord::Base
   scope :active, ->{ where(active: true) }
 
   def calculate_charge(order)
+    return nil unless order.shipping_address
     calculator_class.constantize.new(order).rate
   end
 end
