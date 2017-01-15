@@ -36,7 +36,7 @@ class Order < ActiveRecord::Base
   validates_presence_of :client_id,
                         :order_date
   validates_presence_of :delivery_email, if: ->{ submitted? && electronic_delivery? }
-  validates_presence_of :customer_name, if: :submitted?
+  validates_presence_of :customer_name, if: ->{ submitted? && physical_delivery? }
   validates_presence_of [:shipping_address_id, :telephone], if: ->{ submitted? && physical_delivery? }
   validates_length_of :customer_name,
                        maximum: 50
@@ -126,7 +126,6 @@ class Order < ActiveRecord::Base
 
   def ready_for_submission?
     items.length > 0 &&
-      customer_name.present? &&
       customer_email.present? &&
       physical_delivery_requirements_satisfied? &&
       electronic_delivery_requirements_satisfied?
