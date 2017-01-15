@@ -28,6 +28,7 @@ class ShipMethod < ActiveRecord::Base
   scope :active, ->{ where(active: true) }
 
   def calculate_charge(order)
+    return nil unless order.shipping_address
     calculator_class.constantize.new(order).rate
   end
 end
