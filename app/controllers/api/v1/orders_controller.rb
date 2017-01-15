@@ -51,6 +51,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
       OrderMailer.purchase_confirmation(@order).deliver_now
       render json: @order.as_json(include: {shipping_address: {}, items: {methods: [:extended_price]}})
     else
+      logger.warn "Unable to submit the order #{@order.id}: #{@order.errors.full_messages}"
       render json: {error: "Unable to submit the order."}, status: :internal_server_error
     end
   end
