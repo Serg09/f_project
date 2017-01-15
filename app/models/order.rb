@@ -174,13 +174,13 @@ class Order < ActiveRecord::Base
     end
   end
 
-  private
-
   Product::FULFILLMENT_TYPES.each do |t|
     define_method "#{t}_delivery?" do
       items.any?{|i| i.fulfillment_type == t}
     end
   end
+
+  private
 
   def physical_delivery_requirements_satisfied?
     return true unless physical_delivery?
