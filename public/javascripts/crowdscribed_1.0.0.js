@@ -110,7 +110,7 @@
         data = {
           order: clone
         }
-        if (order.shipping_id) {
+        if (order.shipping_address) {
           data.shipping_address = order.shipping_address
         }
         return $http.patch(url, data, httpConfig);
