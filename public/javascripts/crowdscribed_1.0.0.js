@@ -669,9 +669,6 @@
           // maybe we need to block the app while this call happens?
           cs.updateOrder($rootScope.order).then(function(response) {
             $rootScope.order = response.data;
-          },
-          function(error) {
-            $rootScope.errors.push("Unable to update the order in order update the freight charge.");
           });
         }
       };
