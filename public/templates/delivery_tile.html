@@ -8,7 +8,7 @@
       </div>
     </form>
   </div>
-  <div id="electronic-delivery">
+  <div id="electronic-delivery" ng-hide="!hasElectronicDelivery()">
     <h2 class="electronic-delivery-header">Email To</h2>
     <p>Your e-book will be emailed to your Send-To-Kindle email address. In order
     to receive the email, you will need to add noreply@crowdscribed.com to
@@ -22,7 +22,7 @@
       </div>
     </form>
   </div>
-  <div id="physical-delivery">
+  <div id="physical-delivery" ng-hide="!hasPhysicalDelivery()">
     <h2 class="physical-delivery-header">Ship To</h2>
     <form name="physicalDeliveryForm" novalidate action="#" ng-hide="submission.IsInProgress()">
       <div class="form-group" id="recipient-group" ng-class="{ 'has-error': physicalDeliveryForm.recipient.$invalid && physicalDeliveryForm.recipient.$touched }">
