@@ -13,13 +13,12 @@ module Freight
     end
 
     def total_weight
-      @total_weight ||= order.items.reduce(0) do |sum, item|
-        product = Product.find_by_sku(item.sku)
-        item_weight = product.present? ?
-          product.weight * item.quantity :
-          0
-        sum + item_weight
-      end
+      @total_weight ||= order.items.physical.
+        map{|i| {item: i, product: Product.find_by_sku(i.sku)}}.
+        select{|tuple| tuple[:product].present?}.
+        reduce(0) do |sum, tuple|
+          sum + tuple[:product].weight * tuple[:item].quantity
+        end
     end
   end
 end
