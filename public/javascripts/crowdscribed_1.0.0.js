@@ -216,9 +216,6 @@
       // Multi Purchase Tile Controller
       // ------------------------------
 
-      console.log("products");
-      console.log($scope.products);
-
       _.each($scope.products, function(product) {
         cs.getProduct(product.sku).then(function(response) {
           product.caption = product.caption + " - " + response.data.price;
