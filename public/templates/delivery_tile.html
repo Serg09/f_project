@@ -18,7 +18,10 @@
     <form name="electronicDeliveryForm" novalidate action="#" ng-hide="submission.isInProgress()">
       <div class="form-group" id="delivery-email-group" ng-class="{ 'has-error': electronicDeliveryForm.deliveryEmail.$invalid && electronicDeliveryForm.deliveryEmail.$touched }">
         <label class="control-label" ng-class="{required: hasElectronicDelivery()}" for="deliveryEmail">e-Reader Email</label>
-        <input id="deliveryEmail" type="email" name="deliveryEmail" class="form-control" ng-model="order.delivery_email" ng-required="hasElectronicDelivery()" />
+        <div class="input-group">
+          <input id="deliveryEmail" type="text" name="deliveryEmail" class="form-control" ng-model="order.delivery_email_prefix" ng-required="hasElectronicDelivery()" />
+          <span class="input-group-addon">@kindle.com</span>
+        </div>
       </div>
     </form>
   </div>
