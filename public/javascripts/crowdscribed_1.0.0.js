@@ -106,11 +106,15 @@
       this.updateOrder = function(order) {
         var url = CROWDSCRIBED_HOST + '/api/v1/orders/' + order.id;
         var clone = _.clone(order);
-        clone.shipping_address = null
+        clone.shipping_address = null;
+        if (clone.delivery_email_prefix) {
+          clone.delivery_email = clone.delivery_email_prefix + "@kindle.com";
+          clone.delivery_email_prefix = null;
+        }
         data = {
           order: clone
         }
-        if (order.shipping_address) {
+        if (order.shipping_address && order.shipping_address.line_1) {
           data.shipping_address = order.shipping_address
         }
         return $http.patch(url, data, httpConfig);
@@ -373,7 +377,7 @@
 
       var electronicDeliveryRequirementsSatisfied = function() {
         if ($rootScope.hasElectronicDelivery()) {
-          return $rootScope.order.delivery_email != null;
+          return $rootScope.order.delivery_email_prefix != null;
         }
         return true;
       };
@@ -654,6 +658,13 @@
         $rootScope.errors.push("Unable to get the ship methods from the service.");
       });
 
+      var setOrder = function(order) {
+        if (order.delivery_email != null) {
+          order.delivery_email_prefix = order.delivery_email.split('@')[0];
+        }
+        $rootScope.order = order;
+      };
+
       $rootScope.updateFreightCharge = function() {
         order = $rootScope.order;
         if (order != null &&
@@ -665,14 +676,14 @@
 
           // maybe we need to block the app while this call happens?
           cs.updateOrder($rootScope.order).then(function(response) {
-            $rootScope.order = response.data;
+            setOrder(response.data);
           });
         }
       };
 
       var refreshOrder = function() {
         cs.getOrder($rootScope.order.id).then(function(response) {
-          $rootScope.order = response.data;
+          setOrder(response.data);
         }, function(error) {
           $rootScope.errors.push("Unable to get the updated order.");
         });

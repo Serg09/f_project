@@ -9,7 +9,7 @@ describe ExportProcessor do
     let (:electronic_product) { FactoryGirl.create :electronic_product }
     let!(:order) do
       FactoryGirl.create :submitted_order,
-        delivery_email: Faker::Internet.email,
+        delivery_email: "#{Faker::Internet.user_name}@kindle.com",
         item_attributes: [
           {sku: physical_product.sku},
           {sku: electronic_product.sku}
@@ -76,7 +76,7 @@ describe ExportProcessor do
     context 'but only contain electronic delivery items' do
       let!(:order) do
         FactoryGirl.create :submitted_order,
-          delivery_email: Faker::Internet.email,
+          delivery_email: "#{Faker::Internet.user_name}@kindle.com",
           item_attributes: [
             {sku: electronic_product.sku}
           ]
