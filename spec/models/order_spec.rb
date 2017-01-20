@@ -70,7 +70,12 @@ RSpec.describe Order, type: :model do
 
   describe '#customer_email' do
     it 'cannot be more than 100 characters' do
-      order = Order.new attributes.merge(customer_email: 'X' * 101)
+      order = Order.new attributes.merge(customer_email: "#{'X' * 93}@aol.com")
+      expect(order).to have_at_least(1).error_on :customer_email
+    end
+
+    it 'must be a valid email address' do
+      order = Order.new attributes.merge(customer_email: 'notanemailaddress')
       expect(order).to have_at_least(1).error_on :customer_email
     end
   end
@@ -98,6 +103,13 @@ RSpec.describe Order, type: :model do
     let (:order) { Order.new attributes.merge confirmation: 'abcd123456789012345679012345678' }
     it 'is the first 8 characters of the full confirmation, separated with a hyphen' do
       expect(order.abbreviated_confirmation).to eq 'ABCD-1234'
+    end
+  end
+
+  describe '#delivery_emai' do
+    it 'must be a kindle email address' do
+      order = Order.new attributes.merge delivery_email: 'someone@somewhere.com'
+      expect(order).to have(1).error_on :delivery_email
     end
   end
 

@@ -217,7 +217,7 @@ describe Api::V1::OrdersController do
             FactoryGirl.create :order, client: client,
                                       shipping_address: nil,
                                       telephone: nil,
-                                      delivery_email: Faker::Internet.email
+                                      delivery_email: "#{Faker::Internet.user_name}@kindle.com"
           end
           let (:product) { FactoryGirl.create :electronic_product }
           before { order << product }
