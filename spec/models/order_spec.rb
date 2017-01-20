@@ -78,6 +78,11 @@ RSpec.describe Order, type: :model do
       order = Order.new attributes.merge(customer_email: 'notanemailaddress')
       expect(order).to have_at_least(1).error_on :customer_email
     end
+
+    it 'cannot have two @s' do
+      order = Order.new attributes.merge(customer_email: 'blah@blah@blah.com')
+      expect(order).to have_at_least(1).error_on :customer_email
+    end
   end
 
   describe '#telephone' do
@@ -107,8 +112,23 @@ RSpec.describe Order, type: :model do
   end
 
   describe '#delivery_emai' do
-    it 'must be a kindle email address' do
+    it 'can have a kindle.com domain' do
+      order = Order.new attributes.merge delivery_email: 'someone@kindle.com'
+      expect(order).to have(0).errors_on :delivery_email
+    end
+
+    it 'it cannot have a domain other than kindle.com' do
       order = Order.new attributes.merge delivery_email: 'someone@somewhere.com'
+      expect(order).to have(1).error_on :delivery_email
+    end
+
+    it 'must be a valid email address' do
+      order = Order.new attributes.merge delivery_email: 'notanemailaddress'
+      expect(order).to have(1).error_on :delivery_email
+    end
+
+    it 'cannot have two @s' do
+      order = Order.new attributes.merge delivery_email: 'some@one@kindle.com'
       expect(order).to have(1).error_on :delivery_email
     end
   end

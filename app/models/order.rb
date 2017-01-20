@@ -45,8 +45,8 @@ class Order < ActiveRecord::Base
                        maximum: 100
   validates_length_of :telephone, maximum: 25
   validates_uniqueness_of :client_order_id, if: :client_order_id
-  validates_format_of :delivery_email, with: /\A\S+@kindle\.com\z/i, if: :delivery_email
-  validates_format_of :customer_email, with: /\A\S+@\S+\.[a-z]{2,4}\z/i, if: :customer_email
+  validates_format_of :delivery_email, with: /\A[^\s@]+@kindle\.com\z/i, if: :delivery_email
+  validates_format_of :customer_email, with: /\A[^\s@]+@[^\s@]+\.[a-z]{2,4}\z/i, if: :customer_email
   validate :at_least_one_item, if: :submitted?
 
   accepts_nested_attributes_for :shipping_address
