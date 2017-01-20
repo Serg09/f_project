@@ -4,7 +4,7 @@
     <form name="contactForm" novalidate action="#">
       <div class="form-group" id="email-group" ng-class="{ 'has-error': contactForm.customer_email.$invalid && contactForm.customer_email.$touched }">
         <label class="control-label required" for="customer_email">Email</label>
-        <input id="customer_email" type="text" name="customer_email" class="form-control" pattern="^\w+@\w+\.\w+$" ng-model="order.customer_email" required autofocus />
+        <input id="customer_email" type="text" name="customer_email" class="form-control" pattern="^[^\s@]+@[^\s@]+\.\w+$" ng-model="order.customer_email" required autofocus />
       </div>
     </form>
   </div>
@@ -19,7 +19,7 @@
       <div class="form-group" id="delivery-email-group" ng-class="{ 'has-error': electronicDeliveryForm.deliveryEmail.$invalid && electronicDeliveryForm.deliveryEmail.$touched }">
         <label class="control-label" ng-class="{required: hasElectronicDelivery()}" for="deliveryEmail">e-Reader Email</label>
         <div class="input-group">
-          <input id="deliveryEmail" type="text" name="deliveryEmail" class="form-control" ng-model="order.delivery_email_prefix" ng-required="hasElectronicDelivery()" />
+          <input id="deliveryEmail" type="text" name="deliveryEmail" class="form-control" ng-model="order.delivery_email_prefix" ng-required="hasElectronicDelivery()" pattern="^[^\s@]+$" />
           <span class="input-group-addon">@kindle.com</span>
         </div>
       </div>
