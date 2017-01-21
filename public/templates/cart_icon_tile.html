@@ -1,0 +1,6 @@
+<div id="cart-icon" ng-controller="cartIconController">
+  <a ng-href="{{ purchasePath }}">
+    <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+    <span ng-bind="itemCount" ng-hide="itemCount == 0"></span>
+  </a>
+</div>

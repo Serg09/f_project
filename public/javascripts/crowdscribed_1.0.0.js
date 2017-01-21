@@ -43,6 +43,15 @@
         templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/payment_tile.html')
       }
     }])
+    .directive('cartIconTile', ['$sce', function($sce) {
+      // ---------------
+      // Cart Icone Tile
+      // ---------------
+      return {
+        restrict: 'E',
+        templateUrl: $sce.trustAsResourceUrl(CROWDSCRIBED_HOST + '/templates/cart_icon_tile.html')
+      }
+    }])
     .directive('cartTile', ['$sce', function($sce) {
       // ---------
       // Cart Tile
@@ -652,6 +661,20 @@
         //{ name: "Yemen", abbreviation: "YE"}
       ];
     }]) // paymentController
+    .controller('cartIconController', ['$scope', '$cookies', 'cs', function($scope, $cookies, cs) {
+      $scope.purchasePath = CROWDSCRIBED_PURCHASE_PATH;
+      $scope.itemCount = 0;
+      var orderId = $cookies.get('order_id');
+      if (orderId) {
+        cs.getOrder(orderId).then(function(response) {
+          $scope.itemCount = _.filter(response.data.items, function(item) {
+            return item['standard_item?'];
+          }).length
+        }, function(error) {
+          $rootScope.errors.push("Unable to get the updated order.");
+        });
+      }
+    }])
     .controller('cartController', ['$rootScope', '$cookies', '$location', 'cs', function($rootScope, $cookies, $location, cs) {
 
       // Look up ship methods
