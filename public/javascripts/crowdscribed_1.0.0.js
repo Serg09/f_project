@@ -205,7 +205,6 @@
       // Purchase Tile Controller
       // ------------------------
 
-
       // Lookup the price
       cs.getProduct($scope.sku).then(function(response) {
         if(response.data) {
