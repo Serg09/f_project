@@ -229,6 +229,9 @@
       $scope.purchasePath = CROWDSCRIBED_PURCHASE_PATH;
     }])
     .controller('paymentController', ['$rootScope', '$scope', '$q', '$uibModal', '$sce', 'cs', 'workflow', function($rootScope, $scope, $q, $uibModal, $sce, cs, workflow) {
+
+      $scope.browsePath = CROWDSCRIBED_BROWSE_PATH;
+
       var StateMachine = function() {
         this.state = "unstarted";
       };
