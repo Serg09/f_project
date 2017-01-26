@@ -96,7 +96,13 @@ class OrdersController < ApplicationController
   end
 
   def export_csv
-    raise 'not implemented'
+    orders = Order.find(params[:order_ids].split(','))
+    csv = CSV.generate do |csv|
+      orders.each do |order|
+        csv << [order.id, order.customer_name, order.customer_email, order.delivery_email]
+      end
+    end
+    render text: csv, content_type: 'text/csv'
   end
 
   private
