@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   respond_to :html
 
   before_filter :authenticate_user!
-  before_filter :load_order, except: [:index, :new, :create]
+  before_filter :load_order, except: [:index, :new, :create, :export_csv]
 
   def index
     @orders = Order.
@@ -93,6 +93,10 @@ class OrdersController < ApplicationController
         end
       end
     end
+  end
+
+  def export_csv
+    raise 'not implemented'
   end
 
   private
