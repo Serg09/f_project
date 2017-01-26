@@ -6,7 +6,10 @@
 -#   - mark the orders as manually exported
 :coffee
   window.export_csv = () ->
-    $('#orders_form').attr('method', 'get').submit()
+    ids = $('input[name="order_id"]').map (index, elem) -> elem.value
+    url = "/orders/export_csv?order_ids=" + _.reduce ids, (result, id) ->
+      result + "," + id
+    window.open url
 =render_navigation level: 2
 =form_tag export_csv_orders_path, name: 'orders_form', id: 'orders_form' do
   %table#order-table.table.table-striped.table-hover
