@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   respond_to :html
 
   before_filter :authenticate_user!
-  before_filter :load_order, except: [:index, :new, :create]
+  before_filter :load_order, except: [:index, :new, :create, :export_csv]
 
   def index
     @orders = Order.
@@ -93,6 +93,12 @@ class OrdersController < ApplicationController
         end
       end
     end
+  end
+
+  def export_csv
+    orders = Order.find(params[:order_ids].split(','))
+    exporter = OrderCsvExporter.new(orders)
+    render text: exporter.content, content_type: 'text/csv'
   end
 
   private

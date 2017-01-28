@@ -30,6 +30,9 @@ Rails.application.routes.draw do
       patch :submit
       patch :export
     end
+    collection do
+      get :export_csv
+    end
   end
   resources :confirmations, only: [:show]
   resources :order_items, only: [:edit, :update, :destroy]
