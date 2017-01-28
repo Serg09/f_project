@@ -28,8 +28,25 @@ class OrderCsvExporter
 
   def content
     csv = CSV.generate do |csv|
+      csv << [
+        "SKU",
+        "Description",
+        "Quantity",
+        "Order ID",
+        "Line Item No",
+        "",
+        "Ship Method",
+        "Recipient",
+        "Address 1",
+        "Address 2",
+        "City",
+        "State",
+        "Postal Code",
+        "Country Code",
+        "Telephone"
+      ]
       @orders.each do |order|
-        order.items.physical.each do |item|
+        order.items.physical.select(&:standard_item?).each do |item|
           csv << [
             item.sku,
             item.description,
