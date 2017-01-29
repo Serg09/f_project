@@ -137,15 +137,30 @@ RSpec.describe OrdersController, type: :controller do
     end
 
     shared_examples_for 'an unexportable order' do
-      it 'redirects to the order show page' do
-        patch :export, id: order
-        expect(response).to redirect_to order_path(order)
+      describe 'PATCH #export' do
+        it 'redirects to the order show page' do
+          patch :export, id: order
+          expect(response).to redirect_to order_path(order)
+        end
+
+        it 'does not change the order status' do
+          expect do
+            patch :export, id: order
+          end.not_to change(order, :status)
+        end
       end
 
-      it 'does not change the order status' do
-        expect do
+      describe 'PATCH #manual_export' do
+        it 'redirects to the order show page' do
           patch :export, id: order
-        end.not_to change(order, :status)
+          expect(response).to redirect_to order_path(order)
+        end
+
+        it 'does not change the order status' do
+          expect do
+            patch :export, id: order
+          end.not_to change(order, :status)
+        end
       end
     end
 
@@ -220,6 +235,20 @@ RSpec.describe OrdersController, type: :controller do
             patch :export, id: order
             order.reload
           end.to change(order, :status).to('exporting')
+        end
+      end
+
+      describe 'PATCH #manual_export' do
+        it 'redirects to the exported order index page' do
+          patch :manual_export, id: order
+          expect(response).to redirect_to orders_path(status: :exported)
+        end
+
+        it 'changes the order status to "exported"' do
+          expect do
+            patch :manual_export, id: order
+            order.reload
+          end.to change(order, :status).to('exported')
         end
       end
 

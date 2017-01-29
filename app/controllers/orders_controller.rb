@@ -95,6 +95,14 @@ class OrdersController < ApplicationController
     end
   end
 
+  def manual_export
+    if @order.manual_export!
+      redirect_to orders_path(status: :exported), notice: 'The order has been marked as exported.'
+    else
+      redirect_to order_path(@order), alert: 'The order could not be marked as exported.'
+    end
+  end
+
   def export_csv
     orders = Order.find(params[:order_ids].split(','))
     exporter = OrderCsvExporter.new(orders)
