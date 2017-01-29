@@ -395,10 +395,10 @@ RSpec.describe Order, type: :model do
         expect(order.manual_export).to be true
       end
 
-      it 'changes the status to "exported"' do
+      it 'changes the status to "processing"' do
         expect do
           order.manual_export
-        end.to change(order, :status).to('exported')
+        end.to change(order, :status).to('processing')
       end
     end
   end

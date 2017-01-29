@@ -97,7 +97,7 @@ class OrdersController < ApplicationController
 
   def manual_export
     if @order.manual_export!
-      redirect_to orders_path(status: :exported), notice: 'The order has been marked as exported.'
+      redirect_to orders_path(status: @order.status), notice: 'The order has been manually exported.'
     else
       redirect_to order_path(@order), alert: 'The order could not be marked as exported.'
     end
