@@ -1,0 +1,34 @@
+-content_for :page_title do
+  New shipment for #{h @order.formatted_id}
+
+=form_for([@order,@shipment]) do |f|
+  .row
+    .col-md-3
+      .form-group{ class: form_group_class(@shipment, :external_id) }
+        =f.label :external_id, 'External ID', class: 'control-label'
+        =f.text_field :external_id, class: 'form-control', autofocus: true
+        =help_blocks(@shipment, :external_id)
+      .form-group{ class: form_group_class(@shipment, :ship_date) }
+        =f.label :ship_date, class: 'control-label'
+        =f.text_field :ship_date, class: 'form-control date-field'
+        =help_blocks(@shipment, :ship_date)
+      .form-group{ class: form_group_class(@shipment, :quantity) }
+        =f.label :quantity, class: 'control-label'
+        =f.number_field :quantity, class: 'form-control', step: 1, min: 1
+        =help_blocks(@shipment, :quantity)
+    .col-md-3
+      .form-group{ class: form_group_class(@shipment, :weight) }
+        =f.label :weight, class: 'control-label'
+        =f.number_field :weight, class: 'form-control', step: 0.01, min: 0.01
+        =help_blocks(@shipment, :weight)
+      .form-group{ class: form_group_class(@shipment, :freight_charge) }
+        =f.label :freight_charge, class: 'control-label'
+        =f.number_field :freight_charge, class: 'form-control', step: 0.01, min: 0
+        =help_blocks(@shipment, :freight_charge)
+      .form-group{ class: form_group_class(@shipment, :handling_charge) }
+        =f.label :handling_charge, class: 'control-label'
+        =f.number_field :handling_charge, class: 'form-control', step: 0.01, min: 0
+        =help_blocks(@shipment, :handling_charge)
+  .row
+    .col-md-3
+      =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save this shipment'

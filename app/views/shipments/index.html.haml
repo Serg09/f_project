@@ -1,0 +1,17 @@
+-content_for :page_title do
+  Shipments for #{h @order.formatted_id}
+
+.row
+  .col-md-6
+    %table#shipment-table.table.table-striped
+      %tr
+        %th Ship date
+        %th External ID
+        %th Quantity
+      -@shipments.each do |shipment|
+        %tr
+          %td= format_date(shipment.ship_date)
+          %td= shipment.external_id
+          %td= shipment.quantity
+
+    =link_to 'Add', new_order_shipment_path(@order), class: 'btn btn-primary', title: 'Click here to add a shipment for this order.'

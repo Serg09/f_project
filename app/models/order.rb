@@ -88,6 +88,11 @@ class Order < ActiveRecord::Base
     end
   end
 
+  def formatted_id
+    return nil unless id
+    "%06d" % id
+  end
+
   def total
     items.reduce(0){|sum, i| sum + i.total_price}
   end

@@ -38,10 +38,11 @@ Feature: Create a shipment
     Then I should see "New shipment for" within the page title
 
     When I fill in "External ID" with "54321"
-    And I fill in "Ship Date" with "3/6/2016"
+    And I fill in "Ship date" with "3/6/2016"
+    And I fill in "Quantity" with "2"
     And I fill in "Weight" with "1.2"
-    And I fill in "Freight Charge" with "5.65"
-    And I fill in "Handling Charge" with "1.65"
+    And I fill in "Freight charge" with "5.65"
+    And I fill in "Handling charge" with "1.65"
     And I click "Save"
     Then I should see "The shipment was created successfully" within the notification area
     And I should see "Shipment items" within the page title
