@@ -58,8 +58,9 @@
   .col-md-1
     .btn-group-vertical
       =link_to 'Back', orders_path(status: @order.status), class: 'btn btn-primary', title: 'Click here to return to the list of orders.'
-      -if @order.submitted?
+      -if @order.submitted? && @order.physical_delivery?
         =link_to 'Export', export_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to export this order to the fulfillment provider.'
+        =link_to 'Manual Export', manual_export_order_path(@order), method: :patch, class: 'btn btn-default', title: 'Click here to indicate this order has been manually exported.'
 .row
   .col-md-12
     %h2 Items

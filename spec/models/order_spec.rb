@@ -383,10 +383,22 @@ RSpec.describe Order, type: :model do
         expect(order.export).to be true
       end
 
-      it 'changes the status to "exported"' do
+      it 'changes the status to "exporting"' do
         expect do
           order.export
         end.to change(order, :status).to('exporting')
+      end
+    end
+
+    describe '#manual_export' do
+      it 'returns true' do
+        expect(order.manual_export).to be true
+      end
+
+      it 'changes the status to "exported"' do
+        expect do
+          order.manual_export
+        end.to change(order, :status).to('exported')
       end
     end
   end
@@ -400,6 +412,18 @@ RSpec.describe Order, type: :model do
       it 'does not changes the status' do
         expect do
           order.export
+        end.not_to change(order, :status)
+      end
+    end
+
+    describe '#export' do
+      it 'returns false' do
+        expect(order.manual_export).to be false
+      end
+
+      it 'does not changes the status' do
+        expect do
+          order.manual_export
         end.not_to change(order, :status)
       end
     end

@@ -71,6 +71,9 @@ class Order < ActiveRecord::Base
     event :export do
       transitions from: :submitted, to: :exporting
     end
+    event :manual_export do
+      transitions from: :submitted, to: :exported
+    end
     event :complete_export do
       transitions from: :exporting, to: :exported
     end
