@@ -27,6 +27,10 @@ Given /^(#{CLIENT}) submitted an order on (#{DATE})$/ do |client, order_date|
                                        order_date: order_date
 end
 
+Given /^(#{ORDER}) is being processed$/ do |order|
+  expect(order.manual_export!).to be(true) if order.submitted?
+end
+
 Then /^(#{ORDER}) should be marked as (.*)$/ do |order, status|
   expect(order.status).to eq status
 end
