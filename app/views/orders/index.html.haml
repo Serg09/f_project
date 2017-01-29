@@ -47,7 +47,7 @@
             -else
               =link_to order_path(order), class: 'btn btn-xs btn-info view-button', title: 'Click here to view the order details' do
                 %span.glyphicon.glyphicon-eye-open{ 'aria-hidden' => true }
-            -if order.submitted?
+            -if order.submitted? && order.physical_delivery?
               =link_to export_order_path(order), method: :patch, class: 'btn btn-xs btn-warning export-button', title: 'Click here to send this order to the fulfillment provider.', 'data-confirm' => 'Are you sure you want to send this order for fulfillment?' do
                 %span.glyphicon.glyphicon-export{ 'aria-hidden' => true }
               =link_to manual_export_order_path(order), method: :patch, class: 'btn btn-xs btn-default manual-export-button', title: 'Click here to indicate this order has been manually sent to the fulfillment provider.', 'data-confirm' => 'Are you sure you want to mark this order as exported?' do
