@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   resources :clients
   resources :orders do
     resources :order_items, only: [:new, :create], path: 'items'
+    resources :shipments, only: [:index]
     member do
       patch :submit
       patch :export
