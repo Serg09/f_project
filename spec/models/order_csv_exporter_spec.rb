@@ -47,6 +47,7 @@ describe OrderCsvExporter do
   describe '#content' do
     let (:raw_expected_content) do
       <<-EOS
+        SKU,Description,Quantity,Order ID,Line Item No,"",Ship Method,Recipient,Address 1,Address 2,City,State,Postal Code,Country Code,Telephone
         123456,deluxe widget,1,000001,1,,DONKEY,Sally Readerton,1234 Main St,Apt 227,Dallas,TX,75225,US,2145551212
         123456,deluxe widget,2,000002,1,,DONKEY,Sir Billy Bottington Bookworm Esquire and som,4321 Elm St,,Dallas,TX,75201,US,2145554321
         654321,standard widget,1,000002,2,,DONKEY,Sir Billy Bottington Bookworm Esquire and som,4321 Elm St,,Dallas,TX,75201,US,2145554321
