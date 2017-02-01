@@ -32,7 +32,10 @@ RSpec.describe ShipmentsController, type: :controller do
     end
 
     describe 'POST #create' do
-      it 'redirects to the shipment item index page'
+      it 'redirects to the shipment item index page' do
+        post :create, order_id: order, shipment: attributes
+        expect(response).to redirect_to shipment_shipment_items_path(Shipment.last)
+      end
 
       it 'creates a shipment record' do
         expect do

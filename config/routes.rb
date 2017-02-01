@@ -45,5 +45,8 @@ Rails.application.routes.draw do
   resources :order_items, only: [:edit, :update, :destroy]
   resources :products
   resources :payments, only: [:index, :show]
+  resources :shipments, only: [] do
+    resources :shipment_items, only: [:index, :new, :create], path: 'items'
+  end
   root to: 'pages#welcome'
 end

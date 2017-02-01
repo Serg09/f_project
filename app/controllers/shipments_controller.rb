@@ -15,7 +15,7 @@ class ShipmentsController < ApplicationController
   def create
     @shipment = @order.shipments.new shipment_params
     flash[:notice] = 'The shipment was created successfully.' if @shipment.save
-    respond_with @shipment, location: order_shipments_path(@order)
+    respond_with @shipment, location: shipment_shipment_items_path(@shipment)
   end
 
   private
