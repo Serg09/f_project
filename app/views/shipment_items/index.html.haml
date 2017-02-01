@@ -1,0 +1,6 @@
+-content_for :page_title do
+  Shipment items
+
+.row
+  .col-md-6
+    =link_to 'Add', new_shipment_shipment_item_path(@shipment), class: 'btn btn-primary', title: 'Click here to add an item to this shipment.'

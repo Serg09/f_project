@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  get 'shipment_items/index'
+
+  get 'shipment_items/new'
+
   get 'shipments/index'
 
   mount ResqueWeb::Engine => '/resque_web'

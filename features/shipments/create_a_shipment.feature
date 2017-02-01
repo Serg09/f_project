@@ -48,9 +48,11 @@ Feature: Create a shipment
     And I should see "Shipment items" within the page title
 
     When I click "Add" within the main content
-    Then I should see "New shipment item" within the page titled
+    Then I should see "New shipment item" within the page title
 
-    When I select "1 - 123456 - Deluxe Widget" from the "Item" list
+    When I select "1 - 123456 - Deluxe Widget" from the "Order item" list
+    And I fill in "Quantity shipped" with 1
+    And I fill in "External Line No" with 1
     And I click "Save"
     Then I should see "The shipment item was created successfully" within the notification area
     And I should see "Shipment items" within the page title

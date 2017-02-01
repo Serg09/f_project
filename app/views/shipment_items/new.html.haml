@@ -1,0 +1,12 @@
+-content_for :page_title do
+  New shipment item
+
+.row
+  .col-md-6
+    =form_for([@shipment, @shipment_item]) do |f|
+      .form-group
+        =f.label :order_item_id, class: 'control-label'
+        =f.select :order_item_id, order_item_options_for_shipment_item_select(@shipment, @shipment_item), {}, class: 'form-control'
+      .form-group
+        =f.label :shipped_quantity, class: 'control-label'
+        =f.number_field :shipped_quantity, class: 'form-control', min: 1, step: 1
