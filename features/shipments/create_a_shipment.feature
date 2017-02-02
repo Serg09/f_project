@@ -10,8 +10,7 @@ Feature: Create a shipment
       | 123456 | Deluxe Widget |
 
     And there is a client named "ACME Publishing"
-    And client "ACME Publishing" submitted an order on 3/2/2016
-    And order for client "ACME Publishing" on 3/2/2016 has the following items
+    And client "ACME Publishing" submitted an order on 3/2/2016 with the following items
       | SKU    | Quantity |
       | 123456 |        2 |
     And order for client "ACME Publishing" on 3/2/2016 is being processed
@@ -51,11 +50,11 @@ Feature: Create a shipment
     Then I should see "New shipment item" within the page title
 
     When I select "1 - 123456 - Deluxe Widget" from the "Order item" list
-    And I fill in "Quantity shipped" with 1
-    And I fill in "External Line No" with 1
+    And I fill in "Shipped quantity" with "2"
+    And I fill in "External line no" with "1"
     And I click "Save"
-    Then I should see "The shipment item was created successfully" within the notification area
-    And I should see "Shipment items" within the page title
-    And I should see the following shipment items table
-      | Line # | SKU    | Description   | Shipped Qty. |
-      |      1 | 123456 | Deluxe Widget |            2 |
+    Then I should see "The shipment item was created successfully. The order is now fully shipped." within the notification area
+    And I should see "Order" within the page title
+    And I should see the following order items table
+      | Line # | SKU    | Description   | Qty | Unit price | Ext. price |  Tax | Tot. price | Weight | Status  |
+      |      1 | 123456 | Deluxe Widget |   2 |       9.99 |      19.98 | 0.00 |      19.98 |    1.2 | shipped |
