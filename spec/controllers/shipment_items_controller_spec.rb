@@ -10,7 +10,6 @@ RSpec.describe ShipmentItemsController, type: :controller do
     {
       order_item_id: shipment.order.items.first.id,
       external_line_to: 1,
-      sku: '123456',
       shipped_quantity: 1
     }
   end

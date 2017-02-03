@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170106021607) do
+ActiveRecord::Schema.define(version: 20170203000122) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -196,8 +196,6 @@ ActiveRecord::Schema.define(version: 20170106021607) do
     t.integer  "shipment_id",      null: false
     t.integer  "order_item_id",    null: false
     t.integer  "external_line_no", null: false
-    t.string   "sku",              null: false
-    t.decimal  "unit_price"
     t.integer  "shipped_quantity", null: false
     t.string   "cancel_code"
     t.string   "cancel_reason"
@@ -206,7 +204,6 @@ ActiveRecord::Schema.define(version: 20170106021607) do
   end
 
   add_index "shipment_items", ["shipment_id", "order_item_id"], name: "index_shipment_items_on_shipment_id_and_order_item_id", using: :btree
-  add_index "shipment_items", ["sku"], name: "index_shipment_items_on_sku", using: :btree
 
   create_table "shipments", force: :cascade do |t|
     t.integer  "order_id",                               null: false
