@@ -64,12 +64,11 @@ class OrderItem < ActiveRecord::Base
       transitions from: :new, to: :processing
     end
 
-    event :ship_part do
-      transitions from: :processing, to: :partially_shipped
-    end
-
     event :ship do
-      transitions from: [:processing, :partially_shipped], to: :shipped
+      transitions from: [:new, :processing, :partially_shipped],
+        to: :shipped,
+        if: :all_items_shipped?
+      transitions from: [:new, :processing], to: :partially_shipped
     end
 
     event :reject do

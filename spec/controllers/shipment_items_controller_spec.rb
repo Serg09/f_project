@@ -3,16 +3,26 @@ require 'rails_helper'
 RSpec.describe ShipmentItemsController, type: :controller do
   let!(:product) { FactoryGirl.create :product, sku: '123456' }
   let (:order) do
-    FactoryGirl.create :submitted_order, item_attributes: [{sku: '123456'}]
+    FactoryGirl.create :submitted_order,
+      item_attributes: [
+        {
+          sku: '123456',
+          quantity: 2
+        }
+      ]
+  end
+  let (:order_item) do
+    order.items.select{|i| i.sku == product.sku}.first
   end
   let (:shipment) { FactoryGirl.create :shipment, order: order }
   let (:attributes) do
     {
       order_item_id: shipment.order.items.first.id,
-      external_line_to: 1,
-      shipped_quantity: 1
+      external_line_no: 1,
+      shipped_quantity: 2
     }
   end
+  before { order_item.acknowledge! }
 
   context 'for an authenticated user' do
     let (:user) { FactoryGirl.create :user }
@@ -33,10 +43,23 @@ RSpec.describe ShipmentItemsController, type: :controller do
     end
 
     describe 'POST #create' do
-      it 'creates the shipment item record'
+      it 'creates the shipment item record' do
+        expect do
+          post :create, shipment_id: shipment, shipment_item: attributes
+        end.to change(shipment.items, :count).by(1)
+      end
 
       context 'when the order item still has unshipped quantity' do
-        it 'updates the item status to "partially shipped"'
+        let (:partial_attributes) do
+          attributes.merge shipped_quantity: 1
+        end
+
+        it 'updates the item status to "partially shipped"' do
+          expect do
+            post :create, shipment_id: shipment, shipment_item: partial_attributes
+            order_item.reload
+          end.to change(order_item, :status).from('processing').to('partially_shipped')
+        end
       end
 
       context 'when the order item is completely shipped' do

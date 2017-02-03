@@ -19,4 +19,12 @@ class ShipmentItem < ActiveRecord::Base
   has_many :packages
 
   validates_presence_of :shipment_id, :order_item_id, :shipped_quantity
+
+  after_create :update_order_item
+
+  private
+
+  def update_order_item
+    order_item.ship!
+  end
 end
