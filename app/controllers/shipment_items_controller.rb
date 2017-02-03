@@ -14,7 +14,7 @@ class ShipmentItemsController < ApplicationController
   def create
     @shipment_item = @shipment.items.new shipment_params
     flash[:notice] = "The shipment item was created successfully." if @shipment_item.save
-    respond_with @shipment_item, location: shipment_shipment_items_path(@shipment)
+    respond_with @shipment_item, location: create_redirect_path
   end
 
   private
@@ -29,5 +29,13 @@ class ShipmentItemsController < ApplicationController
                                           :external_line_no,
                                           :cancel_code,
                                           :cancel_reason)
+  end
+
+  def create_redirect_path
+    if @shipment.order.shipped?
+      order_path(@shipment.order_id)
+    else
+      shipment_shipment_items_path(@shipment)
+    end
   end
 end

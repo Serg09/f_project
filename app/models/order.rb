@@ -84,7 +84,9 @@ class Order < ActiveRecord::Base
       transitions from: [:processing, :exported], to: :rejected
     end
     event :ship do
-      transitions from: [:exported, :processing], to: :shipped
+      transitions from: [:exported, :processing],
+        to: :shipped,
+        if: :all_items_shipped?
     end
   end
 

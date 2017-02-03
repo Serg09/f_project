@@ -65,6 +65,7 @@ class OrderItem < ActiveRecord::Base
     end
 
     event :ship do
+      after { order.ship! }
       transitions from: [:new, :processing, :partially_shipped],
         to: :shipped,
         if: :all_items_shipped?
