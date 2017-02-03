@@ -105,12 +105,26 @@ RSpec.describe ShipmentItemsController, type: :controller do
       end
 
       context 'when the order item is overshipped' do
-        it 'shows a warning'
+        let (:overshipped_attributes) do
+          attributes.merge shipped_quantity: 3
+        end
+        it 'shows a warning' do
+          post :create, shipment_id: shipment, shipment_item: overshipped_attributes
+          expect(flash[:notice]).to match /more items were shipped than were ordered/
+        end
       end
 
       context 'when there are still unshipped items in the order' do
-        it 'redirects to the shipment items page'
-        it 'updates the order status to "partially shipped"'
+        it 'redirects to the shipment items page' do
+          post :create, shipment_id: shipment, shipment_item: attributes
+          expect(response).to redirect_to shipment_shipment_items_path(shipment)
+        end
+
+        it 'does not change the order status' do
+          post :create, shipment_id: shipment, shipment_item: attributes
+          order.reload
+          expect(order).to be_processing
+        end
       end
     end
   end
@@ -136,9 +150,25 @@ RSpec.describe ShipmentItemsController, type: :controller do
         expect(response).to redirect_to new_user_session_path
       end
 
-      it 'does not create a shipment item record'
-      it 'does not change the status of the order item'
-      it 'does not change the status of the order'
+      it 'does not create a shipment item record' do
+        expect do
+          post :create, shipment_id: shipment, shipment_item: attributes
+        end.not_to change(ShipmentItem, :count)
+      end
+
+      it 'does not change the status of the order item' do
+        expect do
+          post :create, shipment_id: shipment, shipment_item: attributes
+          order_item_1.reload
+        end.not_to change(order_item_1, :status)
+      end
+
+      it 'does not change the status of the order' do
+        expect do
+          post :create, shipment_id: shipment, shipment_item: attributes
+          order.reload
+        end.not_to change(order, :status)
+      end
     end
   end
 end

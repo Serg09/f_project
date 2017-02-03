@@ -103,6 +103,10 @@ class OrderItem < ActiveRecord::Base
     total_shipped_quantity > 0
   end
 
+  def too_many_items_shipped?
+    total_shipped_quantity > quantity
+  end
+
   def extended_price
     return 0 unless unit_price.present? && quantity.present?
     unit_price * quantity

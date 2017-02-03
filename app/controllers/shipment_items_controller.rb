@@ -13,7 +13,7 @@ class ShipmentItemsController < ApplicationController
 
   def create
     @shipment_item = @shipment.items.new shipment_params
-    flash[:notice] = "The shipment item was created successfully." if @shipment_item.save
+    flash[:notice] = create_notification if @shipment_item.save
     respond_with @shipment_item, location: create_redirect_path
   end
 
@@ -36,6 +36,14 @@ class ShipmentItemsController < ApplicationController
       order_path(@shipment.order_id)
     else
       shipment_shipment_items_path(@shipment)
+    end
+  end
+
+  def create_notification
+    if @shipment_item.order_item.too_many_items_shipped?
+      "The shipment item was created successfully, but more items were shipped than were ordered."
+    else
+      "The shipment item was created successfully."
     end
   end
 end

@@ -194,6 +194,7 @@ RSpec.describe OrderItem, type: :model do
                                          order_item: order_item,
                                          shipped_quantity: 1)
     end
+    before { order_item.shipment_items(true) }
   end
 
   shared_context :full_shipment do
@@ -203,6 +204,7 @@ RSpec.describe OrderItem, type: :model do
                                          order_item: order_item,
                                          shipped_quantity: 1)
     end
+    before { order_item.shipment_items(true) }
   end
 
   describe '#total_shipped_quantity' do
