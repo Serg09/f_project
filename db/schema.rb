@@ -86,21 +86,21 @@ ActiveRecord::Schema.define(version: 20170203000122) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "order_id",                                            null: false
-    t.integer  "line_item_no",                                        null: false
-    t.string   "sku",                 limit: 30,                      null: false
-    t.string   "description",         limit: 50
-    t.integer  "quantity",                                            null: false
+    t.integer  "order_id",                                             null: false
+    t.integer  "line_item_no",                                         null: false
+    t.string   "sku",                 limit: 30,                       null: false
+    t.string   "description",         limit: 250
+    t.integer  "quantity",                                             null: false
     t.decimal  "unit_price"
     t.decimal  "discount_percentage"
     t.decimal  "tax"
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
-    t.string   "status",              limit: 30, default: "new",      null: false
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.string   "status",              limit: 30,  default: "new",      null: false
     t.integer  "accepted_quantity"
     t.integer  "shipped_quantity"
     t.decimal  "weight"
-    t.string   "fulfillment_type",    limit: 15, default: "physical", null: false
+    t.string   "fulfillment_type",    limit: 15,  default: "physical", null: false
   end
 
   add_index "order_items", ["order_id", "line_item_no"], name: "index_order_items_on_order_id_and_line_item_no", using: :btree
