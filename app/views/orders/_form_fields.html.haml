@@ -68,6 +68,11 @@
         =f.label :ship_method_id, class: 'control-label'
         =f.select :ship_method_id, options_from_collection_for_select(ShipMethod.all, :id, :description, @order.ship_method_id), {}, class: 'form-control'
         =help_blocks(shipping_address, :ship_method_id)
+      .form-group
+        .checkbox
+          =label_tag :charge_freight do
+            =check_box_tag :charge_freight
+            Charge freight
 =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the order.'
 -if @order.ready_for_submission?
   =link_to 'Submit', submit_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to finalize this order.'

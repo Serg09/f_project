@@ -161,6 +161,10 @@ class Order < ActiveRecord::Base
     freight_charge_item.try(:total_price)
   end
 
+  def clear_freight_charge!
+    freight_charge_item.destroy! if freight_charge_item.present?
+  end
+
   def update_freight_charge!
     freight_charge = calculate_freight_charge
     if freight_charge.present?

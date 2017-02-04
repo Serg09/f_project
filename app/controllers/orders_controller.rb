@@ -51,7 +51,11 @@ class OrdersController < ApplicationController
       end
       if @order.save
         flash[:notice] = 'The order was updated successfully.'
-        @order.update_freight_charge!
+        if params[:charge_freight]
+          @order.update_freight_charge!
+        else
+          @order.clear_freight_charge!
+        end
       end
       respond_with @order, location: orders_path(status: :incipient)
     else
