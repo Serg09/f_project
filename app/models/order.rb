@@ -132,6 +132,13 @@ class Order < ActiveRecord::Base
       map(&:shipped?).all?
   end
 
+  def shippable_quantity
+    items.
+      select(&:physical_delivery?).
+      map(&:quantity).
+      reduce(0){|s, q| s + q}
+  end
+
   def updatable?
     incipient?
   end

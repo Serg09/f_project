@@ -13,7 +13,8 @@ class ShipmentItemsController < ApplicationController
 
   def create
     @shipment_item = @shipment.items.new shipment_params
-    flash[:notice] = create_notification if @shipment_item.save
+    @shipment_item.save
+    set_flash
     respond_with @shipment_item, location: create_redirect_path
   end
 
@@ -39,11 +40,12 @@ class ShipmentItemsController < ApplicationController
     end
   end
 
-  def create_notification
+  def set_flash
+    return unless @shipment_item.persisted?
     if @shipment_item.order_item.too_many_items_shipped?
-      "The shipment item was created successfully, but more items were shipped than were ordered."
+      flash[:warning] = "The shipment item was created successfully, but more items were shipped than were ordered."
     else
-      "The shipment item was created successfully."
+      flash[:notice] = "The shipment item was created successfully."
     end
   end
 end

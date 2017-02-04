@@ -109,6 +109,11 @@ class OrdersController < ApplicationController
     render text: exporter.content, content_type: 'text/csv'
   end
 
+  def ship
+    @order.ship!
+    render :show
+  end
+
   private
 
   def create_order

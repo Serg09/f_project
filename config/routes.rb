@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       patch :submit
       patch :export
       patch :manual_export
+      patch :ship
     end
     collection do
       get :export_csv

@@ -1,6 +1,19 @@
 -content_for :page_title do
-  Shipment items
+  Shipment items for #{h @shipment.order.formatted_id}
 
 .row
   .col-md-6
+    %h3 Order items
+    =render 'orders/summary', order: @shipment.order
+  .col-md-6
+    %h3 Shipment items
+    %table.table.table-striped
+      %tr
+        %th Sku
+        %th Qty
+      -@shipment.items.each do |item|
+        %tr
+          %td= item.order_item.sku
+          %td= item.shipped_quantity
     =link_to 'Add', new_shipment_shipment_item_path(@shipment), class: 'btn btn-primary', title: 'Click here to add an item to this shipment.'
+    =link_to 'Back', order_shipments_path(@shipment.order), class: 'btn btn-default', title: 'Click here to return to the shipments page.'

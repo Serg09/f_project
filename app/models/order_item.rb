@@ -116,6 +116,12 @@ class OrderItem < ActiveRecord::Base
     sku != ShipMethod::FREIGHT_CHARGE_SKU
   end
 
+  Product::FULFILLMENT_TYPES.each do |t|
+    define_method "#{t}_delivery?" do
+      fulfillment_type == t
+    end
+  end
+
   private
 
   def set_defaults
