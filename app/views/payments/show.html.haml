@@ -46,3 +46,6 @@
           #response-content.panel-collapse.collapse
             .panel-body
               %pre= response.content
+  .row
+    .col-md-12
+      =link_to 'Back', order_path(@payment.order), class: 'btn btn-primary', title: 'Click here to return to the order page.'
