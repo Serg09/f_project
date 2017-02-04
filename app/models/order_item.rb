@@ -64,12 +64,12 @@ class OrderItem < ActiveRecord::Base
       transitions from: :new, to: :processing
     end
 
-    event :ship_part do
-      transitions from: :processing, to: :partially_shipped
-    end
-
     event :ship do
-      transitions from: [:processing, :partially_shipped], to: :shipped
+      after { order.ship! }
+      transitions from: [:new, :processing, :partially_shipped],
+        to: :shipped,
+        if: :all_items_shipped?
+      transitions from: [:new, :processing], to: :partially_shipped
     end
 
     event :reject do
@@ -103,6 +103,10 @@ class OrderItem < ActiveRecord::Base
     total_shipped_quantity > 0
   end
 
+  def too_many_items_shipped?
+    total_shipped_quantity > quantity
+  end
+
   def extended_price
     return 0 unless unit_price.present? && quantity.present?
     unit_price * quantity
@@ -110,6 +114,12 @@ class OrderItem < ActiveRecord::Base
 
   def standard_item?
     sku != ShipMethod::FREIGHT_CHARGE_SKU
+  end
+
+  Product::FULFILLMENT_TYPES.each do |t|
+    define_method "#{t}_delivery?" do
+      fulfillment_type == t
+    end
   end
 
   private

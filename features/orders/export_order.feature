@@ -35,5 +35,5 @@ Feature: Export an order
 
   Scenario: A user marks an order as having been manually exported
     When I click the manual export button within the 1st order row
-    Then I should see "The order has been marked as exported." within the notification area
-    And order for client "ACME Publishing" on 3/2/2016 should be marked as exported
+    Then I should see "The order has been manually exported." within the notification area
+    And order for client "ACME Publishing" on 3/2/2016 should be marked as processing

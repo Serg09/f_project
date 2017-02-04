@@ -1,0 +1,27 @@
+-content_for :page_title do
+  Shipments for #{h @order.formatted_id}
+
+.row
+  .col-md-6
+    %h3 Order items
+    =render 'orders/summary', order: @order
+  .col-md-6
+    %h3 Shipments
+    %table#shipment-table.table.table-striped
+      %tr
+        %th Ship date
+        %th External ID
+        %th Quantity
+        %th &nbsp;
+      -@shipments.each do |shipment|
+        %tr
+          %td= format_date(shipment.ship_date)
+          %td= shipment.external_id
+          %td= shipment.quantity
+          %td
+            .btn-group
+              =link_to shipment_shipment_items_path(shipment), class: 'btn btn-xs btn-info edit-button', title: 'Click here to manage items for this shipment.' do
+                %span.glyphicon.glyphicon-list{ 'aria-hidden' => true }
+
+    =link_to 'Add', new_order_shipment_path(@order), class: 'btn btn-primary', title: 'Click here to add a shipment for this order.'
+    =link_to 'Back', order_path(@order), class: 'btn btn-default', title: 'Click here to return to the order details.'

@@ -1,0 +1,15 @@
+%table.table.table-striped
+  %tr
+    %th Line No.
+    %th Sku
+    %th Description
+    %th Qty.
+  -order.items.each do |item|
+    %tr
+      %td= item.line_item_no
+      %td= item.sku
+      %td= item.description
+      %td= item.quantity
+  %tr.summary-row
+    %td.text-right{ colspan: 3 } Total items to be shipped
+    %td= order.shippable_quantity

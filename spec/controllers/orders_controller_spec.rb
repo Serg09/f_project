@@ -239,16 +239,16 @@ RSpec.describe OrdersController, type: :controller do
       end
 
       describe 'PATCH #manual_export' do
-        it 'redirects to the exported order index page' do
+        it 'redirects to the processing order index page' do
           patch :manual_export, id: order
-          expect(response).to redirect_to orders_path(status: :exported)
+          expect(response).to redirect_to orders_path(status: :processing)
         end
 
-        it 'changes the order status to "exported"' do
+        it 'changes the order status to "processing"' do
           expect do
             patch :manual_export, id: order
             order.reload
-          end.to change(order, :status).to('exported')
+          end.to change(order, :status).to('processing')
         end
       end
 

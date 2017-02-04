@@ -6,13 +6,17 @@
         =f.label :customer_name, class: 'control-label'
         =f.text_field :customer_name, class: 'form-control', maxlength: 50, autofocus: true
         =help_blocks(order, :customer_name)
+      .form-group{ class: form_group_class(order, :customer_email) }
+        =f.label :customer_email, class: 'control-label'
+        =f.text_field :customer_email, class: 'form-control', maxlength: 100
+        =help_blocks(order, :customer_email)
       .form-group{ class: form_group_class(order, :telephone) }
         =f.label :telephone, class: 'control-label'
         =f.text_field :telephone, class: 'form-control', maxlength: 25
         =help_blocks(order, :telephone)
       .form-group{ class: form_group_class(order, :delivery_email) }
         =f.label :delivery_email, class: 'control-label'
-        =f.text_field :delivery_email, class: 'form-control', maxlength: 25
+        =f.text_field :delivery_email, class: 'form-control', maxlength: 100
         =help_blocks(order, :delivery_email)
     %fieldset
       %legend Order
@@ -64,6 +68,11 @@
         =f.label :ship_method_id, class: 'control-label'
         =f.select :ship_method_id, options_from_collection_for_select(ShipMethod.all, :id, :description, @order.ship_method_id), {}, class: 'form-control'
         =help_blocks(shipping_address, :ship_method_id)
+      .form-group
+        .checkbox
+          =label_tag :charge_freight do
+            =check_box_tag :charge_freight
+            Charge freight
 =f.submit 'Save', class: 'btn btn-primary', title: 'Click here to save the order.'
 -if @order.ready_for_submission?
   =link_to 'Submit', submit_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to finalize this order.'

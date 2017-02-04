@@ -186,8 +186,14 @@ RSpec.describe Order, type: :model do
   describe '#all_items_shipped?' do
     let (:order) { FactoryGirl.create(:processing_order) }
     let (:item) { order.items.first }
+    let (:shipment) { FactoryGirl.create :shipment, order: order }
     context 'when all items have been shipped' do
-      before { item.acknowledge!; item.ship! }
+      before do
+        item.acknowledge!
+        shipment.items.create order_item_id: item.id,
+          shipped_quantity: item.quantity,
+          external_line_no: 1
+      end
       it 'returns true' do
         expect(order).to be_all_items_shipped
       end
@@ -395,10 +401,10 @@ RSpec.describe Order, type: :model do
         expect(order.manual_export).to be true
       end
 
-      it 'changes the status to "exported"' do
+      it 'changes the status to "processing"' do
         expect do
           order.manual_export
-        end.to change(order, :status).to('exported')
+        end.to change(order, :status).to('processing')
       end
     end
   end

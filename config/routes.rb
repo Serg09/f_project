@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  get 'shipment_items/index'
+
+  get 'shipment_items/new'
+
+  get 'shipments/index'
+
   mount ResqueWeb::Engine => '/resque_web'
   devise_for :users
 
@@ -29,10 +35,12 @@ Rails.application.routes.draw do
   resources :clients
   resources :orders do
     resources :order_items, only: [:new, :create], path: 'items'
+    resources :shipments, only: [:index, :new, :create]
     member do
       patch :submit
       patch :export
       patch :manual_export
+      patch :ship
     end
     collection do
       get :export_csv
@@ -42,5 +50,8 @@ Rails.application.routes.draw do
   resources :order_items, only: [:edit, :update, :destroy]
   resources :products
   resources :payments, only: [:index, :show]
+  resources :shipments, only: [] do
+    resources :shipment_items, only: [:index, :new, :create], path: 'items'
+  end
   root to: 'pages#welcome'
 end

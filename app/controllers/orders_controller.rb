@@ -51,7 +51,11 @@ class OrdersController < ApplicationController
       end
       if @order.save
         flash[:notice] = 'The order was updated successfully.'
-        @order.update_freight_charge!
+        if params[:charge_freight]
+          @order.update_freight_charge!
+        else
+          @order.clear_freight_charge!
+        end
       end
       respond_with @order, location: orders_path(status: :incipient)
     else
@@ -97,7 +101,7 @@ class OrdersController < ApplicationController
 
   def manual_export
     if @order.manual_export!
-      redirect_to orders_path(status: :exported), notice: 'The order has been marked as exported.'
+      redirect_to orders_path(status: @order.status), notice: 'The order has been manually exported.'
     else
       redirect_to order_path(@order), alert: 'The order could not be marked as exported.'
     end
@@ -107,6 +111,11 @@ class OrdersController < ApplicationController
     orders = Order.find(params[:order_ids].split(','))
     exporter = OrderCsvExporter.new(orders)
     render text: exporter.content, content_type: 'text/csv'
+  end
+
+  def ship
+    @order.ship!
+    render :show
   end
 
   private
@@ -146,6 +155,7 @@ class OrdersController < ApplicationController
              :client_order_id,
              :customer_name,
              :customer_email,
+             :delivery_email,
              :telephone,
              :ship_method_id).
       tap do |attr|

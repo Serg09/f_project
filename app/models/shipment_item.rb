@@ -6,8 +6,6 @@
 #  shipment_id      :integer          not null
 #  order_item_id    :integer          not null
 #  external_line_no :integer          not null
-#  sku              :string           not null
-#  unit_price       :decimal(, )
 #  shipped_quantity :integer          not null
 #  cancel_code      :string
 #  cancel_reason    :string
@@ -21,4 +19,12 @@ class ShipmentItem < ActiveRecord::Base
   has_many :packages
 
   validates_presence_of :shipment_id, :order_item_id, :shipped_quantity
+
+  after_create :update_order_item
+
+  private
+
+  def update_order_item
+    order_item.ship!
+  end
 end

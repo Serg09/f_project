@@ -33,6 +33,8 @@ class Order < ActiveRecord::Base
   belongs_to :client
   belongs_to :ship_method
 
+  before_validation :clear_empty_strings
+
   validates_presence_of :client_id,
                         :order_date
   validates_presence_of :delivery_email, if: ->{ submitted? && electronic_delivery? }
@@ -72,7 +74,7 @@ class Order < ActiveRecord::Base
       transitions from: :submitted, to: :exporting
     end
     event :manual_export do
-      transitions from: :submitted, to: :exported
+      transitions from: :submitted, to: :processing
     end
     event :complete_export do
       transitions from: :exporting, to: :exported
@@ -84,8 +86,15 @@ class Order < ActiveRecord::Base
       transitions from: [:processing, :exported], to: :rejected
     end
     event :ship do
-      transitions from: [:exported, :processing], to: :shipped
+      transitions from: [:exported, :processing],
+        to: :shipped,
+        if: :all_items_shipped?
     end
+  end
+
+  def formatted_id
+    return nil unless id
+    "%06d" % id
   end
 
   def total
@@ -125,6 +134,13 @@ class Order < ActiveRecord::Base
       map(&:shipped?).all?
   end
 
+  def shippable_quantity
+    items.
+      select(&:physical_delivery?).
+      map(&:quantity).
+      reduce(0){|s, q| s + q}
+  end
+
   def updatable?
     incipient?
   end
@@ -143,6 +159,10 @@ class Order < ActiveRecord::Base
 
   def freight_charge
     freight_charge_item.try(:total_price)
+  end
+
+  def clear_freight_charge!
+    freight_charge_item.destroy! if freight_charge_item.present?
   end
 
   def update_freight_charge!
@@ -185,6 +205,10 @@ class Order < ActiveRecord::Base
   end
 
   private
+
+  def clear_empty_strings
+    self.client_order_id = nil unless client_order_id.nil? || client_order_id.length > 0
+  end
 
   def physical_delivery_requirements_satisfied?
     return true unless physical_delivery?

@@ -52,5 +52,8 @@
                 %span.glyphicon.glyphicon-export{ 'aria-hidden' => true }
               =link_to manual_export_order_path(order), method: :patch, class: 'btn btn-xs btn-default manual-export-button', title: 'Click here to indicate this order has been manually sent to the fulfillment provider.', 'data-confirm' => 'Are you sure you want to mark this order as exported?' do
                 %span.glyphicon.glyphicon-export{ 'aria-hidden' => true }
+            -if order.exported? || order.processing?
+              =link_to order_shipments_path(order), class: 'btn btn-xs btn-default shipments-button', title: 'Click here to manage shipments for this order' do
+                %span.glyphicon.glyphicon-compressed{ 'aria-hidden' => true }
 =will_paginate @orders, renderer: BootstrapPagination::Rails
 =link_to 'Add', new_order_path, class: 'btn btn-primary', title: 'Click here to create an order'

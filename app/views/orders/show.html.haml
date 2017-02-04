@@ -61,6 +61,9 @@
       -if @order.submitted? && @order.physical_delivery?
         =link_to 'Export', export_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to export this order to the fulfillment provider.'
         =link_to 'Manual Export', manual_export_order_path(@order), method: :patch, class: 'btn btn-default', title: 'Click here to indicate this order has been manually exported.'
+      -if @order.exported? || @order.processing?
+        =link_to 'Shipments', order_shipments_path(@order), class: 'btn btn-default', title: 'Click here to manage shipments for this order.'
+        =link_to 'Shipped', ship_order_path(@order), method: :patch, class: 'btn btn-warning', title: 'Click here to mark this order as having been shipped.'
 .row
   .col-md-12
     %h2 Items
