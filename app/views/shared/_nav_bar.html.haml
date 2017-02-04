@@ -11,9 +11,10 @@
       #menu
         =render_navigation level: 1
       -if show_nav_bar_sign_in_form?
-        %form.navbar-form.navbar-right
+        %form.navbar-form.navbar-right{ action: 'users/sign_in/', method: :post}
+          %input{name: 'authenticity_token', type: :hidden, value: form_authenticity_token}
           .form-group
-            %input.form-control{:placeholder => "Email", :type => "text"}/
+            %input.form-control{name: 'user[email]', placeholder: "Email", type: :text}
           .form-group
-            %input.form-control{:placeholder => "Password", :type => "password"}/
+            %input.form-control{name: 'user[password]', placeholder: "Password", type: "password"}
           %button.btn.btn-success{:type => "submit"} Sign in
