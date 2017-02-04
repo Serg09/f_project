@@ -33,6 +33,8 @@ class Order < ActiveRecord::Base
   belongs_to :client
   belongs_to :ship_method
 
+  before_validation :clear_empty_strings
+
   validates_presence_of :client_id,
                         :order_date
   validates_presence_of :delivery_email, if: ->{ submitted? && electronic_delivery? }
@@ -199,6 +201,10 @@ class Order < ActiveRecord::Base
   end
 
   private
+
+  def clear_empty_strings
+    self.client_order_id = nil unless client_order_id.nil? || client_order_id.length > 0
+  end
 
   def physical_delivery_requirements_satisfied?
     return true unless physical_delivery?
