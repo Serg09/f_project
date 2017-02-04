@@ -151,6 +151,7 @@ class OrdersController < ApplicationController
              :client_order_id,
              :customer_name,
              :customer_email,
+             :delivery_email,
              :telephone,
              :ship_method_id).
       tap do |attr|
